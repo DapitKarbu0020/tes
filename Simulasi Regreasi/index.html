@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Eksperimen Regresi Linear</title>
+<style>
+:root{
+  --blue:#153f8f;--blue2:#2b67c7;--ink:#17304f;--muted:#687a91;--bg:#eef5fb;
+  --card:#fff;--line:#d9e5f1;--yellow:#f6c84c;--red:#de5b63;--green:#2d9b73;
+  --purple:#7a5cc7;--shadow:0 10px 28px rgba(35,69,109,.09);--radius:18px;
+  --gap:14px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg)}
+body{overflow-x:hidden}
+button,select,input{font:inherit}
+button{cursor:pointer}
+img,canvas{max-width:100%}
+.app{width:min(100%,1600px);margin:0 auto;padding:14px}
+
+/* Header */
+.hero{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 18px;background:linear-gradient(135deg,#123d89,#2865c6);border-radius:20px;color:#fff;box-shadow:var(--shadow)}
+.hero>div:first-child{min-width:0}
+.hero h1{font-size:clamp(1.2rem,2.2vw,1.9rem);line-height:1.15;margin:0 0 4px}
+.hero p{margin:0;opacity:.9;font-size:clamp(.78rem,1.4vw,.95rem);line-height:1.4}
+.hero-badge{white-space:nowrap;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);padding:8px 11px;border-radius:999px;font-size:.84rem;font-weight:700}
+
+/* Mode navigation */
+.mode-strip{display:flex;gap:7px;flex-wrap:wrap;padding:10px 0 2px}
+.mode-btn{border:1px solid #cbdced;background:#fff;color:var(--ink);padding:8px 12px;border-radius:999px;white-space:nowrap;font-size:.8rem;font-weight:700;min-height:38px}
+.mode-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* Main laboratory layout */
+.lab{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:var(--gap);align-items:start;margin-top:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.graph-card{padding:13px;min-width:0}
+.graph-head{display:grid;grid-template-columns:minmax(180px,1fr) minmax(420px,auto);gap:12px;align-items:center;margin-bottom:10px}
+.graph-title{min-width:0}
+.graph-title h2{margin:0 0 3px;font-size:1.04rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.graph-title small{color:var(--muted);font-size:.74rem;line-height:1.35}
+.toolbar{display:grid;grid-template-columns:repeat(5,minmax(88px,1fr));gap:6px;min-width:0}
+.btn{border:1px solid #c8d9eb;background:#fff;color:var(--ink);font-weight:700;border-radius:10px;padding:8px 9px;min-height:39px;font-size:.76rem;line-height:1.2}
+.btn:hover{background:#f3f8fd}
+.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn.danger{color:#b54149}
+.btn.active{background:#e8f1ff;border-color:#76a5e8;color:#174c9f}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.canvas-wrap{position:relative;width:100%;height:auto;aspect-ratio:16/10;min-height:0;background:#fff;border:1px solid #d7e3ef;border-radius:14px;overflow:hidden;touch-action:none}
+.canvas-wrap.group-mode{outline:3px solid rgba(122,92,199,.28);outline-offset:-3px}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+.canvas-tip{position:absolute;pointer-events:none;display:none;min-width:145px;max-width:min(200px,70vw);background:#132e4fee;color:#fff;padding:8px 9px;border-radius:9px;font-size:.74rem;line-height:1.4;box-shadow:0 8px 20px rgba(0,0,0,.18);z-index:4}
+.canvas-message{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:none;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-weight:700;box-shadow:var(--shadow);text-align:center;max-width:80%}
+.axis-note{display:grid;grid-template-columns:auto auto minmax(180px,1fr);align-items:center;gap:8px 14px;color:var(--muted);font-size:.74rem;margin-top:8px}
+.axis-note b{color:var(--ink)}
+.pill{justify-self:end;display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:#edf4fb;padding:5px 8px;font-size:.68rem;font-weight:700;min-width:0;max-width:100%}
+.pill span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex:none}
+
+/* Sidebar and cards */
+.sidebar{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;min-width:0}
+.stats,.control-card,.explain-card{padding:12px}
+.stats h3,.control-card h3,.compare-card h3,.explain-card h3{margin:0 0 9px;font-size:.95rem}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.stat{border:1px solid #dce8f3;background:#f9fcff;border-radius:11px;padding:9px;min-width:0}
+.stat span{display:block;color:var(--muted);font-size:.68rem;margin-bottom:3px}
+.stat b{display:block;font-size:.96rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat small{display:block;color:var(--muted);font-size:.63rem;line-height:1.3;margin-top:3px}
+.stat.eq{grid-column:1/-1}
+.meter{height:7px;background:#e6eef7;border-radius:999px;overflow:hidden;margin-top:6px}
+.meter>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#79a4e3,#1c5cb6);transition:width .18s ease}
+.change-box{margin-top:9px;border-top:1px dashed #d6e2ee;padding-top:8px}
+.change-row{display:flex;justify-content:space-between;gap:8px;font-size:.75rem;padding:2px 0}
+.change-row span:first-child{color:var(--muted)}
+.selected-box{margin-top:9px;padding:9px;border-radius:10px;background:#f5f8fc;border:1px solid #dbe7f2;font-size:.74rem;line-height:1.5;overflow-wrap:anywhere}
+.selected-box b{display:block;margin-bottom:3px}
+.selected-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px 8px}
+
+.control-card[data-panel]{transition:.18s}
+.control-card.dimmed{display:none}
+.control-row{margin:10px 0}
+.control-row:last-child{margin-bottom:0}
+.label-line{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:.75rem;font-weight:700;margin-bottom:5px;min-width:0}
+.label-line span{min-width:0}
+.label-line output{color:var(--blue);white-space:nowrap}
+input[type=range]{width:100%;margin:0;accent-color:var(--blue);touch-action:pan-y}
+.range-labels{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:.62rem;margin-top:2px}
+.switch-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.switch{position:relative;width:46px;height:26px;flex:none}
+.switch input{opacity:0;width:0;height:0}
+.slider-toggle{position:absolute;inset:0;background:#cfd9e5;border-radius:999px;transition:.2s}
+.slider-toggle:before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 2px 5px #0002}
+.switch input:checked+.slider-toggle{background:var(--blue)}
+.switch input:checked+.slider-toggle:before{transform:translateX(20px)}
+.preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tiny{border:1px solid #ceddeb;background:#fff;color:var(--ink);padding:8px 7px;border-radius:9px;min-height:38px;font-size:.71rem;line-height:1.2;font-weight:700}
+.tiny:hover{background:#f1f7fd}
+.playback{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.playback select:first-child{grid-column:1/-1}
+.field{width:100%;min-width:0;border:1px solid #cddceb;background:#fff;color:var(--ink);padding:8px 9px;border-radius:9px;min-height:39px;font-size:.75rem}
+.errorbar{height:9px;border-radius:999px;background:#ebf0f5;overflow:hidden;margin-top:7px}
+.errorbar i{display:block;height:100%;background:linear-gradient(90deg,#6b9fda,#de5b63);width:0;transition:width .15s}
+.note{font-size:.68rem;color:var(--muted);line-height:1.4;margin:4px 0 0}
+
+/* Explanation */
+.explain-lead{margin:0 0 9px;color:var(--muted);font-size:.73rem;line-height:1.45}
+.explain-list{display:grid;gap:6px}
+.explain-item{display:grid;grid-template-columns:26px minmax(0,1fr);gap:7px;align-items:start;padding:7px;border:1px solid #dce8f3;background:#f9fcff;border-radius:9px;font-size:.7rem;line-height:1.35}
+.explain-item i{display:grid;place-items:center;width:26px;height:26px;border-radius:7px;background:#e9f2ff;color:var(--blue);font-style:normal;font-weight:800}
+.explain-item b{display:block;margin-bottom:1px}
+.formula-mini{margin-top:8px;padding:8px 9px;border-radius:9px;background:#eef5ff;border:1px dashed #b8cfe9;font-size:.71rem;line-height:1.45}
+.formula-mini strong{color:var(--blue)}
+
+/* Compare */
+.compare-card{margin-top:14px;padding:12px}
+.compare-top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.compare-top>div{min-width:0}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:9px}
+.compare-pane{min-width:0;border:1px solid #dce7f1;border-radius:13px;padding:9px;background:#fbfdff}
+.compare-pane h4{margin:0 0 7px;font-size:.88rem}
+.mini-wrap{width:100%;height:auto;aspect-ratio:16/8;min-height:0;touch-action:none}
+.mini-wrap canvas{border-radius:9px;background:#fff;border:1px solid #e1eaf2}
+.mini-controls{display:grid;grid-template-columns:1fr;gap:5px;margin-top:7px}
+.mini-stats{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;font-size:.69rem}
+.mini-stats span{background:#eef5fc;padding:4px 6px;border-radius:7px}
+.footer-note{text-align:center;color:var(--muted);font-size:.68rem;padding:12px 4px 4px}
+
+/* Medium desktop / tablet landscape */
+@media(max-width:1180px){
+  .app{padding:12px}
+  .lab{grid-template-columns:1fr}
+  .graph-card{position:static}
+  .graph-head{grid-template-columns:1fr}
+  .toolbar{grid-template-columns:repeat(5,minmax(0,1fr));width:100%}
+  .sidebar{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .sidebar>.stats,.sidebar>.explain-card{grid-column:span 1}
+  .canvas-wrap{aspect-ratio:16/9}
+}
+
+/* Tablet portrait */
+@media(max-width:820px){
+  :root{--radius:15px;--gap:10px}
+  .app{padding:9px}
+  .hero{padding:13px 14px;border-radius:16px}
+  .hero-badge{font-size:.73rem;padding:7px 9px}
+  .mode-strip{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-inline:contain;padding:9px 0 3px;scrollbar-width:thin}
+  .mode-btn{flex:0 0 auto}
+  .toolbar{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .toolbar .btn:nth-last-child(-n+2){grid-column:auto}
+  .canvas-wrap{aspect-ratio:4/3}
+  .axis-note{grid-template-columns:1fr 1fr}
+  .pill{grid-column:1/-1;justify-self:stretch;justify-content:center}
+  .sidebar{grid-template-columns:1fr}
+  .compare-grid{grid-template-columns:1fr}
+  .mini-wrap{aspect-ratio:16/9}
+  .compare-top .btn{width:100%}
+}
+
+/* Phones */
+@media(max-width:560px){
+  .app{padding:6px}
+  .hero{padding:12px;border-radius:14px}
+  .hero-badge{display:none}
+  .mode-strip{gap:6px;padding-top:8px}
+  .mode-btn{min-height:36px;padding:7px 10px;font-size:.74rem}
+  .graph-card,.stats,.control-card,.compare-card,.explain-card{padding:9px;border-radius:13px}
+  .graph-head{gap:9px}
+  .graph-title h2{font-size:.96rem;white-space:normal}
+  .graph-title small{font-size:.68rem}
+  .toolbar{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+  .toolbar .btn:last-child{grid-column:1/-1}
+  .btn{min-height:42px;padding:8px;font-size:.72rem}
+  .canvas-wrap{aspect-ratio:1/1;min-height:300px}
+  .axis-note{gap:6px 10px;font-size:.68rem}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat{padding:8px}
+  .stat b{font-size:.9rem}
+  .selected-grid{grid-template-columns:1fr}
+  .preset-grid{grid-template-columns:1fr 1fr}
+  .tiny{min-height:42px;font-size:.7rem}
+  .playback{grid-template-columns:1fr 1fr}
+  .field{min-height:42px}
+  .compare-pane{padding:8px}
+  .mini-wrap{aspect-ratio:4/3}
+}
+
+/* Very small phones */
+@media(max-width:380px){
+  .hero h1{font-size:1.05rem}
+  .hero p{font-size:.72rem}
+  .toolbar{grid-template-columns:1fr 1fr}
+  .btn{font-size:.68rem;padding:7px 6px}
+  .canvas-wrap{min-height:280px}
+  .stat-grid{grid-template-columns:1fr}
+  .stat.eq{grid-column:auto}
+  .preset-grid{grid-template-columns:1fr}
+  .playback{grid-template-columns:1fr}
+  .playback select:first-child{grid-column:auto}
+  .axis-note{grid-template-columns:1fr}
+  .pill{grid-column:auto}
+}
+
+/* Desktop-only sticky graph keeps controls easy to test without overlapping */
+@media(min-width:1181px){
+  .graph-card{position:sticky;top:10px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="hero">
+    <div><h1>Eksperimen Regresi Linear</h1><p>Gerakkan data dan lihat bagaimana model berubah.</p></div>
+    <div class="hero-badge">Laboratorium Data</div>
+  </header>
+
+  <nav class="mode-strip" aria-label="Mode eksperimen">
+    <button class="mode-btn active" data-mode="free">Eksperimen Bebas</button>
+    <button class="mode-btn" data-mode="slope">Kemiringan</button>
+    <button class="mode-btn" data-mode="noise">Sebaran & R²</button>
+    <button class="mode-btn" data-mode="outlier">Outlier</button>
+    <button class="mode-btn" data-mode="residual">Residual</button>
+    <button class="mode-btn" data-mode="intercept">Intercept</button>
+    <button class="mode-btn" data-mode="manual">Garis Manual</button>
+    <button class="mode-btn" data-mode="compare">Bandingkan</button>
+  </nav>
+
+  <main class="lab">
+    <section class="card graph-card">
+      <div class="graph-head">
+        <div class="graph-title"><h2 id="datasetTitle">Jam Belajar vs Nilai</h2><small id="graphHint">Drag titik • klik area kosong untuk menambah data</small></div>
+        <div class="toolbar">
+          <button class="btn" id="addBtn">+ Tambah Data</button>
+          <button class="btn danger" id="deleteBtn">Hapus Data</button>
+          <button class="btn" id="randomBtn">🎲 Acak Data</button>
+          <button class="btn" id="snapshotBtn">Before / After</button>
+          <button class="btn primary" id="resetBtn">↺ Reset</button>
+        </div>
+      </div>
+      <div class="canvas-wrap" id="canvasWrap">
+        <canvas id="plot" aria-label="Scatter plot regresi linear"></canvas>
+        <div class="canvas-tip" id="canvasTip"></div>
+        <div class="canvas-message" id="canvasMessage">Tambahkan minimal 2 titik data.</div>
+      </div>
+      <div class="axis-note"><span>X: <b id="xLabel">Jam Belajar</b></span><span>Y: <b id="yLabel">Nilai</b></span><span class="pill"><i class="dot"></i><span id="modeStatus">Drag satu titik untuk mulai bereksperimen</span></span></div>
+    </section>
+
+    <aside class="sidebar">
+      <section class="card stats">
+        <h3>Model Saat Ini</h3>
+        <div class="stat-grid">
+          <div class="stat eq"><span>Persamaan</span><b id="eqVal">—</b><small>garis yang mengikuti pola data</small></div>
+          <div class="stat"><span>Slope</span><b id="slopeVal">—</b><small id="slopeText">arah garis</small></div>
+          <div class="stat"><span>Intercept</span><b id="interceptVal">—</b><small>posisi vertikal model</small></div>
+          <div class="stat"><span>R²</span><b id="r2Val">—</b><div class="meter"><i id="r2Meter"></i></div></div>
+          <div class="stat"><span>Total Error (SSE)</span><b id="sseVal">—</b><small>lebih kecil = garis lebih dekat</small></div>
+        </div>
+        <div class="change-box">
+          <div style="font-weight:700;font-size:.78rem;margin-bottom:4px">Yang Berubah</div>
+          <div class="change-row"><span>Slope</span><b id="chgSlope">—</b></div>
+          <div class="change-row"><span>R²</span><b id="chgR2">—</b></div>
+          <div class="change-row"><span>Intercept</span><b id="chgInt">—</b></div>
+        </div>
+        <div class="selected-box" id="selectedBox"><b>Data terpilih</b><span>Klik atau sentuh sebuah titik.</span></div>
+      </section>
+
+      <section class="card explain-card">
+        <h3>Apa itu Regresi Linear?</h3>
+        <p class="explain-lead">Regresi linear mencari <b>garis lurus yang paling mewakili pola titik data</b>. Geser satu titik pada grafik dan lihat sendiri bagaimana garis serta angkanya berubah.</p>
+        <div class="explain-list">
+          <div class="explain-item"><i>•</i><div><b>Titik data</b>Setiap titik adalah satu pengamatan yang memiliki nilai X dan Y.</div></div>
+          <div class="explain-item"><i>↗</i><div><b>Slope</b>Menunjukkan arah dan kemiringan garis. Positif = naik, negatif = turun.</div></div>
+          <div class="explain-item"><i>Y</i><div><b>Intercept</b>Perkiraan nilai Y ketika X = 0. Ini menggeser posisi garis ke atas atau ke bawah.</div></div>
+          <div class="explain-item"><i>↕</i><div><b>Residual</b>Jarak vertikal antara titik asli dan nilai yang diprediksi garis.</div></div>
+          <div class="explain-item"><i>R²</i><div><b>R²</b>Menunjukkan seberapa rapat pola titik mengikuti garis. Semakin mendekati 1, pola linear biasanya semakin kuat.</div></div>
+        </div>
+        <div class="formula-mini"><strong>ŷ = intercept + slope × X</strong><br>Garis dipilih agar total error kuadrat (SSE) sekecil mungkin.</div>
+      </section>
+
+      <section class="card control-card" data-panel="dataset">
+        <h3>Data & Tampilan</h3>
+        <div class="control-row"><label class="label-line" for="datasetSelect"><span>Dataset</span></label><select class="field" id="datasetSelect"></select></div>
+        <div class="switch-line"><span><b>Garis Regresi</b><div class="note">Bandingkan pola titik dengan garis.</div></span><label class="switch"><input type="checkbox" id="regToggle" checked><span class="slider-toggle"></span></label></div>
+        <div class="switch-line" style="margin-top:10px"><span><b>Tampilkan Residual</b><div class="note">Lihat jarak data ke prediksi.</div></span><label class="switch"><input type="checkbox" id="residualToggle"><span class="slider-toggle"></span></label></div>
+        <div class="switch-line" style="margin-top:10px"><span><b>Geser Semua Titik</b><div class="note">Aktifkan lalu drag area grafik.</div></span><label class="switch"><input type="checkbox" id="groupToggle"><span class="slider-toggle"></span></label></div>
+      </section>
+
+      <section class="card control-card" data-panel="shape">
+        <h3>Manipulasi Pola</h3>
+        <div class="control-row"><div class="label-line"><span>Kemiringan Pola</span><output id="slopeCtlOut">0</output></div><input id="slopeCtl" type="range" min="-100" max="100" value="0"><div class="range-labels"><span>Negatif</span><span>Datar</span><span>Positif</span></div></div>
+        <div class="control-row"><div class="label-line"><span>Kerapatan Pola</span><output id="densityOut">50%</output></div><input id="densityCtl" type="range" min="0" max="100" value="50"><div class="range-labels"><span>Renggang</span><span>Rapat</span></div></div>
+        <div class="control-row"><div class="label-line"><span>Noise Data</span><output id="noiseOut">0%</output></div><input id="noiseCtl" type="range" min="0" max="100" value="0"><div class="range-labels"><span>0%</span><span>100%</span></div></div>
+        <div class="control-row"><div class="label-line"><span>Putar Pola Data</span><output id="rotateOut">0°</output></div><input id="rotateCtl" type="range" min="-60" max="60" value="0"><div class="range-labels"><span>-60°</span><span>0°</span><span>+60°</span></div></div>
+      </section>
+
+      <section class="card control-card" data-panel="transform">
+        <h3>Geser & Rentangkan</h3>
+        <div class="control-row"><div class="label-line"><span>Geser Semua Data Vertikal</span><output id="shiftYOut">0</output></div><input id="shiftYCtl" type="range" min="-100" max="100" value="0"><div class="range-labels"><span>Turun</span><span>Naik</span></div></div>
+        <div class="control-row"><div class="label-line"><span>Rentangkan Data X</span><output id="scaleXOut">100%</output></div><input id="scaleXCtl" type="range" min="50" max="160" value="100"><div class="range-labels"><span>Sempit</span><span>Lebar</span></div></div>
+        <div class="control-row"><div class="label-line"><span>Rentangkan Data Y</span><output id="scaleYOut">100%</output></div><input id="scaleYCtl" type="range" min="50" max="160" value="100"><div class="range-labels"><span>Sempit</span><span>Lebar</span></div></div>
+      </section>
+
+      <section class="card control-card" data-panel="outlier">
+        <h3>Outlier & Titik Ekstrem</h3>
+        <div class="preset-grid"><button class="tiny" id="addOutlierBtn">+ Tambah Outlier</button><button class="tiny" id="removeOutlierBtn">Hapus Outlier</button></div>
+        <div class="control-row"><div class="label-line"><span>Jauhkan Titik Terpilih</span><output id="extremeOut">0%</output></div><input id="extremeCtl" type="range" min="0" max="100" value="0"><div class="range-labels"><span>Dekat</span><span>Jauh</span></div></div>
+        <div class="selected-box" id="outlierCompare"><b>Sebelum → Sesudah</b><span>Tambahkan atau geser outlier untuk melihat perubahan.</span></div>
+      </section>
+
+      <section class="card control-card" data-panel="count">
+        <h3>Jumlah Data</h3>
+        <div class="control-row"><div class="label-line"><span>Jumlah Titik</span><output id="countOut">8</output></div><input id="countCtl" type="range" min="3" max="30" value="8"><div class="range-labels"><span>3</span><span>30</span></div></div>
+      </section>
+
+      <section class="card control-card" data-panel="generator">
+        <h3>Generator Data</h3>
+        <div class="preset-grid">
+          <button class="tiny preset" data-preset="posStrong">Positif Kuat</button><button class="tiny preset" data-preset="posWeak">Positif Lemah</button>
+          <button class="tiny preset" data-preset="negStrong">Negatif Kuat</button><button class="tiny preset" data-preset="negWeak">Negatif Lemah</button>
+          <button class="tiny preset" data-preset="flat">Hampir Datar</button><button class="tiny preset" data-preset="random">Acak</button>
+          <button class="tiny preset" data-preset="outliers">Banyak Outlier</button><button class="tiny" id="tightenBtn">Rapatkan Data</button>
+        </div>
+      </section>
+
+      <section class="card control-card" data-panel="manual">
+        <h3>Garis Eksperimen</h3>
+        <div class="switch-line"><span><b>Garis Manual</b><div class="note">Drag ujung garis atau gunakan slider.</div></span><label class="switch"><input type="checkbox" id="manualToggle"><span class="slider-toggle"></span></label></div>
+        <div class="control-row"><div class="label-line"><span>Kemiringan Garis</span><output id="manualSlopeOut">0.00</output></div><input id="manualSlopeCtl" type="range" min="-100" max="100" value="0"></div>
+        <div class="control-row"><div class="label-line"><span>Geser Garis</span><output id="manualIntOut">0</output></div><input id="manualIntCtl" type="range" min="-100" max="100" value="0"></div>
+        <div class="preset-grid"><button class="tiny" id="matchRegBtn">Samakan dengan Garis Regresi</button><button class="tiny" id="manualResidualBtn">Residual Manual</button></div>
+        <div class="selected-box"><b>Error Garis</b><div>Manual: <span id="manualSse">—</span></div><div>Regresi: <span id="regSse">—</span></div><div class="errorbar"><i id="manualErrorBar"></i></div></div>
+      </section>
+
+      <section class="card control-card" data-panel="playback">
+        <h3>Playback Eksperimen</h3>
+        <div class="playback">
+          <select class="field" id="playExperiment"><option value="noise">Noise: rendah → tinggi</option><option value="slope">Slope: negatif → positif</option><option value="rotate">Putar: -60° → +60°</option><option value="shift">Intercept: turun → naik</option></select>
+          <button class="btn primary" id="playBtn">▶ Jalankan</button><button class="btn" id="pauseBtn">⏸ Pause</button>
+          <button class="btn" id="playResetBtn">↺ Reset Playback</button><select class="field" id="speedSelect"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <section class="card compare-card" id="compareSection">
+    <div class="compare-top"><div><h3>Bandingkan Dua Eksperimen</h3><div class="note">Drag titik pada masing-masing grafik atau ubah noise secara independen.</div></div><button class="btn" id="copyCompareBtn">Salin Data Utama ke A & B</button></div>
+    <div class="compare-grid">
+      <div class="compare-pane"><h4>Eksperimen A</h4><div class="mini-wrap"><canvas id="compareA"></canvas></div><div class="mini-controls"><div class="label-line"><span>Noise A</span><output id="noiseAOut">0%</output></div><input id="noiseA" type="range" min="0" max="100" value="0"></div><div class="mini-stats"><span id="slopeA">Slope —</span><span id="r2A">R² —</span></div></div>
+      <div class="compare-pane"><h4>Eksperimen B</h4><div class="mini-wrap"><canvas id="compareB"></canvas></div><div class="mini-controls"><div class="label-line"><span>Noise B</span><output id="noiseBOut">35%</output></div><input id="noiseB" type="range" min="0" max="100" value="35"></div><div class="mini-stats"><span id="slopeB">Slope —</span><span id="r2B">R² —</span></div></div>
+    </div>
+  </section>
+  <div class="footer-note">Eksperimen bebas: geser, ubah, tambah, hapus, amati, bandingkan, lalu coba lagi.</div>
+</div>
+<script>
+'use strict';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const fmt=(v,d=2)=>Number.isFinite(v)?Number(v).toFixed(d):'—';
+const clone=pts=>pts.map(p=>({x:+p.x,y:+p.y,id:p.id??cryptoId()}));
+const cryptoId=()=>Math.random().toString(36).slice(2,10);
+
+const datasets=[
+ {name:'Jam Belajar vs Nilai',x:'Jam Belajar',y:'Nilai',xr:[0,10],yr:[35,100],pts:[[1,48],[2,55],[3,57],[4,66],[5,70],[6,79],[7,82],[8,88]]},
+ {name:'Suhu vs Penjualan Es Krim',x:'Suhu (°C)',y:'Penjualan',xr:[18,38],yr:[20,150],pts:[[20,36],[22,43],[24,52],[26,61],[28,77],[30,89],[32,105],[35,125]]},
+ {name:'Biaya Iklan vs Penjualan',x:'Biaya Iklan',y:'Penjualan',xr:[0,20],yr:[20,170],pts:[[2,40],[4,48],[6,64],[8,76],[10,90],[12,105],[15,122],[18,143]]},
+ {name:'Tinggi Badan vs Berat Badan',x:'Tinggi (cm)',y:'Berat (kg)',xr:[140,190],yr:[35,100],pts:[[145,43],[151,47],[157,52],[163,58],[168,61],[174,69],[180,76],[186,82]]},
+ {name:'Latihan vs Waktu Lari',x:'Latihan (jam/minggu)',y:'Waktu Lari (menit)',xr:[0,10],yr:[18,45],pts:[[1,41],[2,38],[3,37],[4,34],[5,32],[6,29],[7,28],[8,25]]},
+ {name:'Data Eksperimen Acak',x:'X',y:'Y',xr:[0,10],yr:[0,100],pts:[[1,15],[2,31],[3,29],[4,48],[5,52],[6,67],[7,63],[8,82]]}
+].map(d=>({...d,pts:d.pts.map(([x,y])=>({x,y,id:cryptoId()}))}));
+
+let dsIndex=0, points=clone(datasets[0].pts), selected=-1, dragging=-1, groupDragging=false;
+let showReg=true, showResidual=false, showBefore=false, beforeSnapshot=null;
+let outlierIds=new Set(), prevStats=null, lastStats=null;
+let manual={enabled:false,m:0,b:65,showResidual:false,drag:null};
+let transformBase=clone(points), playback={active:false,raf:0,start:0,base:null};
+let pointExtremeBase=null;
+
+const canvas=$('#plot'), wrap=$('#canvasWrap'), ctx=canvas.getContext('2d');
+const PAD={l:58,r:24,t:22,b:48};
+
+function currentD(){return datasets[dsIndex]}
+function regression(pts=points){
+ const n=pts.length;
+ if(n<2) return {valid:false,m:0,b:0,r2:0,sse:0,sst:0,pred:()=>0};
+ const mx=pts.reduce((s,p)=>s+p.x,0)/n, my=pts.reduce((s,p)=>s+p.y,0)/n;
+ let num=0,den=0; for(const p of pts){num+=(p.x-mx)*(p.y-my);den+=(p.x-mx)**2}
+ const m=Math.abs(den)<1e-12?0:num/den, b=my-m*mx;
+ let sse=0,sst=0; for(const p of pts){const yh=m*p.x+b;sse+=(p.y-yh)**2;sst+=(p.y-my)**2}
+ const r2=sst<1e-12?(sse<1e-12?1:0):clamp(1-sse/sst,0,1);
+ return {valid:true,m,b,r2,sse,sst,pred:x=>m*x+b};
+}
+function mapX(x,w){const d=currentD();return PAD.l+(x-d.xr[0])/(d.xr[1]-d.xr[0])*(w-PAD.l-PAD.r)}
+function mapY(y,h){const d=currentD();return h-PAD.b-(y-d.yr[0])/(d.yr[1]-d.yr[0])*(h-PAD.t-PAD.b)}
+function invX(px,w){const d=currentD();return d.xr[0]+(px-PAD.l)/(w-PAD.l-PAD.r)*(d.xr[1]-d.xr[0])}
+function invY(py,h){const d=currentD();return d.yr[0]+(h-PAD.b-py)/(h-PAD.t-PAD.b)*(d.yr[1]-d.yr[0])}
+function resizeCanvas(c){const r=c.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);const W=Math.max(1,Math.round(r.width*dpr)),H=Math.max(1,Math.round(r.height*dpr));if(c.width!==W||c.height!==H){c.width=W;c.height=H}const cx=c.getContext('2d');cx.setTransform(dpr,0,0,dpr,0,0);return {w:r.width,h:r.height,cx}}
+function niceTick(v){if(Math.abs(v)>=100)return Math.round(v);if(Math.abs(v)>=10)return Math.round(v);return Number(v.toFixed(1))}
+function drawGrid(cx,w,h){
+ const d=currentD();cx.clearRect(0,0,w,h);cx.fillStyle='#fff';cx.fillRect(0,0,w,h);
+ const minorDiv=20,majorStep=5;
+ cx.fillStyle='#404c5a';cx.font='11px Arial';cx.textAlign='center';cx.textBaseline='top';
+ for(let i=0;i<=minorDiv;i++){
+   const x=PAD.l+(w-PAD.l-PAD.r)*i/minorDiv;
+   const major=i%majorStep===0;
+   cx.strokeStyle=major?'#8f8f8f':'#cfcfcf';
+   cx.lineWidth=major?1.1:0.7;
+   cx.beginPath();cx.moveTo(x,PAD.t);cx.lineTo(x,h-PAD.b);cx.stroke();
+   if(major){
+     cx.beginPath();cx.moveTo(x,h-PAD.b);cx.lineTo(x,h-PAD.b+6);cx.strokeStyle='#000';cx.lineWidth=1;
+     cx.stroke();
+     cx.fillText(niceTick(d.xr[0]+(d.xr[1]-d.xr[0])*i/minorDiv),x,h-PAD.b+9);
+   }
+ }
+ cx.textAlign='right';cx.textBaseline='middle';
+ for(let i=0;i<=minorDiv;i++){
+   const y=h-PAD.b-(h-PAD.t-PAD.b)*i/minorDiv;
+   const major=i%majorStep===0;
+   cx.strokeStyle=major?'#8f8f8f':'#cfcfcf';
+   cx.lineWidth=major?1.1:0.7;
+   cx.beginPath();cx.moveTo(PAD.l,y);cx.lineTo(w-PAD.r,y);cx.stroke();
+   if(major){
+     cx.beginPath();cx.moveTo(PAD.l-6,y);cx.lineTo(PAD.l,y);cx.strokeStyle='#000';cx.lineWidth=1;
+     cx.stroke();
+     cx.fillText(niceTick(d.yr[0]+(d.yr[1]-d.yr[0])*i/minorDiv),PAD.l-8,y);
+   }
+ }
+ cx.strokeStyle='#000';cx.lineWidth=1.5;cx.beginPath();cx.moveTo(PAD.l,PAD.t);cx.lineTo(PAD.l,h-PAD.b);cx.lineTo(w-PAD.r,h-PAD.b);cx.stroke();
+}
+function drawLine(cx,w,h,m,b,color,width=3,dash=[]){const d=currentD(),x1=d.xr[0],x2=d.xr[1];cx.save();cx.strokeStyle=color;cx.lineWidth=width;cx.setLineDash(dash);cx.beginPath();cx.moveTo(mapX(x1,w),mapY(m*x1+b,h));cx.lineTo(mapX(x2,w),mapY(m*x2+b,h));cx.stroke();cx.restore()}
+function draw(){
+ const {w,h,cx}=resizeCanvas(canvas);drawGrid(cx,w,h);const R=regression();
+ $('#canvasMessage').style.display=points.length<2?'block':'none';
+ if(showBefore&&beforeSnapshot?.points?.length){cx.save();cx.globalAlpha=.28;for(const p of beforeSnapshot.points){cx.beginPath();cx.arc(mapX(p.x,w),mapY(p.y,h),6,0,Math.PI*2);cx.fillStyle='#6e7f93';cx.fill()}if(beforeSnapshot.reg.valid)drawLine(cx,w,h,beforeSnapshot.reg.m,beforeSnapshot.reg.b,'#6e7f93',2,[8,7]);cx.restore()}
+ if(R.valid&&showReg)drawLine(cx,w,h,R.m,R.b,'#1f63bd',3.2);
+ if(showResidual&&R.valid){cx.save();cx.strokeStyle='rgba(222,91,99,.75)';cx.lineWidth=2;for(const p of points){cx.beginPath();cx.moveTo(mapX(p.x,w),mapY(p.y,h));cx.lineTo(mapX(p.x,w),mapY(R.pred(p.x),h));cx.stroke()}cx.restore()}
+ if(manual.enabled){drawLine(cx,w,h,manual.m,manual.b,'#7a5cc7',3,[7,5]);if(manual.showResidual){cx.save();cx.strokeStyle='rgba(122,92,199,.55)';cx.lineWidth=1.6;for(const p of points){cx.beginPath();cx.moveTo(mapX(p.x,w),mapY(p.y,h));cx.lineTo(mapX(p.x,w),mapY(manual.m*p.x+manual.b,h));cx.stroke()}cx.restore()}drawManualHandles(cx,w,h)}
+ for(let i=0;i<points.length;i++){const p=points[i],x=mapX(p.x,w),y=mapY(p.y,h);cx.beginPath();cx.arc(x,y,i===selected?9:7,0,Math.PI*2);cx.fillStyle=outlierIds.has(p.id)?'#de5b63':(i===selected?'#f6c84c':'#153f8f');cx.fill();cx.strokeStyle='#fff';cx.lineWidth=2;cx.stroke();if(i===selected){cx.strokeStyle='#153f8f';cx.lineWidth=1.5;cx.beginPath();cx.arc(x,y,12,0,Math.PI*2);cx.stroke()}}
+ updateTipPosition();
+}
+function drawManualHandles(cx,w,h){const d=currentD(),x1=d.xr[0]+(d.xr[1]-d.xr[0])*.08,x2=d.xr[1]-(d.xr[1]-d.xr[0])*.08;for(const x of [x1,x2]){const px=mapX(x,w),py=mapY(manual.m*x+manual.b,h);cx.beginPath();cx.arc(px,py,8,0,Math.PI*2);cx.fillStyle='#7a5cc7';cx.fill();cx.strokeStyle='#fff';cx.lineWidth=2;cx.stroke()}}
+function manualSSE(){return points.reduce((s,p)=>s+(p.y-(manual.m*p.x+manual.b))**2,0)}
+function slopeInterpret(m){if(Math.abs(m)<.02)return 'garis hampir datar';return m>0?'garis naik ke kanan':'garis turun ke kanan'}
+function updateStats(source=''){const R=regression();prevStats=lastStats;lastStats=R.valid?{m:R.m,b:R.b,r2:R.r2,sse:R.sse}:null;
+ if(!R.valid){$('#eqVal').textContent=$('#slopeVal').textContent=$('#interceptVal').textContent=$('#r2Val').textContent=$('#sseVal').textContent='—';$('#r2Meter').style.width='0%';return}
+ $('#eqVal').textContent=`ŷ = ${fmt(R.b,2)} ${R.m>=0?'+':'−'} ${fmt(Math.abs(R.m),2)}x`;$('#slopeVal').textContent=(R.m>=0?'+':'')+fmt(R.m,3);$('#slopeText').textContent=slopeInterpret(R.m);$('#interceptVal').textContent=fmt(R.b,2);$('#r2Val').textContent=fmt(R.r2,3);$('#sseVal').textContent=fmt(R.sse,1);$('#r2Meter').style.width=(R.r2*100)+'%';
+ if(prevStats){$('#chgSlope').textContent=`${fmt(prevStats.m,2)} → ${fmt(R.m,2)}`;$('#chgR2').textContent=`${fmt(prevStats.r2,2)} → ${fmt(R.r2,2)}`;$('#chgInt').textContent=`${fmt(prevStats.b,1)} → ${fmt(R.b,1)}`}
+ $('#regSse').textContent=fmt(R.sse,1);const ms=manualSSE();$('#manualSse').textContent=manual.enabled?fmt(ms,1):'—';const scale=R.sse>0?clamp(ms/(R.sse*6),0,1):0;$('#manualErrorBar').style.width=(scale*100)+'%';
+ if(source)$('#modeStatus').textContent=source;updateSelected();
+}
+function updateAll(source=''){updateStats(source);draw();}
+function updateSelected(){const box=$('#selectedBox');if(selected<0||!points[selected]){box.innerHTML='<b>Data terpilih</b><span>Klik atau sentuh sebuah titik.</span>';$('#canvasTip').style.display='none';return}const p=points[selected],R=regression(),pred=R.valid?R.pred(p.x):0,res=R.valid?p.y-pred:0;box.innerHTML=`<b>Data ${selected+1}</b><div class="selected-grid"><span>X: ${fmt(p.x,2)}</span><span>Y: ${fmt(p.y,2)}</span><span>Prediksi: ${R.valid?fmt(pred,2):'—'}</span><span>Residual: ${R.valid?(res>=0?'+':'')+fmt(res,2):'—'}</span></div>`;const tip=$('#canvasTip');tip.innerHTML=`<b>Data ${selected+1}</b><br>X: ${fmt(p.x,2)}<br>Y: ${fmt(p.y,2)}<br>Prediksi: ${R.valid?fmt(pred,2):'—'}<br>Residual: ${R.valid?(res>=0?'+':'')+fmt(res,2):'—'}`;tip.style.display='block'}
+function updateTipPosition(){if(selected<0||!points[selected])return;const r=canvas.getBoundingClientRect(),p=points[selected];let x=mapX(p.x,r.width)+14,y=mapY(p.y,r.height)-10;const tip=$('#canvasTip');if(x+165>r.width)x-=178;if(y<8)y=8;tip.style.left=x+'px';tip.style.top=y+'px'}
+function hitPoint(px,py,w,h){let best=-1,bd=17;for(let i=0;i<points.length;i++){const d=Math.hypot(px-mapX(points[i].x,w),py-mapY(points[i].y,h));if(d<bd){best=i;bd=d}}return best}
+function hitManualHandle(px,py,w,h){if(!manual.enabled)return null;const d=currentD(),xs=[d.xr[0]+(d.xr[1]-d.xr[0])*.08,d.xr[1]-(d.xr[1]-d.xr[0])*.08];for(let i=0;i<2;i++){const x=xs[i],y=manual.m*x+manual.b;if(Math.hypot(px-mapX(x,w),py-mapY(y,h))<16)return i}return null}
+function pointer(e,c=canvas){const r=c.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top,w:r.width,h:r.height}}
+function snapshot(){beforeSnapshot={points:clone(points),reg:regression()};showBefore=true;$('#snapshotBtn').classList.add('active');$('#snapshotBtn').textContent='Before / After: ON';updateAll('Kondisi sebelum disimpan sebagai lapisan transparan.')}
+function newTransformBase(){transformBase=clone(points)}
+function setDataset(i){dsIndex=i;points=clone(currentD().pts);selected=-1;outlierIds.clear();beforeSnapshot=null;showBefore=false;manual.enabled=false;$('#manualToggle').checked=false;syncControls();newTransformBase();updateLabels();updateAll('Dataset diganti. Semua kontrol siap digunakan.')}
+function updateLabels(){const d=currentD();$('#datasetTitle').textContent=d.name;$('#xLabel').textContent=d.x;$('#yLabel').textContent=d.y}
+function syncControls(){for(const id of ['slopeCtl','noiseCtl','rotateCtl','shiftYCtl','extremeCtl'])$('#'+id).value=0;$('#densityCtl').value=50;$('#scaleXCtl').value=100;$('#scaleYCtl').value=100;$('#countCtl').value=points.length;syncOutputs()}
+function syncOutputs(){$('#slopeCtlOut').textContent=$('#slopeCtl').value;$('#densityOut').textContent=$('#densityCtl').value+'%';$('#noiseOut').textContent=$('#noiseCtl').value+'%';$('#rotateOut').textContent=$('#rotateCtl').value+'°';$('#shiftYOut').textContent=$('#shiftYCtl').value;$('#scaleXOut').textContent=$('#scaleXCtl').value+'%';$('#scaleYOut').textContent=$('#scaleYCtl').value+'%';$('#extremeOut').textContent=$('#extremeCtl').value+'%';$('#countOut').textContent=points.length}
+function reset(){points=clone(currentD().pts);selected=-1;outlierIds.clear();beforeSnapshot=null;showBefore=false;$('#snapshotBtn').classList.remove('active');$('#snapshotBtn').textContent='Before / After';manual={enabled:false,m:0,b:(currentD().yr[0]+currentD().yr[1])/2,showResidual:false,drag:null};$('#manualToggle').checked=false;$('#residualToggle').checked=false;showResidual=false;$('#groupToggle').checked=false;wrap.classList.remove('group-mode');syncControls();newTransformBase();prevStats=null;lastStats=null;updateAll('Data kembali ke kondisi awal.')}
+function addPoint(){const d=currentD(),R=regression();if(points.length>=30)return;const x=d.xr[0]+(d.xr[1]-d.xr[0])*(.18+.64*Math.random()), y=R.valid?clamp(R.pred(x)+(Math.random()-.5)*(d.yr[1]-d.yr[0])*.16,d.yr[0],d.yr[1]):(d.yr[0]+d.yr[1])/2;points.push({x,y,id:cryptoId()});selected=points.length-1;$('#countCtl').value=points.length;newTransformBase();updateAll('Satu data baru ditambahkan.')}
+function deleteSelected(){if(selected<0||!points[selected])return;outlierIds.delete(points[selected].id);points.splice(selected,1);selected=-1;$('#countCtl').value=points.length;newTransformBase();updateAll('Data terpilih dihapus; model dihitung ulang.')}
+function randomize(){generatePreset(['posStrong','posWeak','negStrong','negWeak','flat','random'][Math.floor(Math.random()*6)])}
+function generatePreset(type){const d=currentD(),n=+$('#countCtl').value||8,xr=d.xr[1]-d.xr[0],yr=d.yr[1]-d.yr[0];points=[];outlierIds.clear();let sign=1,noise=.1,slope=.6;if(type==='posWeak'){sign=1;noise=.34;slope=.35}if(type==='negStrong'){sign=-1;noise=.1;slope=.62}if(type==='negWeak'){sign=-1;noise=.36;slope=.35}if(type==='flat'){sign=1;noise=.14;slope=.03}if(type==='random'){sign=0;noise=1;slope=0}if(type==='outliers'){sign=1;noise=.12;slope=.55}
+ for(let i=0;i<n;i++){const x=d.xr[0]+xr*(.06+.88*(i/(Math.max(1,n-1))));let yn;if(type==='random')yn=.15+.7*Math.random();else yn=.5+sign*slope*((x-d.xr[0])/xr-.5)+(Math.random()-.5)*noise;const p={x,y:clamp(d.yr[0]+yr*yn,d.yr[0],d.yr[1]),id:cryptoId()};points.push(p)}
+ if(type==='outliers'&&points.length>4){for(const idx of [1,points.length-2]){points[idx].y=idx===1?d.yr[1]-yr*.03:d.yr[0]+yr*.03;outlierIds.add(points[idx].id)}}selected=-1;newTransformBase();syncControls();updateAll('Pola data baru dibuat untuk dieksplorasi.')}
+function tighten(){const R=regression(),d=currentD();if(!R.valid)return;for(const p of points)p.y=clamp(R.pred(p.x)+(p.y-R.pred(p.x))*.42,d.yr[0],d.yr[1]);newTransformBase();updateAll('Titik dirapatkan ke arah pola model.')}
+function addOutlier(){const d=currentD(),R=regression(),before=R.valid?{m:R.m,r2:R.r2,b:R.b}:null;const x=d.xr[0]+(d.xr[1]-d.xr[0])*.86;let y=R.valid?R.pred(x):(d.yr[0]+d.yr[1])/2;const mid=(d.yr[0]+d.yr[1])/2;y=y>mid?d.yr[0]+(d.yr[1]-d.yr[0])*.06:d.yr[1]-(d.yr[1]-d.yr[0])*.06;const p={x,y,id:cryptoId()};points.push(p);outlierIds.add(p.id);selected=points.length-1;$('#countCtl').value=points.length;newTransformBase();updateAll('Outlier ditambahkan. Amati garis dan R².');const after=regression();if(before&&after.valid)$('#outlierCompare').innerHTML=`<b>Sebelum → Sesudah</b><div>Slope: ${fmt(before.m,2)} → ${fmt(after.m,2)}</div><div>R²: ${fmt(before.r2,2)} → ${fmt(after.r2,2)}</div><div>Intercept: ${fmt(before.b,1)} → ${fmt(after.b,1)}</div>`}
+function removeOutliers(){if(!outlierIds.size)return;points=points.filter(p=>!outlierIds.has(p.id));outlierIds.clear();selected=-1;$('#countCtl').value=points.length;newTransformBase();updateAll('Outlier yang ditandai dihapus.')}
+
+function applyShapeTransform(){
+ const d=currentD(),xr=d.xr[1]-d.xr[0],yr=d.yr[1]-d.yr[0],cx=(d.xr[0]+d.xr[1])/2,cy=(d.yr[0]+d.yr[1])/2;
+ const slopeN=+$('#slopeCtl').value/100,density=+$('#densityCtl').value/100,noise=+$('#noiseCtl').value/100,rot=+$('#rotateCtl').value*Math.PI/180,shift=+$('#shiftYCtl').value/100,scx=+$('#scaleXCtl').value/100,scy=+$('#scaleYCtl').value/100;
+ const source=transformBase.length===points.length?transformBase:clone(points);
+ points=source.map((p,i)=>{let nx=(p.x-cx)/xr,ny=(p.y-cy)/yr;const natural=ny;ny=natural*(1-density*.45)+slopeN*nx*(.9+density*.5);ny+=(Math.sin(i*12.9898+3.1)*43758.5453%1)*noise*.14;nx*=scx;ny*=scy;const rx=nx*Math.cos(rot)-ny*Math.sin(rot), ry=nx*Math.sin(rot)+ny*Math.cos(rot)+shift*.38;return{x:clamp(cx+rx*xr,d.xr[0],d.xr[1]),y:clamp(cy+ry*yr,d.yr[0],d.yr[1]),id:p.id}});
+ updateAll('Pola berubah langsung mengikuti slider.')
+}
+function changeCount(n){const d=currentD(),R=regression(),xr=d.xr[1]-d.xr[0],yr=d.yr[1]-d.yr[0];n=clamp(n,3,30);while(points.length<n){const x=d.xr[0]+xr*(.05+.9*Math.random()),y=R.valid?clamp(R.pred(x)+(Math.random()-.5)*yr*.22,d.yr[0],d.yr[1]):d.yr[0]+Math.random()*yr;points.push({x,y,id:cryptoId()})}while(points.length>n){const p=points.pop();outlierIds.delete(p.id)}selected=-1;newTransformBase();$('#countOut').textContent=points.length;updateAll('Jumlah data diubah; garis dihitung ulang.')}
+
+canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);const q=pointer(e);const mh=hitManualHandle(q.x,q.y,q.w,q.h);if(mh!==null){manual.drag=mh;return}const group=$('#groupToggle').checked;if(group){groupDragging={x:q.x,y:q.y,pts:clone(points)};wrap.classList.add('group-mode');return}const i=hitPoint(q.x,q.y,q.w,q.h);if(i>=0){selected=i;dragging=i;pointExtremeBase={...points[i]};$('#extremeCtl').value=0;syncOutputs();updateAll('Data terpilih. Drag ke arah mana pun.')}else if(points.length<30){const d=currentD(),x=clamp(invX(q.x,q.w),d.xr[0],d.xr[1]),y=clamp(invY(q.y,q.h),d.yr[0],d.yr[1]);points.push({x,y,id:cryptoId()});selected=points.length-1;$('#countCtl').value=points.length;newTransformBase();updateAll('Data baru dibuat dari area grafik.')}});
+canvas.addEventListener('pointermove',e=>{const q=pointer(e),d=currentD();if(manual.drag!==null){const x=clamp(invX(q.x,q.w),d.xr[0],d.xr[1]),y=clamp(invY(q.y,q.h),d.yr[0],d.yr[1]);const xOther=manual.drag===0?d.xr[1]-(d.xr[1]-d.xr[0])*.08:d.xr[0]+(d.xr[1]-d.xr[0])*.08;const yOther=manual.m*xOther+manual.b;const den=x-xOther;if(Math.abs(den)>.0001){manual.m=(y-yOther)/den;manual.b=y-manual.m*x;syncManualControls();updateAll('Garis manual digeser; error berubah real-time.')}return}if(groupDragging){const dx=invX(q.x,q.w)-invX(groupDragging.x,q.w),dy=invY(q.y,q.h)-invY(groupDragging.y,q.h);points=groupDragging.pts.map(p=>({x:clamp(p.x+dx,d.xr[0],d.xr[1]),y:clamp(p.y+dy,d.yr[0],d.yr[1]),id:p.id}));updateAll('Seluruh kelompok data digeser bersama.');return}if(dragging>=0&&points[dragging]){points[dragging].x=clamp(invX(q.x,q.w),d.xr[0],d.xr[1]);points[dragging].y=clamp(invY(q.y,q.h),d.yr[0],d.yr[1]);updateAll('Titik bergerak; model berubah real-time.')}});
+function endPointer(){if(dragging>=0||groupDragging)newTransformBase();dragging=-1;groupDragging=false;manual.drag=null;wrap.classList.toggle('group-mode',$('#groupToggle').checked)}canvas.addEventListener('pointerup',endPointer);canvas.addEventListener('pointercancel',endPointer);
+
+function syncManualControls(){const d=currentD(),yr=d.yr[1]-d.yr[0],xr=d.xr[1]-d.xr[0];$('#manualSlopeCtl').value=clamp(manual.m*xr/yr*100,-100,100);$('#manualIntCtl').value=clamp(((manual.b-(d.yr[0]+d.yr[1])/2)/yr)*200,-100,100);$('#manualSlopeOut').textContent=fmt(manual.m,2);$('#manualIntOut').textContent=fmt(manual.b,1)}
+function setManualFromControls(){const d=currentD(),yr=d.yr[1]-d.yr[0],xr=d.xr[1]-d.xr[0];manual.m=(+$('#manualSlopeCtl').value/100)*(yr/xr);manual.b=(d.yr[0]+d.yr[1])/2+(+$('#manualIntCtl').value/200)*yr;$('#manualSlopeOut').textContent=fmt(manual.m,2);$('#manualIntOut').textContent=fmt(manual.b,1);updateAll('Garis manual berubah; bandingkan total error.')}
+
+$('#addBtn').onclick=addPoint;$('#deleteBtn').onclick=deleteSelected;$('#randomBtn').onclick=randomize;$('#resetBtn').onclick=reset;$('#snapshotBtn').onclick=()=>{if(!beforeSnapshot)snapshot();else{showBefore=!showBefore;$('#snapshotBtn').classList.toggle('active',showBefore);$('#snapshotBtn').textContent=showBefore?'Before / After: ON':'Before / After: OFF';draw()}};
+$('#regToggle').onchange=e=>{showReg=e.target.checked;updateAll(showReg?'Garis regresi ditampilkan.':'Garis regresi disembunyikan.')};$('#residualToggle').onchange=e=>{showResidual=e.target.checked;updateAll(showResidual?'Residual aktif: jarak titik ke model terlihat.':'Residual disembunyikan.')};$('#groupToggle').onchange=e=>{wrap.classList.toggle('group-mode',e.target.checked);$('#modeStatus').textContent=e.target.checked?'Drag area grafik untuk menggeser semua titik':'Drag satu titik untuk memindahkan data'};
+$('#addOutlierBtn').onclick=addOutlier;$('#removeOutlierBtn').onclick=removeOutliers;$('#tightenBtn').onclick=tighten;
+$$('.preset').forEach(b=>b.onclick=()=>generatePreset(b.dataset.preset));
+
+for(const id of ['slopeCtl','densityCtl','noiseCtl','rotateCtl','shiftYCtl','scaleXCtl','scaleYCtl']){$('#'+id).addEventListener('pointerdown',()=>{newTransformBase()});$('#'+id).addEventListener('input',()=>{syncOutputs();applyShapeTransform()})}
+$('#countCtl').oninput=e=>changeCount(+e.target.value);
+$('#extremeCtl').oninput=e=>{if(selected<0||!points[selected])return;if(!pointExtremeBase)pointExtremeBase={...points[selected]};const d=currentD(),t=+e.target.value/100,yr=d.yr[1]-d.yr[0],xr=d.xr[1]-d.xr[0],cx=(d.xr[0]+d.xr[1])/2,cy=(d.yr[0]+d.yr[1])/2,base=pointExtremeBase,dirX=base.x>=cx?1:-1,dirY=base.y>=cy?1:-1;points[selected].x=clamp(base.x+dirX*xr*.18*t,d.xr[0],d.xr[1]);points[selected].y=clamp(base.y+dirY*yr*.45*t,d.yr[0],d.yr[1]);$('#extremeOut').textContent=e.target.value+'%';updateAll('Titik terpilih dijauhkan dari kelompok.')};
+
+$('#manualToggle').onchange=e=>{manual.enabled=e.target.checked;if(manual.enabled){const R=regression(),d=currentD();manual.m=R.valid?R.m*.6:0;manual.b=R.valid?R.b:(d.yr[0]+d.yr[1])/2;syncManualControls()}updateAll(manual.enabled?'Garis manual aktif. Drag ujung garis atau gunakan slider.':'Garis manual dinonaktifkan.')};$('#manualSlopeCtl').oninput=setManualFromControls;$('#manualIntCtl').oninput=setManualFromControls;$('#manualResidualBtn').onclick=()=>{manual.showResidual=!manual.showResidual;$('#manualResidualBtn').classList.toggle('active',manual.showResidual);updateAll(manual.showResidual?'Residual terhadap garis manual ditampilkan.':'Residual manual disembunyikan.')};$('#matchRegBtn').onclick=()=>{const R=regression();if(!R.valid)return;manual.enabled=true;$('#manualToggle').checked=true;const sm=manual.m,sb=manual.b,start=performance.now(),dur=500;function anim(t){const k=Math.min(1,(t-start)/dur),e=1-(1-k)**3;manual.m=sm+(R.m-sm)*e;manual.b=sb+(R.b-sb)*e;syncManualControls();updateAll('Garis manual bergerak menuju garis regresi.');if(k<1)requestAnimationFrame(anim)}requestAnimationFrame(anim)};
+
+function initDatasets(){datasets.forEach((d,i)=>{const o=document.createElement('option');o.value=i;o.textContent=d.name;$('#datasetSelect').appendChild(o)});$('#datasetSelect').onchange=e=>setDataset(+e.target.value)}
+
+function setMode(mode){$$('.mode-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));const show=(panels)=>$$('.control-card[data-panel]').forEach(c=>c.classList.toggle('dimmed',mode!=='free'&&!panels.includes(c.dataset.panel)));
+ if(mode==='free')show([]);if(mode==='slope')show(['shape','playback','dataset']);if(mode==='noise')show(['shape','count','playback','dataset']);if(mode==='outlier')show(['outlier','dataset']);if(mode==='residual'){show(['dataset','shape']);$('#residualToggle').checked=true;showResidual=true;updateAll('Residual aktif. Geser titik dan lihat garis residual berubah.')}if(mode==='intercept')show(['transform','playback','dataset']);if(mode==='manual'){show(['manual','dataset']);if(!manual.enabled){manual.enabled=true;$('#manualToggle').checked=true;const R=regression();manual.m=R.valid?R.m*.5:0;manual.b=R.valid?R.b:0;syncManualControls();updateAll('Garis manual aktif untuk eksplorasi error.')}}if(mode==='compare'){show(['dataset']);$('#compareSection').scrollIntoView({behavior:'smooth',block:'start'})}}
+$$('.mode-btn').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+
+function playbackValue(progress){return .5-.5*Math.cos(progress*Math.PI)}
+function stopPlayback(){playback.active=false;if(playback.raf)cancelAnimationFrame(playback.raf);playback.raf=0}
+$('#playBtn').onclick=()=>{if(playback.active)return;stopPlayback();playback.active=true;playback.start=performance.now();playback.base=clone(points);newTransformBase();const kind=$('#playExperiment').value,speed=+$('#speedSelect').value;function step(t){if(!playback.active)return;const p=((t-playback.start)*speed/4200)%1,k=playbackValue(p);if(kind==='noise'){$('#noiseCtl').value=Math.round(k*100)}if(kind==='slope'){$('#slopeCtl').value=Math.round(-100+k*200)}if(kind==='rotate'){$('#rotateCtl').value=Math.round(-60+k*120)}if(kind==='shift'){$('#shiftYCtl').value=Math.round(-100+k*200)}syncOutputs();applyShapeTransform();playback.raf=requestAnimationFrame(step)}playback.raf=requestAnimationFrame(step)};$('#pauseBtn').onclick=()=>{stopPlayback();$('#modeStatus').textContent='Playback dijeda.'};$('#playResetBtn').onclick=()=>{stopPlayback();if(playback.base){points=clone(playback.base);newTransformBase();syncControls();updateAll('Kondisi sebelum playback dikembalikan.')}};
+
+// Dua grafik perbandingan
+const compare={A:{canvas:$('#compareA'),pts:clone(points),base:clone(points),drag:-1},B:{canvas:$('#compareB'),pts:clone(points),base:clone(points),drag:-1}};
+function miniMapX(x,w){const d=currentD();return 34+(x-d.xr[0])/(d.xr[1]-d.xr[0])*(w-46)}function miniMapY(y,h){const d=currentD();return h-28-(y-d.yr[0])/(d.yr[1]-d.yr[0])*(h-40)}function miniInvX(px,w){const d=currentD();return d.xr[0]+(px-34)/(w-46)*(d.xr[1]-d.xr[0])}function miniInvY(py,h){const d=currentD();return d.yr[0]+(h-28-py)/(h-40)*(d.yr[1]-d.yr[0])}
+function drawMini(key){const obj=compare[key],{w,h,cx}=resizeCanvas(obj.canvas),R=regression(obj.pts);cx.clearRect(0,0,w,h);cx.fillStyle='#fff';cx.fillRect(0,0,w,h);const minorDiv=20,majorStep=5;for(let i=0;i<=minorDiv;i++){const x=34+(w-46)*i/minorDiv;const major=i%majorStep===0;cx.strokeStyle=major?'#919191':'#d0d0d0';cx.lineWidth=major?1.05:0.65;cx.beginPath();cx.moveTo(x,12);cx.lineTo(x,h-28);cx.stroke()}for(let i=0;i<=minorDiv;i++){const y=12+(h-40)*i/minorDiv;const major=i%majorStep===0;cx.strokeStyle=major?'#919191':'#d0d0d0';cx.lineWidth=major?1.05:0.65;cx.beginPath();cx.moveTo(34,y);cx.lineTo(w-12,y);cx.stroke()}cx.strokeStyle='#000';cx.lineWidth=1.2;cx.beginPath();cx.moveTo(34,12);cx.lineTo(34,h-28);cx.lineTo(w-12,h-28);cx.stroke();if(R.valid){const d=currentD();cx.strokeStyle='#2b67c7';cx.lineWidth=2.3;cx.beginPath();cx.moveTo(miniMapX(d.xr[0],w),miniMapY(R.pred(d.xr[0]),h));cx.lineTo(miniMapX(d.xr[1],w),miniMapY(R.pred(d.xr[1]),h));cx.stroke()}for(const p of obj.pts){cx.beginPath();cx.arc(miniMapX(p.x,w),miniMapY(p.y,h),5.5,0,Math.PI*2);cx.fillStyle='#153f8f';cx.fill();cx.strokeStyle='#fff';cx.lineWidth=1.5;cx.stroke()}$('#slope'+key).textContent='Slope '+(R.valid?fmt(R.m,2):'—');$('#r2'+key).textContent='R² '+(R.valid?fmt(R.r2,2):'—')}
+function setCompareNoise(key,val){const obj=compare[key],d=currentD(),yr=d.yr[1]-d.yr[0],R=regression(obj.base);obj.pts=obj.base.map((p,i)=>({x:p.x,y:clamp((R.valid?R.pred(p.x):p.y)+(p.y-(R.valid?R.pred(p.x):p.y))+(Math.sin(i*17.23+val)*.5+.5-.5)*yr*(val/100)*.5,d.yr[0],d.yr[1]),id:p.id}));drawMini(key)}
+function attachMini(key){const obj=compare[key],c=obj.canvas;c.addEventListener('pointerdown',e=>{c.setPointerCapture(e.pointerId);const r=c.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;let best=-1,bd=15;obj.pts.forEach((p,i)=>{const dist=Math.hypot(x-miniMapX(p.x,r.width),y-miniMapY(p.y,r.height));if(dist<bd){best=i;bd=dist}});obj.drag=best});c.addEventListener('pointermove',e=>{if(obj.drag<0)return;const r=c.getBoundingClientRect(),d=currentD();obj.pts[obj.drag].x=clamp(miniInvX(e.clientX-r.left,r.width),d.xr[0],d.xr[1]);obj.pts[obj.drag].y=clamp(miniInvY(e.clientY-r.top,r.height),d.yr[0],d.yr[1]);drawMini(key)});c.addEventListener('pointerup',()=>{obj.drag=-1;obj.base=clone(obj.pts)});c.addEventListener('pointercancel',()=>{obj.drag=-1})}
+$('#noiseA').oninput=e=>{$('#noiseAOut').textContent=e.target.value+'%';setCompareNoise('A',+e.target.value)};$('#noiseB').oninput=e=>{$('#noiseBOut').textContent=e.target.value+'%';setCompareNoise('B',+e.target.value)};$('#copyCompareBtn').onclick=()=>{compare.A.pts=clone(points);compare.B.pts=clone(points);compare.A.base=clone(points);compare.B.base=clone(points);$('#noiseA').value=0;$('#noiseB').value=35;$('#noiseAOut').textContent='0%';$('#noiseBOut').textContent='35%';drawMini('A');setCompareNoise('B',35)};
+
+window.addEventListener('resize',()=>{draw();drawMini('A');drawMini('B')});
+initDatasets();attachMini('A');attachMini('B');updateLabels();syncControls();manual.b=(currentD().yr[0]+currentD().yr[1])/2;updateAll('Drag satu titik untuk mulai bereksperimen.');compare.A.pts=clone(points);compare.A.base=clone(points);compare.B.pts=clone(points);compare.B.base=clone(points);drawMini('A');setCompareNoise('B',35);
+</script>
+</body>
+</html>
