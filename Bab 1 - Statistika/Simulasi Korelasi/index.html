@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Simulasi Korelasi</title>
+<style>
+:root{--blue:#174b9b;--blue2:#2a68c7;--ink:#18304d;--muted:#66788d;--bg:#eef5fb;--card:#fff;--line:#d7e4ef;--red:#b7424b;--green:#16765a}
+*{box-sizing:border-box}html,body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg)}button,input{font:inherit}.app{width:min(100%,1500px);margin:auto;padding:12px}.hero{background:linear-gradient(135deg,#133f8d,#2865c6);color:#fff;border-radius:18px;padding:15px 18px;margin-bottom:10px}.hero h1{margin:0;font-size:clamp(1.25rem,2.3vw,1.85rem)}.hero p{margin:5px 0 0;font-size:.86rem;opacity:.9}.layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(320px,.65fr);gap:12px;align-items:start}.card{background:#fff;border:1px solid var(--line);border-radius:16px}.graph-card{padding:12px;min-width:0}.graph-head{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}.graph-head h2{font-size:1rem;margin:0}.graph-head small{display:block;color:var(--muted);margin-top:4px}.actions{display:flex;gap:6px;flex-wrap:wrap}.btn{border:1px solid #cbdbea;background:#fff;color:var(--ink);border-radius:9px;padding:8px 10px;font-weight:700;font-size:.74rem;cursor:pointer}.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}.canvas-wrap{position:relative;aspect-ratio:16/9;min-height:400px}.canvas-wrap canvas{width:100%;height:100%;display:block;border:1px solid #cddbea;border-radius:12px;background:#fff;touch-action:none}.tip{position:absolute;display:none;pointer-events:none;background:rgba(15,42,70,.94);color:#fff;padding:8px 10px;border-radius:9px;font-size:.73rem;line-height:1.45;max-width:180px}.axis-note{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:.72rem;margin-top:7px}.sidebar{display:grid;gap:9px;min-width:0}.acc{overflow:hidden}.acc-head{width:100%;border:0;background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:space-between;text-align:left;padding:12px 13px;cursor:pointer}.acc-head strong{font-size:.96rem}.acc-head small{display:block;color:var(--muted);font-weight:400;margin-top:2px}.chev{width:28px;height:28px;border-radius:8px;background:#edf5ff;display:grid;place-items:center;color:var(--blue2);font-weight:900}.acc.open .chev{transform:rotate(180deg)}.acc-body{display:none;padding:0 12px 12px;border-top:1px solid #edf2f7}.acc.open .acc-body{display:block}.tools{display:flex;gap:6px;justify-content:flex-end}.tools .btn{font-size:.7rem;padding:7px 9px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.stat{border:1px solid #d8e6f3;border-radius:11px;background:#f9fcff;padding:10px}.stat.wide{grid-column:1/-1}.stat span{display:block;color:var(--muted);font-size:.69rem}.stat b{display:block;font-size:1.03rem;margin-top:4px}.stat small{display:block;color:var(--muted);font-size:.66rem;margin-top:3px;line-height:1.35}.meter{height:8px;background:#e4edf6;border-radius:999px;overflow:hidden;margin-top:7px}.meter i{display:block;height:100%;background:var(--blue);width:0}.positive{color:#1168b3}.negative{color:#b33a3a}.none{color:#66788b}.warn{padding:9px 10px;border-radius:10px;background:#fff6e7;border:1px solid #eed6a7;font-size:.72rem;line-height:1.45;margin-top:10px;display:none}.preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.preset{border:1px solid #ccdceb;background:#fff;border-radius:10px;padding:9px 8px;font-size:.73rem;font-weight:700;cursor:pointer}.preset:hover{background:#f1f6fb}.table-wrap{overflow:auto;max-height:355px;border:1px solid #d9e5ef;border-radius:10px;margin-top:10px}table{width:100%;border-collapse:collapse;font-size:.74rem;min-width:390px}th,td{border-bottom:1px solid #e4ecf3;padding:7px 8px;text-align:center}th{position:sticky;top:0;background:#f1f6fb;z-index:1}td input{width:82px;max-width:100%;padding:6px;border:1px solid #cbd9e6;border-radius:7px;text-align:center;font-size:16px}.calc-table{min-width:540px}.sum-row{font-weight:800;background:#f7fafc}.explain{display:grid;gap:7px;margin-top:10px}.ex-item{border:1px solid #d9e6f2;border-radius:10px;background:#fbfdff;padding:9px;font-size:.73rem;line-height:1.45}.ex-item b{display:block;margin-bottom:2px}.formula{margin-top:9px;padding:9px 10px;border-radius:10px;background:#eef5ff;border:1px dashed #b8cfe9;font-size:.72rem;line-height:1.5}.book-scale{display:grid;grid-template-columns:1.1fr 1fr;gap:0;font-size:.7rem;margin-top:9px;border:1px solid #dce6ef;border-radius:9px;overflow:hidden}.book-scale div{padding:6px 7px;border-bottom:1px solid #e7edf3}.book-scale div:nth-last-child(-n+2){border-bottom:0}.selected{margin-top:9px;padding:9px;border:1px solid #d7e4ef;border-radius:10px;background:#f8fbfe;font-size:.72rem;line-height:1.5}.selected b{display:block;margin-bottom:3px}.footer{color:var(--muted);font-size:.67rem;text-align:center;padding:10px 2px}
+@media(max-width:1050px){.layout{grid-template-columns:1fr}.sidebar{grid-template-columns:1fr 1fr}.sidebar .tools{grid-column:1/-1}.acc.table-panel{grid-column:1/-1}}
+@media(max-width:720px){.app{padding:7px}.layout{gap:8px}.graph-card{padding:8px}.canvas-wrap{aspect-ratio:4/3;min-height:320px}.sidebar{grid-template-columns:1fr}.sidebar .tools,.acc.table-panel{grid-column:auto}.actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.btn{min-height:42px}.stats{grid-template-columns:1fr 1fr}.preset-grid{grid-template-columns:1fr}}
+@media(max-width:420px){.stats{grid-template-columns:1fr}.stat.wide{grid-column:auto}.canvas-wrap{aspect-ratio:1/1;min-height:290px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="hero"><h1>Simulasi Korelasi</h1><p>Ubah data X–Y dan amati arah, kekuatan hubungan, nilai r, dan r².</p></header>
+<main class="layout">
+<section class="card graph-card">
+  <div class="graph-head"><div><h2>Nilai Matematika vs Nilai Fisika</h2><small>Drag titik pada grafik atau edit nilai pada tabel.</small></div><div class="actions"><button class="btn" id="addBtn">+ Tambah Data</button><button class="btn" id="deleteBtn">Hapus Terpilih</button><button class="btn primary" id="resetBtn">↺ Reset</button></div></div>
+  <div class="canvas-wrap"><canvas id="chart" aria-label="Diagram pencar korelasi Pearson"></canvas><div class="tip" id="tip"></div></div>
+  <div class="axis-note"><span>X: <b>Nilai Matematika</b></span><span>Y: <b>Nilai Fisika</b></span><span>Garis biru membantu melihat kecenderungan linear</span></div>
+</section>
+<aside class="sidebar">
+  <div class="tools"><button class="btn" id="openAllBtn">Buka Semua</button><button class="btn" id="closeAllBtn">Tutup Semua</button></div>
+  <section class="card acc open" data-acc>
+    <button class="acc-head" type="button"><span><strong>Hasil Korelasi</strong><small>r, arah, kekuatan, dan r²</small></span><span class="chev">⌄</span></button>
+    <div class="acc-body">
+      <div class="stats">
+        <div class="stat"><span>Koefisien korelasi (r)</span><b id="rVal">—</b><small>−1 ≤ r ≤ 1</small></div>
+        <div class="stat"><span>Koefisien determinasi (r²)</span><b id="r2Val">—</b><small id="r2Pct">—</small></div>
+        <div class="stat"><span>Arah hubungan</span><b id="dirVal">—</b></div>
+        <div class="stat"><span>Kekuatan hubungan</span><b id="strengthVal">—</b><div class="meter"><i id="strengthMeter"></i></div></div>
+      </div>
+      <div class="warn" id="corrWarn"></div>
+      <div class="selected" id="selectedBox"><b>Data terpilih</b>Klik atau sentuh satu titik pada grafik.</div>
+    </div>
+  </section>
+
+  <section class="card acc open" data-acc>
+    <button class="acc-head" type="button"><span><strong>Pola Cepat</strong><small>Contoh arah dan kekuatan seperti pada materi</small></span><span class="chev">⌄</span></button>
+    <div class="acc-body"><div class="preset-grid">
+      <button class="preset" data-preset="posStrong">Positif Sangat Kuat</button><button class="preset" data-preset="posWeak">Positif Lemah</button>
+      <button class="preset" data-preset="negStrong">Negatif Sangat Kuat</button><button class="preset" data-preset="negWeak">Negatif Lemah</button>
+      <button class="preset" data-preset="none">Tidak Berkorelasi</button><button class="preset" data-preset="book">Data Contoh Buku</button>
+    </div></div>
+  </section>
+
+  <section class="card acc" data-acc>
+    <button class="acc-head" type="button"><span><strong>Keterangan Grafik, Tabel, dan Data</strong><small>Hubungan antarbagian simulasi</small></span><span class="chev">⌄</span></button>
+    <div class="acc-body"><div class="explain">
+      <div class="ex-item"><b>Tabel → Grafik</b>Setiap pasangan X dan Y menjadi satu titik pada diagram pencar.</div>
+      <div class="ex-item"><b>Tanda r → arah</b>r positif berarti titik cenderung naik; r negatif berarti titik cenderung turun.</div>
+      <div class="ex-item"><b>|r| → kekuatan</b>Semakin dekat |r| ke 1, hubungan linear semakin kuat. Semakin dekat ke 0, hubungan linear semakin lemah.</div>
+      <div class="ex-item"><b>r² → variasi yang dijelaskan model linear</b>r² menyatakan proporsi variasi Y yang dapat dijelaskan oleh model linear yang menggunakan X. Ini bukan bukti bahwa X menyebabkan Y.</div>
+      <div class="ex-item"><b>Korelasi ≠ sebab-akibat</b>Dua variabel dapat berkorelasi tanpa salah satunya menjadi penyebab langsung variabel lain.</div>
+    </div>
+    <div class="book-scale"><div><b>|r|</b></div><div><b>Kekuatan</b></div><div>0,00</div><div>Tidak ada hubungan</div><div>0,01–0,09</div><div>Kurang berarti</div><div>0,10–0,29</div><div>Lemah</div><div>0,30–0,49</div><div>Moderat</div><div>0,50–0,69</div><div>Kuat</div><div>0,70–0,89</div><div>Sangat kuat</div><div>&gt; 0,90</div><div>Mendekati sempurna</div></div>
+    </div>
+  </section>
+
+  <section class="card acc table-panel" data-acc>
+    <button class="acc-head" type="button"><span><strong>Tabel Data</strong><small>Edit nilai X dan Y</small></span><span class="chev">⌄</span></button>
+    <div class="acc-body"><div class="table-wrap"><table><thead><tr><th>No.</th><th>X</th><th>Y</th></tr></thead><tbody id="dataBody"></tbody></table></div></div>
+  </section>
+
+  <section class="card acc table-panel" data-acc>
+    <button class="acc-head" type="button"><span><strong>Tabel Perhitungan Korelasi</strong><small>x², y², xy, dan jumlah</small></span><span class="chev">⌄</span></button>
+    <div class="acc-body"><div class="table-wrap"><table class="calc-table"><thead><tr><th>No.</th><th>x</th><th>y</th><th>x²</th><th>y²</th><th>xy</th></tr></thead><tbody id="calcBody"></tbody></table></div><div class="formula" id="formulaBox">—</div></div>
+  </section>
+</aside>
+</main>
+<div class="footer">Simulasi Korelasi • diagram pencar • Pearson r • arah • kekuatan • r²</div>
+</div>
+<script>
+(()=>{
+'use strict';
+const initial=[
+ {x:60,y:80},{x:45,y:69},{x:50,y:71},{x:60,y:85},{x:50,y:80},{x:65,y:82},
+ {x:60,y:89},{x:65,y:93},{x:50,y:76},{x:65,y:86},{x:45,y:71},{x:50,y:69}
+];
+let pts=initial.map(p=>({...p})),selected=-1,drag=-1;
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)],canvas=$('#chart'),tip=$('#tip');
+const PAD={l:54,r:20,t:20,b:44},bounds={xmin:40,xmax:70,ymin:60,ymax:100};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const fmt=(v,d=3)=>Number.isFinite(v)?v.toLocaleString('id-ID',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
+function correlation(){
+ const n=pts.length;if(n<2)return{valid:false,reason:'Tambahkan minimal dua pasangan data.'};
+ let sx=0,sy=0,sx2=0,sy2=0,sxy=0;for(const p of pts){sx+=p.x;sy+=p.y;sx2+=p.x*p.x;sy2+=p.y*p.y;sxy+=p.x*p.y}
+ const dx=n*sx2-sx*sx,dy=n*sy2-sy*sy;
+ if(dx<1e-12||dy<1e-12)return{valid:false,reason:'Koefisien korelasi Pearson tidak dapat dihitung karena salah satu variabel tidak memiliki variasi.',n,sx,sy,sx2,sy2,sxy};
+ const num=n*sxy-sx*sy,den=Math.sqrt(dx*dy),r=clamp(num/den,-1,1),mx=sx/n,my=sy/n;let cov=0,varx=0;for(const p of pts){cov+=(p.x-mx)*(p.y-my);varx+=(p.x-mx)**2}const m=cov/varx,b=my-m*mx;return{valid:true,n,sx,sy,sx2,sy2,sxy,r,r2:r*r,m,b};
+}
+function strength(absr){const rr=Math.round(absr*100)/100;if(rr===0)return'Tidak ada hubungan';if(rr<=.09)return'Kurang berarti';if(rr<=.29)return'Lemah';if(rr<=.49)return'Moderat';if(rr<=.69)return'Kuat';if(rr<=.89)return'Sangat kuat';return'Mendekati sempurna'}
+function direction(r){if(Math.abs(r)<.005)return'Tidak ada kecenderungan linear';return r>0?'Positif':'Negatif'}
+function resize(){const r=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.max(1,Math.round(r.width*dpr));canvas.height=Math.max(1,Math.round(r.height*dpr));const c=canvas.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);return{c,w:r.width,h:r.height}}
+function mapX(x,w){return PAD.l+(x-bounds.xmin)/(bounds.xmax-bounds.xmin)*(w-PAD.l-PAD.r)}function mapY(y,h){return h-PAD.b-(y-bounds.ymin)/(bounds.ymax-bounds.ymin)*(h-PAD.t-PAD.b)}function invX(px,w){return bounds.xmin+(px-PAD.l)/(w-PAD.l-PAD.r)*(bounds.xmax-bounds.xmin)}function invY(py,h){return bounds.ymin+(h-PAD.b-py)/(h-PAD.t-PAD.b)*(bounds.ymax-bounds.ymin)}
+function draw(){const{c,w,h}=resize();c.clearRect(0,0,w,h);c.fillStyle='#fff';c.fillRect(0,0,w,h);const nx=12,ny=16;for(let i=0;i<=nx;i++){const x=PAD.l+(w-PAD.l-PAD.r)*i/nx,major=i%3===0;c.strokeStyle=major?'#9b9b9b':'#d5d5d5';c.lineWidth=major?1.05:.65;c.beginPath();c.moveTo(x,PAD.t);c.lineTo(x,h-PAD.b);c.stroke();if(major){const v=bounds.xmin+(bounds.xmax-bounds.xmin)*i/nx;c.fillStyle='#44546a';c.font='11px Arial';c.textAlign='center';c.textBaseline='top';c.fillText(Math.round(v),x,h-PAD.b+8)}}for(let i=0;i<=ny;i++){const y=PAD.t+(h-PAD.t-PAD.b)*i/ny,major=i%4===0;c.strokeStyle=major?'#9b9b9b':'#d5d5d5';c.lineWidth=major?1.05:.65;c.beginPath();c.moveTo(PAD.l,y);c.lineTo(w-PAD.r,y);c.stroke();if(major){const v=bounds.ymax-(bounds.ymax-bounds.ymin)*i/ny;c.fillStyle='#44546a';c.font='11px Arial';c.textAlign='right';c.textBaseline='middle';c.fillText(Math.round(v),PAD.l-8,y)}}c.strokeStyle='#111';c.lineWidth=1.5;c.beginPath();c.moveTo(PAD.l,PAD.t);c.lineTo(PAD.l,h-PAD.b);c.lineTo(w-PAD.r,h-PAD.b);c.stroke();const R=correlation();if(R.valid){c.save();c.beginPath();c.rect(PAD.l,PAD.t,w-PAD.l-PAD.r,h-PAD.t-PAD.b);c.clip();c.strokeStyle='#2a68c7';c.lineWidth=2.5;c.beginPath();c.moveTo(mapX(bounds.xmin,w),mapY(R.m*bounds.xmin+R.b,h));c.lineTo(mapX(bounds.xmax,w),mapY(R.m*bounds.xmax+R.b,h));c.stroke();c.restore()}pts.forEach((p,i)=>{c.beginPath();c.arc(mapX(p.x,w),mapY(p.y,h),i===selected?7.5:5.8,0,Math.PI*2);c.fillStyle=i===selected?'#f1bc3d':'#174b9b';c.fill();c.strokeStyle='#fff';c.lineWidth=1.7;c.stroke();if(i===selected){c.strokeStyle='#174b9b';c.lineWidth=1.3;c.beginPath();c.arc(mapX(p.x,w),mapY(p.y,h),10,0,Math.PI*2);c.stroke()}})}
+function renderTable(){const body=$('#dataBody');body.innerHTML='';pts.forEach((p,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${i+1}</td><td><input inputmode="decimal" data-i="${i}" data-k="x" value="${p.x.toFixed(0)}"></td><td><input inputmode="decimal" data-i="${i}" data-k="y" value="${p.y.toFixed(0)}"></td>`;body.appendChild(tr)});body.querySelectorAll('input').forEach(inp=>inp.addEventListener('change',e=>{const i=+e.target.dataset.i,k=e.target.dataset.k,v=parseFloat(e.target.value);if(!Number.isFinite(v)){e.target.value=pts[i][k];return}pts[i][k]=clamp(v,k==='x'?bounds.xmin:bounds.ymin,k==='x'?bounds.xmax:bounds.ymax);update(false)}))}
+function renderCalc(){const R=correlation(),body=$('#calcBody');body.innerHTML='';pts.forEach((p,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${i+1}</td><td>${fmt(p.x,0)}</td><td>${fmt(p.y,0)}</td><td>${fmt(p.x*p.x,0)}</td><td>${fmt(p.y*p.y,0)}</td><td>${fmt(p.x*p.y,0)}</td>`;body.appendChild(tr)});let sx=pts.reduce((s,p)=>s+p.x,0),sy=pts.reduce((s,p)=>s+p.y,0),sx2=pts.reduce((s,p)=>s+p.x*p.x,0),sy2=pts.reduce((s,p)=>s+p.y*p.y,0),sxy=pts.reduce((s,p)=>s+p.x*p.y,0);const tr=document.createElement('tr');tr.className='sum-row';tr.innerHTML=`<td>Σ</td><td>${fmt(sx,0)}</td><td>${fmt(sy,0)}</td><td>${fmt(sx2,0)}</td><td>${fmt(sy2,0)}</td><td>${fmt(sxy,0)}</td>`;body.appendChild(tr);$('#formulaBox').innerHTML=R.valid?`n = ${R.n}, Σx = ${fmt(R.sx,0)}, Σy = ${fmt(R.sy,0)}, Σx² = ${fmt(R.sx2,0)}, Σy² = ${fmt(R.sy2,0)}, Σxy = ${fmt(R.sxy,0)}<br><b>r = ${fmt(R.r,3)}</b>`:R.reason}
+function updateStats(){const R=correlation(),warn=$('#corrWarn');if(!R.valid){$('#rVal').textContent=$('#r2Val').textContent=$('#dirVal').textContent=$('#strengthVal').textContent='—';$('#r2Pct').textContent='—';$('#strengthMeter').style.width='0%';warn.textContent=R.reason;warn.style.display='block';return}warn.style.display='none';const ar=Math.abs(R.r),str=strength(ar),dir=direction(R.r);$('#rVal').textContent=fmt(R.r,3);$('#r2Val').textContent=fmt(R.r2,3);$('#r2Pct').textContent=`≈ ${fmt(R.r2*100,1)}% variasi Y dijelaskan model linear`;$('#dirVal').textContent=dir;$('#dirVal').className=dir==='Positif'?'positive':dir==='Negatif'?'negative':'none';$('#strengthVal').textContent=str;$('#strengthMeter').style.width=(ar*100)+'%'}
+function updateSelected(){if(selected<0||!pts[selected]){$('#selectedBox').innerHTML='<b>Data terpilih</b>Klik atau sentuh satu titik pada grafik.';tip.style.display='none';return}const p=pts[selected];$('#selectedBox').innerHTML=`<b>Data ${selected+1}</b>X = ${fmt(p.x,1)} • Y = ${fmt(p.y,1)}`}
+function update(table=true){draw();updateStats();updateSelected();renderCalc();if(table)renderTable()}
+function pos(e){const r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top,w:r.width,h:r.height}}
+canvas.addEventListener('pointerdown',e=>{const q=pos(e);let best=-1,bd=18;pts.forEach((p,i)=>{const d=Math.hypot(q.x-mapX(p.x,q.w),q.y-mapY(p.y,q.h));if(d<bd){best=i;bd=d}});if(best>=0){selected=drag=best;canvas.setPointerCapture(e.pointerId);updateSelected();draw()}});canvas.addEventListener('pointermove',e=>{if(drag<0)return;const q=pos(e);pts[drag].x=clamp(invX(q.x,q.w),bounds.xmin,bounds.xmax);pts[drag].y=clamp(invY(q.y,q.h),bounds.ymin,bounds.ymax);update(false);const R=correlation(),p=pts[drag];tip.innerHTML=`<b>Data ${drag+1}</b><br>X: ${fmt(p.x,1)}<br>Y: ${fmt(p.y,1)}${R.valid?`<br>r: ${fmt(R.r,3)}`:''}`;tip.style.display='block';tip.style.left=Math.min(q.x+14,q.w-160)+'px';tip.style.top=Math.max(8,q.y-72)+'px'});canvas.addEventListener('pointerup',()=>{drag=-1;renderTable();tip.style.display='none'});canvas.addEventListener('pointercancel',()=>{drag=-1;tip.style.display='none'});
+const presets={
+ posStrong:[65,76,62,72,81,74,90,81,77,91,89,91],
+ posWeak:[68,62,83,78,79,92,82,79,90,68,94,64],
+ negStrong:[80,94,90,87,79,82,87,72,72,71,72,66],
+ negWeak:[84,75,77,85,63,65,64,80,86,64,82,67],
+ none:[91,68,73,68,86,79,81,84,89,65,85,73]
+};
+function makePreset(type){if(type==='book'){pts=initial.map(p=>({...p}))}else{const xs=[44,46,48,50,52,54,56,58,60,62,64,66],ys=presets[type];pts=xs.map((x,i)=>({x,y:ys[i]}))}selected=-1;update(true)}
+$$('[data-preset]').forEach(b=>b.addEventListener('click',()=>makePreset(b.dataset.preset)));$('#resetBtn').addEventListener('click',()=>makePreset('book'));$('#addBtn').addEventListener('click',()=>{if(pts.length>=30)return;pts.push({x:55,y:80});selected=pts.length-1;update(true)});$('#deleteBtn').addEventListener('click',()=>{if(selected<0||pts.length<=2)return;pts.splice(selected,1);selected=-1;update(true)});
+$$('[data-acc] .acc-head').forEach(h=>h.addEventListener('click',()=>h.parentElement.classList.toggle('open')));$('#openAllBtn').addEventListener('click',()=>$$('[data-acc]').forEach(a=>a.classList.add('open')));$('#closeAllBtn').addEventListener('click',()=>$$('[data-acc]').forEach(a=>a.classList.remove('open')));
+window.addEventListener('resize',draw);renderTable();update(false);
+})();
+</script>
+</body>
+</html>
