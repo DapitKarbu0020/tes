@@ -1,2335 +1,607 @@
 <!doctype html>
 <html lang="id">
-
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#17395f">
-  <meta name="description"
-    content="Eksperimen korelasi Pearson, diagram pencar, dan koefisien determinasi untuk Matematika kelas XII.">
-  <title>Simulasi Korelasi</title>
-  <style>
-    :root {
-      --navy: #17395f;
-      --ink: #233c50;
-      --muted: #607582;
-      --teal: #087f82;
-      --teal-dark: #07696c;
-      --teal-soft: #eaf7f5;
-      --orange: #c16a3e;
-      --orange-soft: #fff3e9;
-      --line: #d5e3eb;
-      --paper: #fff;
-      --blue: #17395f
-    }
-
-    * {
-      box-sizing: border-box
-    }
-
-    html {
-      color-scheme: light;
-      scroll-behavior: smooth;
-      scroll-padding: 16px
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      min-height: 100dvh;
-      background-color: #edf2f1;
-      background-image: url("bahan/bg.png"), radial-gradient(ellipse at 4% 5%, #dcefeb 0, transparent 45%), radial-gradient(ellipse at 98% 85%, #f8e9dc 0, transparent 40%);
-      background-position: center;
-      background-size: cover;
-      background-attachment: fixed;
-      color: var(--ink);
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 14px;
-      line-height: 1.5
-    }
-
-    button,
-    input,
-    select {
-      font: inherit;
-      font-family: Arial, Helvetica, sans-serif
-    }
-
-    button,
-    select,
-    summary {
-      cursor: pointer
-    }
-
-    button {
-      touch-action: manipulation
-    }
-
-    button:disabled {
-      opacity: .4;
-      cursor: default
-    }
-
-    button:focus-visible,
-    input:focus-visible,
-    select:focus-visible,
-    summary:focus-visible,
-    a:focus-visible {
-      outline: 3px solid #5b9bd2;
-      outline-offset: 3px
-    }
-
-    button,
-    input,
-    select,
-    summary {
-      -webkit-tap-highlight-color: transparent
-    }
-
-    [hidden] {
-      display: none !important
-    }
-
-    .app {
-      width: min(1480px, calc(100% - 32px));
-      margin: 18px auto;
-      border: 3px solid #8fb7d7;
-      border-radius: 20px;
-      overflow: clip;
-      background: #f5f8f7;
-      box-shadow: 0 15px 45px #17395f12;
-      min-width: 0
-    }
-
-    .brand-header {
-      background: linear-gradient(180deg, #17395f, #102f52);
-      border-bottom: 6px solid #2f9be8;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      min-height: 90px;
-      padding: 12px 24px;
-      color: #fff;
-      box-sizing: border-box;
-      flex: 0 0 auto
-    }
-
-    .brand-logo-wrap,
-    .interactive-logo-wrap {
-      position: relative;
-      width: 56px;
-      height: 56px;
-      border-radius: 12px;
-      overflow: hidden;
-      flex: 0 0 auto;
-      background: linear-gradient(135deg, #20b8ef, #075687);
-      border: 3px solid #fff;
-      box-shadow: 0 0 0 2px #ffffff2e, 0 3px 8px #0004;
-      display: grid;
-      place-items: center
-    }
-
-    .interactive-logo-wrap {
-      margin-left: auto;
-      background: #fff
-    }
-
-    .brand-logo,
-    .interactive-logo {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      z-index: 1
-    }
-
-    .logo-fallback {
-      width: 29px;
-      height: 29px;
-      display: block
-    }
-
-    .interactive-logo-wrap .logo-fallback {
-      color: var(--teal)
-    }
-
-    .brand-title {
-      flex: 1 1 auto;
-      min-width: 0;
-      margin: 0;
-      font-size: clamp(28px, 3vw, 42px);
-      font-weight: 900;
-      line-height: 1.05;
-      letter-spacing: 0;
-      color: #fff;
-      text-shadow: 0 3px 0 #0007
-    }
-
-    .workspace {
-      padding: 19px 20px 22px;
-      min-width: 0
-    }
-
-    .intro {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 16px;
-      flex-wrap: wrap
-    }
-
-    .breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      color: var(--muted);
-      font-size: 12px
-    }
-
-    .breadcrumb b {
-      color: var(--navy);
-      font-weight: 600
-    }
-
-    .breadcrumb .sep {
-      color: #a5b9bf
-    }
-
-    .explore-note {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--muted);
-      font-size: 12px
-    }
-
-    .explore-note:before {
-      content: "";
-      width: 6px;
-      height: 6px;
-      background: var(--teal);
-      border-radius: 50%
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 340px;
-      grid-template-areas: "plot controls" "plot inspector";
-      grid-template-rows: auto 1fr;
-      gap: 15px;
-      align-items: start
-    }
-
-    .card {
-      min-width: 0;
-      background: var(--paper);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      overflow: hidden
-    }
-
-    .graph-card {
-      grid-area: plot;
-      padding: 17px
-    }
-
-    .control-panel {
-      grid-area: controls;
-      padding: 18px
-    }
-
-    .info-panel {
-      grid-area: inspector
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 18px;
-      min-width: 0
-    }
-
-    .metric {
-      padding: 15px 16px 13px;
-      border: 1px solid #c8e5e1;
-      border-radius: 12px;
-      min-width: 0;
-      background: var(--teal-soft)
-    }
-
-    .metric.determ {
-      background: var(--orange-soft);
-      border-color: #efd9c5
-    }
-
-    .metric-top {
-      display: flex;
-      gap: 7px;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      min-height: 21px;
-      font-size: 11px;
-      color: #486d72;
-      font-weight: 600
-    }
-
-    .determ .metric-top {
-      color: #815b41
-    }
-
-    .metric-top span:first-child {
-      letter-spacing: .15px
-    }
-
-    .direction {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 10px;
-      font-weight: 700;
-      background: #fff9;
-      border: 1px solid #c6e4df;
-      color: var(--teal);
-      padding: 2px 7px;
-      border-radius: 20px;
-      white-space: nowrap
-    }
-
-    .direction.negative {
-      color: #a54f2b;
-      background: #fff7f0;
-      border-color: #e9cbb8
-    }
-
-    .direction.neutral {
-      color: #586d7c;
-      border-color: #d3e0e8;
-      background: #f7fafb
-    }
-
-    .metric-main {
-      display: flex;
-      align-items: baseline;
-      gap: 9px;
-      margin: 5px 0 2px;
-      flex-wrap: wrap
-    }
-
-    .r-number,
-    .percent-number {
-      display: block;
-      font-size: 36px;
-      font-weight: 700;
-      line-height: 1.17;
-      letter-spacing: -1px;
-      color: var(--teal);
-      font-variant-numeric: tabular-nums
-    }
-
-    .r-number.long-value {
-      font-size: 27px
-    }
-
-    .percent-number {
-      color: #a55730;
-      font-size: 35px
-    }
-
-    .r2-decimal {
-      font-size: 11px;
-      color: #946c50;
-      white-space: nowrap
-    }
-
-    .strength {
-      display: block;
-      font-size: 12px;
-      color: #315e63;
-      font-weight: 600;
-      min-height: 18px;
-      margin-top: 3px
-    }
-
-    .determ .strength {
-      color: #815b41;
-      font-weight: 400
-    }
-
-    .scale {
-      margin-top: 10px
-    }
-
-    .scale-track {
-      position: relative;
-      height: 5px;
-      margin: 0 6px;
-      background: #cddfdf;
-      border-radius: 9px
-    }
-
-    .scale-track:before {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: -3px;
-      width: 1px;
-      height: 11px;
-      background: #7d9f9f
-    }
-
-    .scale-fill {
-      position: absolute;
-      top: 0;
-      height: 5px;
-      border-radius: 9px;
-      background: var(--teal)
-    }
-
-    .scale-dot {
-      position: absolute;
-      top: 50%;
-      width: 11px;
-      height: 11px;
-      border: 2px solid #fff;
-      border-radius: 50%;
-      background: var(--teal);
-      box-shadow: 0 0 0 1px #8eb8b6;
-      transform: translate(-50%, -50%)
-    }
-
-    .scale-labels {
-      display: flex;
-      justify-content: space-between;
-      color: #647f81;
-      font-size: 10px;
-      margin-top: 7px
-    }
-
-    .variance-bar {
-      height: 6px;
-      border-radius: 10px;
-      display: flex;
-      overflow: hidden;
-      background: #e4d4c7;
-      margin-top: 10px
-    }
-
-    .variance-bar i {
-      display: block;
-      height: 100%;
-      background: var(--orange);
-      width: 0
-    }
-
-    .variance-legend {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      margin-top: 7px;
-      color: #8a6954;
-      font-size: 10px;
-      font-variant-numeric: tabular-nums
-    }
-
-    .plot-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      flex-wrap: wrap;
-      padding: 0 2px 5px;
-      color: var(--muted);
-      font-size: 11px
-    }
-
-    .plot-title {
-      font-size: 13px;
-      color: var(--ink);
-      font-weight: 600
-    }
-
-    .source-pill {
-      padding: 3px 8px;
-      border-radius: 7px;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: .1px;
-      background: #eef4f8;
-      color: #4b6d89
-    }
-
-    .source-pill.synthetic {
-      background: #fff0e6;
-      color: #a05730
-    }
-
-    .chart-wrap {
-      position: relative;
-      height: clamp(350px, 32vw, 470px);
-      touch-action: pan-y;
-      isolation: isolate
-    }
-
-    canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-      pointer-events: none
-    }
-
-    .point {
-      position: absolute;
-      z-index: 1;
-      width: 34px;
-      height: 34px;
-      transform: translate(-50%, -50%);
-      padding: 0;
-      border: 0;
-      border-radius: 50%;
-      background: transparent;
-      touch-action: none;
-      cursor: grab
-    }
-
-    .point:before {
-      content: "";
-      display: block;
-      width: 13px;
-      height: 13px;
-      margin: auto;
-      border: 2px solid #fff;
-      border-radius: 50%;
-      background: var(--teal);
-      box-shadow: 0 0 0 1px #07696c22
-    }
-
-    .point:hover:before {
-      box-shadow: 0 0 0 5px #087f821c
-    }
-
-    .point.is-selected {
-      z-index: 2
-    }
-
-    .point.is-selected:before {
-      background: var(--orange);
-      box-shadow: 0 0 0 5px #c16a3e25, 0 0 0 6px #c16a3e80
-    }
-
-    .point.is-dragging {
-      cursor: grabbing
-    }
-
-    .point:focus-visible {
-      outline-offset: -1px
-    }
-
-    .plot-bottom {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      flex-wrap: wrap;
-      padding: 11px 2px 12px;
-      border-top: 1px solid #e4edf0;
-      font-size: 11px;
-      color: var(--muted)
-    }
-
-    .legend {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-      flex-wrap: wrap
-    }
-
-    .dot-key,
-    .line-key {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px
-    }
-
-    .dot-key:before {
-      content: "";
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--teal)
-    }
-
-    .line-key:before {
-      content: "";
-      width: 17px;
-      height: 2px;
-      background: var(--orange)
-    }
-
-    .line-equation {
-      font-size: 11px;
-      color: #986343;
-      font-variant-numeric: tabular-nums
-    }
-
-    .graph-toggles {
-      display: flex;
-      gap: 14px;
-      align-items: center;
-      flex-wrap: wrap;
-      margin: 0 0 14px;
-      padding: 10px 11px;
-      border: 1px solid #e1eaee;
-      border-radius: 9px;
-      background: #f8fbfc
-    }
-
-    .switch {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      color: #54717e;
-      font-size: 11px;
-      cursor: pointer;
-      min-height: 22px
-    }
-
-    .switch input {
-      accent-color: var(--teal);
-      width: 15px;
-      height: 15px;
-      margin: 0;
-      cursor: pointer
-    }
-
-    .selection {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 11px;
-      flex-wrap: wrap;
-      min-height: 66px;
-      border: 1px solid #d3e4e8;
-      border-radius: 11px;
-      padding: 10px 12px;
-      background: #f5fafb
-    }
-
-    .selection-label {
-      color: var(--muted);
-      font-size: 12px;
-      flex: 1;
-      min-width: 140px;
-      line-height: 1.5
-    }
-
-    .selection-label strong {
-      display: block;
-      color: var(--ink);
-      font-size: 12px
-    }
-
-    .selection-controls {
-      display: flex;
-      gap: 7px;
-      align-items: center;
-      flex-wrap: wrap
-    }
-
-    .number-field {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-      color: var(--muted);
-      font-size: 12px
-    }
-
-    .number-field input {
-      width: 64px;
-      height: 37px;
-      border: 1px solid #c8dce3;
-      border-radius: 7px;
-      background: #fff;
-      padding: 5px 7px;
-      font-size: 16px;
-      color: var(--ink);
-      text-align: center
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      min-height: 42px;
-      border: 1px solid #ccdde5;
-      border-radius: 9px;
-      padding: 8px 11px;
-      font-size: 12px;
-      line-height: 1.4;
-      font-weight: 600;
-      background: #fff;
-      color: var(--navy);
-      white-space: nowrap
-    }
-
-    .btn:hover:enabled {
-      background: #eff6f8;
-      border-color: #a2c4cf
-    }
-
-    .btn.primary {
-      background: var(--teal);
-      border-color: var(--teal);
-      color: #fff
-    }
-
-    .btn.primary:hover:enabled {
-      background: var(--teal-dark)
-    }
-
-    .btn.delete {
-      min-height: 37px;
-      padding: 7px 9px;
-      border-color: #ecd7ca;
-      color: #aa5836;
-      font-size: 11px
-    }
-
-    .btn.icon {
-      padding: 8px;
-      width: 42px
-    }
-
-    .btn.icon svg {
-      width: 17px;
-      height: 17px
-    }
-
-    .insight {
-      display: flex;
-      gap: 8px;
-      margin: 12px 0 0;
-      color: #566f7b;
-      font-size: 12px;
-      line-height: 1.65
-    }
-
-    .insight:before {
-      content: attr(data-icon);
-      flex: none;
-      color: var(--teal);
-      font-size: 17px;
-      line-height: 1.3
-    }
-
-    .insight[data-icon="↘"]:before {
-      color: var(--orange)
-    }
-
-    .warning {
-      margin: 12px 0 0;
-      padding: 10px 12px;
-      border: 1px solid #ead6c4;
-      border-radius: 9px;
-      background: #fff6ec;
-      color: #845b37;
-      font-size: 12px
-    }
-
-    .panel-heading {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 15px
-    }
-
-    .panel-icon {
-      width: 30px;
-      height: 30px;
-      border-radius: 9px;
-      background: var(--teal-soft);
-      color: var(--teal);
-      display: grid;
-      place-items: center;
-      flex: none
-    }
-
-    .panel-icon svg {
-      width: 17px;
-      height: 17px
-    }
-
-    .control-panel h2 {
-      font-size: 14px;
-      letter-spacing: -.1px;
-      line-height: 1.3;
-      margin: 0
-    }
-
-    .panel-heading small {
-      display: block;
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 2px
-    }
-
-    .field-label {
-      display: block;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 600;
-      margin-bottom: 6px
-    }
-
-    select {
-      width: 100%;
-      height: 43px;
-      min-width: 0;
-      padding: 8px 9px;
-      border: 1px solid #c8dce3;
-      border-radius: 8px;
-      background: #fafdfd;
-      color: var(--ink);
-      font-size: 13px
-    }
-
-    .dataset-note {
-      margin: 9px 0 0;
-      font-size: 12px;
-      line-height: 1.65;
-      color: var(--muted);
-      min-height: 36px
-    }
-
-    .btn-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 42px;
-      gap: 7px;
-      margin-top: 12px
-    }
-
-    .status {
-      margin: 9px 0 0;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.6;
-      min-height: 32px
-    }
-
-    .pattern-box {
-      border: 1px solid #d8e5e9 !important;
-      border-radius: 9px;
-      background: #f7fbfb;
-      margin-top: 12px;
-      overflow: hidden
-    }
-
-    .pattern-box summary {
-      padding: 10px 11px;
-      font-size: 11px
-    }
-
-    .pattern-body {
-      padding: 0 12px 12px
-    }
-
-    .slider-label {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      color: var(--muted);
-      padding-top: 5px
-    }
-
-    .target-value {
-      display: inline-flex;
-      min-width: 47px;
-      justify-content: center;
-      padding: 2px 5px;
-      border-radius: 5px;
-      background: #e4f0ee;
-      color: var(--teal);
-      font-weight: 700;
-      font-size: 12px;
-      font-variant-numeric: tabular-nums
-    }
-
-    input[type="range"] {
-      width: 100%;
-      height: 28px;
-      accent-color: var(--teal);
-      margin: 5px 0 0;
-      cursor: ew-resize;
-      touch-action: pan-y
-    }
-
-    .slider-ends {
-      display: flex;
-      justify-content: space-between;
-      color: #78909b;
-      font-size: 10px
-    }
-
-    .pattern-body p {
-      margin: 8px 0 0;
-      font-size: 10px;
-      color: var(--muted);
-      line-height: 1.6
-    }
-
-    .book-check {
-      display: flex;
-      gap: 7px;
-      align-items: flex-start;
-      background: #f1f7fb;
-      border: 1px solid #dbe7ef;
-      color: #4d6e88;
-      border-radius: 8px;
-      padding: 9px 10px;
-      margin-top: 12px;
-      font-size: 10px;
-      line-height: 1.6
-    }
-
-    .book-check:before {
-      content: "✓";
-      font-size: 13px;
-      color: #3a7290;
-      font-weight: 700
-    }
-
-    details {
-      border-top: 1px solid var(--line)
-    }
-
-    details:first-child {
-      border-top: 0
-    }
-
-    summary {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 14px 16px;
-      font-weight: 600;
-      font-size: 13px;
-      list-style: none;
-      user-select: none
-    }
-
-    summary::-webkit-details-marker {
-      display: none
-    }
-
-    summary:after {
-      content: "+";
-      color: #547e98;
-      font-size: 17px;
-      font-weight: 400;
-      line-height: 1;
-      text-align: center;
-      width: 17px;
-      flex: none
-    }
-
-    details[open]>summary:after {
-      content: "−"
-    }
-
-    .summary-label {
-      flex: 1
-    }
-
-    .count {
-      font-weight: 400;
-      font-size: 10px;
-      color: #678494;
-      background: #f0f5f8;
-      padding: 2px 7px;
-      border-radius: 10px
-    }
-
-    .details-body {
-      padding: 0 15px 15px
-    }
-
-    .range-note {
-      font-size: 11px;
-      color: var(--muted);
-      line-height: 1.6;
-      margin: 0 0 8px
-    }
-
-    .table-wrap {
-      max-height: 250px;
-      overflow: auto;
-      overscroll-behavior-x: contain;
-      scrollbar-width: thin;
-      border: 1px solid var(--line);
-      border-radius: 9px;
-      background: #fff
-    }
-
-    table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      font-size: 11px;
-      text-align: center;
-      font-variant-numeric: tabular-nums
-    }
-
-    th {
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      background: #edf5f7;
-      color: #5a7a86;
-      font-size: 10px;
-      font-weight: 600
-    }
-
-    th,
-    td {
-      padding: 6px 5px;
-      border-bottom: 1px solid #e7eef2
-    }
-
-    tr:last-child td {
-      border-bottom: 0
-    }
-
-    .data-table th:first-child {
-      width: 39px
-    }
-
-    td input {
-      width: 100%;
-      min-width: 0;
-      max-width: 86px;
-      height: 35px;
-      border: 1px solid #d4e2e7;
-      border-radius: 7px;
-      background: #fff;
-      padding: 5px;
-      font-size: 16px;
-      text-align: center;
-      color: var(--ink)
-    }
-
-    .is-selected-row td {
-      background: #eaf6f3
-    }
-
-    .row-number {
-      min-width: 28px;
-      min-height: 32px;
-      display: inline-grid;
-      place-items: center;
-      border: 0;
-      border-radius: 6px;
-      background: transparent;
-      color: #6c8792;
-      padding: 0;
-      font-size: 11px
-    }
-
-    .row-number:hover {
-      color: var(--teal);
-      background: #d8eee9
-    }
-
-    .calc-table {
-      min-width: 445px;
-      font-size: 10px
-    }
-
-    .calc-table td,
-    .calc-table th {
-      white-space: nowrap
-    }
-
-    .sum-row td {
-      position: sticky;
-      bottom: 0;
-      background: #edf5f7;
-      font-weight: 700
-    }
-
-    .formula {
-      padding: 10px 11px;
-      margin-top: 10px;
-      border-radius: 9px;
-      background: #f1f6fa;
-      font-size: 11px;
-      color: #547184;
-      line-height: 1.8;
-      overflow-wrap: anywhere
-    }
-
-    .formula b {
-      color: var(--navy);
-      font-size: 12px
-    }
-
-    .formula-title {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: .3px;
-      margin-bottom: 5px;
-      color: #4f7486
-    }
-
-    .formula-expression {
-      display: block;
-      font-size: 11px;
-      line-height: 1.7;
-      color: var(--ink);
-      margin-bottom: 8px
-    }
-
-    .formula-note {
-      font-size: 10px;
-      color: #6a8290;
-      line-height: 1.65;
-      margin: 8px 0 0
-    }
-
-    .guide {
-      font-size: 12px;
-      line-height: 1.75;
-      color: #5d7683;
-      display: grid;
-      gap: 10px
-    }
-
-    .guide p {
-      margin: 0
-    }
-
-    .guide strong {
-      color: var(--ink)
-    }
-
-    .guide a {
-      color: var(--teal);
-      text-decoration-thickness: 1px;
-      text-underline-offset: 3px
-    }
-
-    .strength-table {
-      text-align: left;
-      font-size: 11px;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      overflow: hidden
-    }
-
-    .strength-table td,
-    .strength-table th {
-      padding: 6px 7px;
-      white-space: normal;
-      position: static
-    }
-
-    .strength-table tr.current td {
-      background: #e2f2ed;
-      font-weight: 600;
-      color: #22625e
-    }
-
-    .strength-table th:first-child {
-      width: 39%
-    }
-
-    .book-citation {
-      color: #516f83;
-      padding: 9px 10px;
-      border: 1px solid #d7e4eb;
-      border-radius: 8px;
-      background: #f5f9fb
-    }
-
-    .brand-footer {
-      background: linear-gradient(180deg, #17395f, #102f52);
-      border-top: 4px solid #f4cf32;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      min-height: 40px;
-      padding: 9px 24px;
-      box-sizing: border-box;
-      font-size: 12px;
-      font-weight: 900;
-      line-height: 1;
-      flex: 0 0 auto
-    }
-
-    .footer-note {
-      font-weight: 400;
-      font-size: 10px;
-      color: #d2e4f0;
-      text-align: right;
-      line-height: 1.4
-    }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0
-    }
-
-    @media(max-width:1180px) {
-      .layout {
-        grid-template-columns: minmax(0, 1fr) 310px;
-        gap: 12px
-      }
-
-      .workspace {
-        padding: 16px
-      }
-
-      .graph-card {
-        padding: 14px
-      }
-
-      .metric {
-        padding: 12px
-      }
-
-      .metric-top {
-        font-size: 10px
-      }
-
-      .r-number,
-      .percent-number {
-        font-size: 31px
-      }
-
-      .chart-wrap {
-        height: 390px
-      }
-
-      .selection-controls {
-        width: 100%
-      }
-
-      .graph-toggles {
-        gap: 10px
-      }
-    }
-
-    @media(max-width:900px) {
-      .layout {
-        grid-template-columns: 1fr;
-        grid-template-areas: "controls" "plot" "inspector";
-        grid-template-rows: auto
-      }
-
-      .control-panel {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        column-gap: 18px;
-        padding: 16px
-      }
-
-      .panel-heading {
-        grid-column: 1/-1;
-        margin-bottom: 12px
-      }
-
-      .source-controls {
-        min-width: 0
-      }
-
-      .pattern-controls {
-        min-width: 0
-      }
-
-      .pattern-box {
-        margin-top: 0
-      }
-
-      .btn-row {
-        margin-top: 9px
-      }
-
-      .status {
-        min-height: 0
-      }
-
-      .book-check {
-        margin-top: 10px
-      }
-
-      .chart-wrap {
-        height: clamp(330px, 56vw, 450px)
-      }
-
-      .selection-controls {
-        width: auto
-      }
-
-      .metric {
-        padding: 15px
-      }
-
-      .r-number,
-      .percent-number {
-        font-size: 36px
-      }
-
-      .info-panel .table-wrap {
-        max-height: 260px
-      }
-
-      .info-panel .data-table td input {
-        max-width: 120px
-      }
-    }
-
-    @media(max-width:720px) {
-      body {
-        background-attachment: scroll
-      }
-
-      .app {
-        width: calc(100% - 10px);
-        margin: 5px auto;
-        border-radius: 14px
-      }
-
-      .brand-header {
-        min-height: 62px;
-        padding: 7px 9px;
-        gap: 9px;
-        border-bottom-width: 4px
-      }
-
-      .brand-logo-wrap,
-      .interactive-logo-wrap {
-        width: 42px;
-        height: 42px;
-        border-radius: 9px
-      }
-
-      .brand-title {
-        font-size: clamp(19px, 6vw, 26px);
-        overflow-wrap: anywhere
-      }
-
-      .logo-fallback {
-        width: 23px;
-        height: 23px
-      }
-
-      .workspace {
-        padding: 13px 10px 15px
-      }
-
-      .intro {
-        gap: 5px;
-        margin-bottom: 12px
-      }
-
-      .breadcrumb {
-        font-size: 10px;
-        gap: 5px
-      }
-
-      .explore-note {
-        font-size: 10px
-      }
-
-      .brand-footer {
-        min-height: 38px;
-        padding: 8px 10px;
-        font-size: 11px;
-        gap: 8px
-      }
-
-      .footer-note {
-        font-size: 9px
-      }
-
-      .control-panel {
-        padding: 14px;
-        column-gap: 14px
-      }
-
-      .card {
-        border-radius: 13px
-      }
-
-      .graph-card {
-        padding: 13px 11px
-      }
-
-      .metric {
-        padding: 12px
-      }
-
-      .metric-main {
-        gap: 5px
-      }
-
-      .metric-top {
-        font-size: 10px
-      }
-
-      .summary-grid {
-        gap: 9px;
-        margin-bottom: 14px
-      }
-
-      .strength {
-        font-size: 11px
-      }
-
-      .r-number,
-      .percent-number {
-        font-size: 32px
-      }
-
-      .chart-wrap {
-        height: 350px
-      }
-
-      .graph-toggles {
-        margin-bottom: 11px
-      }
-
-      .plot-bottom {
-        font-size: 10px
-      }
-
-      .line-equation {
-        font-size: 10px
-      }
-    }
-
-    @media(max-width:540px) {
-      .intro {
-        align-items: flex-start
-      }
-
-      .explore-note {
-        display: none
-      }
-
-      .control-panel {
-        display: block;
-        padding: 14px
-      }
-
-      .panel-heading small {
-        font-size: 10px
-      }
-
-      .panel-heading {
-        margin-bottom: 12px
-      }
-
-      .dataset-note {
-        min-height: 0;
-        margin-top: 7px;
-        font-size: 10px
-      }
-
-      .btn-row {
-        margin-top: 10px
-      }
-
-      .status {
-        font-size: 10px;
-        min-height: 16px;
-        margin-top: 7px
-      }
-
-      .pattern-box {
-        margin-top: 10px
-      }
-
-      .book-check {
-        margin-top: 9px;
-        padding: 7px 9px
-      }
-
-      .metric {
-        padding: 11px 10px
-      }
-
-      .metric-top {
-        display: block;
-        font-size: 9px;
-        min-height: 37px
-      }
-
-      .direction {
-        margin-top: 5px;
-        font-size: 9px;
-        padding: 1px 5px
-      }
-
-      .determ .metric-top {
-        min-height: 37px;
-        line-height: 1.6;
-        max-width: 135px
-      }
-
-      .r-number,
-      .percent-number {
-        font-size: 31px
-      }
-
-      .r2-decimal {
-        font-size: 10px
-      }
-
-      .strength {
-        min-height: 30px;
-        font-size: 10px;
-        line-height: 1.5
-      }
-
-      .scale {
-        margin-top: 7px
-      }
-
-      .scale-labels {
-        font-size: 9px
-      }
-
-      .variance-legend {
-        font-size: 9px;
-        flex-wrap: wrap;
-        gap: 3px;
-        line-height: 1.4
-      }
-
-      .variance-bar {
-        margin-top: 7px
-      }
-
-      .metric-main {
-        margin-top: 7px
-      }
-
-      .summary-grid {
-        align-items: stretch
-      }
-
-      .chart-wrap {
-        height: 320px
-      }
-
-      .plot-title {
-        font-size: 12px
-      }
-
-      .source-pill {
-        font-size: 9px
-      }
-
-      .plot-top {
-        font-size: 10px
-      }
-
-      .selection {
-        padding: 10px;
-        min-height: 61px;
-        gap: 8px
-      }
-
-      .selection-label {
-        min-width: 100%;
-        font-size: 11px
-      }
-
-      .selection-controls {
-        width: 100%;
-        gap: 7px
-      }
-
-      .number-field input {
-        width: 62px
-      }
-
-      .insight {
-        font-size: 11px;
-        line-height: 1.7
-      }
-
-      .graph-toggles {
-        gap: 9px;
-        padding: 8px 9px
-      }
-
-      .switch {
-        font-size: 10px
-      }
-
-      .line-equation {
-        font-size: 10px
-      }
-
-      .plot-bottom {
-        gap: 6px
-      }
-
-      .legend {
-        gap: 12px
-      }
-
-      .footer-note {
-        max-width: 200px
-      }
-
-      summary {
-        padding: 14px
-      }
-
-      .details-body {
-        padding: 0 13px 13px
-      }
-    }
-
-    @media(max-width:350px) {
-      .workspace {
-        padding: 12px 8px
-      }
-
-      .graph-card {
-        padding: 12px 8px
-      }
-
-      .metric {
-        padding: 10px 8px
-      }
-
-      .r-number,
-      .percent-number {
-        font-size: 28px
-      }
-
-      .r-number.long-value {
-        font-size: 20px
-      }
-
-      .metric-top {
-        font-size: 8.5px
-      }
-
-      .summary-grid {
-        gap: 7px
-      }
-
-      .strength {
-        font-size: 9px
-      }
-
-      .variance-legend {
-        font-size: 8px
-      }
-
-      .source-pill {
-        font-size: 8px
-      }
-
-      .chart-wrap {
-        height: 300px
-      }
-
-      .number-field {
-        gap: 4px
-      }
-
-      .number-field input {
-        width: 56px
-      }
-
-      .selection-controls {
-        gap: 6px
-      }
-
-      .btn.delete {
-        padding: 7px
-      }
-
-      .brand-title {
-        font-size: 19px
-      }
-
-      .footer-note {
-        max-width: 180px
-      }
-    }
-
-    @media(orientation:landscape) and (max-height:620px) {
-      .interactive-logo-wrap {
-        width: 36px;
-        height: 36px
-      }
-    }
-
-    @media(prefers-reduced-motion:reduce) {
-      html {
-        scroll-behavior: auto
-      }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17395f">
+<meta name="description" content="Simulasi interaktif korelasi Pearson, diagram pencar, dan koefisien determinasi.">
+<title>Simulasi Korelasi</title>
+<style>
+:root{--navy:#17395f;--ink:#233c50;--muted:#607582;--teal:#087f82;--teal-dark:#07696c;--teal-soft:#eaf7f5;--orange:#c16a3e;--orange-soft:#fff3e9;--line:#d5e3eb;--paper:#fff;--blue:#17395f}
+*{box-sizing:border-box}
+html{color-scheme:light;scroll-behavior:smooth;scroll-padding:16px}
+body{margin:0;min-height:100vh;min-height:100dvh;background-color:#edf2f1;background-image:url("bahan/bg.png"),radial-gradient(ellipse at 4% 5%,#dcefeb 0,transparent 45%),radial-gradient(ellipse at 98% 85%,#f8e9dc 0,transparent 40%);background-position:center;background-size:cover;background-attachment:fixed;color:var(--ink);font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5}
+button,input,select{font:inherit;font-family:Arial,Helvetica,sans-serif}
+button,select,summary{cursor:pointer}
+button{touch-action:manipulation}
+button:disabled{opacity:.4;cursor:default}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid #5b9bd2;outline-offset:3px}
+button,input,select,summary{-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+.app{width:min(1480px,calc(100% - 32px));margin:18px auto;border:3px solid #8fb7d7;border-radius:20px;overflow:clip;background:#f5f8f7;box-shadow:0 15px 45px #17395f12;min-width:0}
+.brand-header{background:linear-gradient(180deg,#17395f,#102f52);border-bottom:6px solid #2f9be8;display:flex;align-items:center;gap:16px;min-height:90px;padding:12px 24px;color:#fff;box-sizing:border-box;flex:0 0 auto}
+.brand-logo-wrap,.interactive-logo-wrap{position:relative;width:56px;height:56px;border-radius:12px;overflow:hidden;flex:0 0 auto;background:linear-gradient(135deg,#20b8ef,#075687);border:3px solid #fff;box-shadow:0 0 0 2px #ffffff2e,0 3px 8px #0004;display:grid;place-items:center}
+.interactive-logo-wrap{margin-left:auto;background:#fff}
+.brand-logo,.interactive-logo{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;z-index:1;padding:2px}
+.brand-logo-wrap.logo-empty:after,.interactive-logo-wrap.logo-empty:after{content:"LOGO";font-size:9px;font-weight:700;letter-spacing:.5px;color:#fff}
+.interactive-logo-wrap.logo-empty:after{color:var(--navy)}
+.brand-title{flex:1 1 auto;min-width:0;margin:0;font-size:clamp(28px,3vw,42px);font-weight:900;line-height:1.05;letter-spacing:0;color:#fff;text-shadow:0 3px 0 #0007}
+.workspace{padding:19px 20px 22px;min-width:0}
+.intro{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.breadcrumb{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:12px}
+.breadcrumb b{color:var(--navy);font-weight:600}
+.breadcrumb .sep{color:#a5b9bf}
+.explore-note{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}
+.explore-note:before{content:"";width:6px;height:6px;background:var(--teal);border-radius:50%}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;grid-template-areas:"plot controls" "plot inspector";grid-template-rows:auto 1fr;gap:15px;align-items:start}
+.card{min-width:0;background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.graph-card{grid-area:plot;padding:17px}
+.control-panel{grid-area:controls;padding:18px}
+.info-panel{grid-area:inspector}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;min-width:0}
+.metric{padding:15px 16px 13px;border:1px solid #c8e5e1;border-radius:12px;min-width:0;background:var(--teal-soft)}
+.metric.determ{background:var(--orange-soft);border-color:#efd9c5}
+.metric-top{display:flex;gap:7px;align-items:center;justify-content:space-between;flex-wrap:wrap;min-height:21px;font-size:11px;color:#486d72;font-weight:600}
+.determ .metric-top{color:#815b41}
+.metric-top span:first-child{letter-spacing:.15px}
+.direction{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;background:#fff9;border:1px solid #c6e4df;color:var(--teal);padding:2px 7px;border-radius:20px;white-space:nowrap}
+.direction.negative{color:#a54f2b;background:#fff7f0;border-color:#e9cbb8}
+.direction.neutral{color:#586d7c;border-color:#d3e0e8;background:#f7fafb}
+.metric-main{display:flex;align-items:baseline;gap:9px;margin:5px 0 2px;flex-wrap:wrap}
+.r-number,.percent-number{display:block;font-size:36px;font-weight:700;line-height:1.17;letter-spacing:-1px;color:var(--teal);font-variant-numeric:tabular-nums}
+.r-number.long-value{font-size:27px}
+.percent-number{color:#a55730;font-size:35px}
+.r2-decimal{font-size:11px;color:#946c50;white-space:nowrap}
+.strength{display:block;font-size:12px;color:#315e63;font-weight:600;min-height:18px;margin-top:3px}
+.determ .strength{color:#815b41;font-weight:400}
+.scale{margin-top:10px}
+.scale-track{position:relative;height:5px;margin:0 6px;background:#cddfdf;border-radius:9px}
+.scale-track:before{content:"";position:absolute;left:50%;top:-3px;width:1px;height:11px;background:#7d9f9f}
+.scale-fill{position:absolute;top:0;height:5px;border-radius:9px;background:var(--teal)}
+.scale-dot{position:absolute;top:50%;width:11px;height:11px;border:2px solid #fff;border-radius:50%;background:var(--teal);box-shadow:0 0 0 1px #8eb8b6;transform:translate(-50%,-50%)}
+.scale-labels{display:flex;justify-content:space-between;color:#647f81;font-size:10px;margin-top:7px}
+.variance-bar{height:6px;border-radius:10px;display:flex;overflow:hidden;background:#e4d4c7;margin-top:10px}
+.variance-bar i{display:block;height:100%;background:var(--orange);width:0}
+.variance-legend{display:flex;justify-content:space-between;gap:8px;margin-top:7px;color:#8a6954;font-size:10px;font-variant-numeric:tabular-nums}
+.plot-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:0 2px 5px;color:var(--muted);font-size:11px}
+.plot-title{font-size:13px;color:var(--ink);font-weight:600}
+.source-pill{padding:3px 8px;border-radius:7px;font-size:10px;font-weight:600;letter-spacing:.1px;background:#eef4f8;color:#4b6d89}
+.source-pill.synthetic{background:#fff0e6;color:#a05730}
+.chart-wrap{position:relative;height:clamp(350px,32vw,470px);touch-action:pan-y;isolation:isolate}
+canvas{display:block;width:100%;height:100%;pointer-events:none}
+.point{position:absolute;z-index:1;width:34px;height:34px;transform:translate(-50%,-50%);padding:0;border:0;border-radius:50%;background:transparent;touch-action:none;cursor:grab}
+.point:before{content:"";display:block;width:13px;height:13px;margin:auto;border:2px solid #fff;border-radius:50%;background:var(--teal);box-shadow:0 0 0 1px #07696c22}
+.point:hover:before{box-shadow:0 0 0 5px #087f821c}
+.point.is-selected{z-index:2}
+.point.is-selected:before{background:var(--orange);box-shadow:0 0 0 5px #c16a3e25,0 0 0 6px #c16a3e80}
+.point.is-dragging{cursor:grabbing}
+.point:focus-visible{outline-offset:-1px}
+.plot-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:11px 2px 12px;border-top:1px solid #e4edf0;font-size:11px;color:var(--muted)}
+.legend{display:flex;gap:15px;align-items:center;flex-wrap:wrap}
+.dot-key,.line-key{display:inline-flex;align-items:center;gap:6px}
+.dot-key:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--teal)}
+.line-key:before{content:"";width:17px;height:2px;background:var(--orange)}
+.line-equation{font-size:11px;color:#986343;font-variant-numeric:tabular-nums}
+.graph-toggles{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:0 0 14px;padding:10px 11px;border:1px solid #e1eaee;border-radius:9px;background:#f8fbfc}
+.switch{display:inline-flex;align-items:center;gap:5px;color:#54717e;font-size:11px;cursor:pointer;min-height:22px}
+.switch input{accent-color:var(--teal);width:15px;height:15px;margin:0;cursor:pointer}
+.selection{display:flex;justify-content:space-between;align-items:center;gap:11px;flex-wrap:wrap;min-height:66px;border:1px solid #d3e4e8;border-radius:11px;padding:10px 12px;background:#f5fafb}
+.selection-label{color:var(--muted);font-size:12px;flex:1;min-width:140px;line-height:1.5}
+.selection-label strong{display:block;color:var(--ink);font-size:12px}
+.selection-controls{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.number-field{display:flex;gap:5px;align-items:center;color:var(--muted);font-size:12px}
+.number-field input{width:64px;height:37px;border:1px solid #c8dce3;border-radius:7px;background:#fff;padding:5px 7px;font-size:16px;color:var(--ink);text-align:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:42px;border:1px solid #ccdde5;border-radius:9px;padding:8px 11px;font-size:12px;line-height:1.4;font-weight:600;background:#fff;color:var(--navy);white-space:nowrap}
+.btn:hover:enabled{background:#eff6f8;border-color:#a2c4cf}
+.btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+.btn.primary:hover:enabled{background:var(--teal-dark)}
+.btn.delete{min-height:37px;padding:7px 9px;border-color:#ecd7ca;color:#aa5836;font-size:11px}
+.btn.icon{padding:8px;width:42px}
+.btn.icon svg{width:17px;height:17px}
+.insight{display:flex;gap:8px;margin:12px 0 0;color:#566f7b;font-size:12px;line-height:1.65}
+.insight:before{content:attr(data-icon);flex:none;color:var(--teal);font-size:17px;line-height:1.3}
+.insight[data-icon="↘"]:before{color:var(--orange)}
+.warning{margin:12px 0 0;padding:10px 12px;border:1px solid #ead6c4;border-radius:9px;background:#fff6ec;color:#845b37;font-size:12px}
+.panel-heading{display:flex;gap:10px;align-items:center;margin-bottom:15px}
+.panel-icon{width:30px;height:30px;border-radius:9px;background:var(--teal-soft);color:var(--teal);display:grid;place-items:center;flex:none}
+.panel-icon svg{width:17px;height:17px}
+.control-panel h2{font-size:14px;letter-spacing:-.1px;line-height:1.3;margin:0}
+.panel-heading small{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.field-label{display:block;color:var(--muted);font-size:11px;font-weight:600;margin-bottom:6px}
+select{width:100%;height:43px;min-width:0;padding:8px 9px;border:1px solid #c8dce3;border-radius:8px;background:#fafdfd;color:var(--ink);font-size:13px}
+.dataset-note{margin:9px 0 0;font-size:12px;line-height:1.65;color:var(--muted);min-height:36px}
+.btn-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 42px;gap:7px;margin-top:12px}
+.status{margin:9px 0 0;color:var(--muted);font-size:11px;line-height:1.6;min-height:32px}
+.pattern-box{border:1px solid #d8e5e9!important;border-radius:9px;background:#f7fbfb;margin-top:12px;overflow:hidden}
+.pattern-box summary{padding:10px 11px;font-size:11px}
+.pattern-body{padding:0 12px 12px}
+.slider-label{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;color:var(--muted);padding-top:5px}
+.target-value{display:inline-flex;min-width:47px;justify-content:center;padding:2px 5px;border-radius:5px;background:#e4f0ee;color:var(--teal);font-weight:700;font-size:12px;font-variant-numeric:tabular-nums}
+input[type="range"]{width:100%;height:28px;accent-color:var(--teal);margin:5px 0 0;cursor:ew-resize;touch-action:pan-y}
+.slider-ends{display:flex;justify-content:space-between;color:#78909b;font-size:10px}
+.pattern-body p{margin:8px 0 0;font-size:10px;color:var(--muted);line-height:1.6}
+.book-check{display:flex;gap:7px;align-items:flex-start;background:#f1f7fb;border:1px solid #dbe7ef;color:#4d6e88;border-radius:8px;padding:9px 10px;margin-top:12px;font-size:10px;line-height:1.6}
+.book-check:before{content:"✓";font-size:13px;color:#3a7290;font-weight:700}
+details{border-top:1px solid var(--line)}
+details:first-child{border-top:0}
+summary{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 16px;font-weight:600;font-size:13px;list-style:none;user-select:none}
+summary::-webkit-details-marker{display:none}
+summary:after{content:"+";color:#547e98;font-size:17px;font-weight:400;line-height:1;text-align:center;width:17px;flex:none}
+details[open]>summary:after{content:"−"}
+.summary-label{flex:1}
+.count{font-weight:400;font-size:10px;color:#678494;background:#f0f5f8;padding:2px 7px;border-radius:10px}
+.details-body{padding:0 15px 15px}
+.range-note{font-size:11px;color:var(--muted);line-height:1.6;margin:0 0 8px}
+.table-wrap{max-height:250px;overflow:auto;overscroll-behavior-x:contain;scrollbar-width:thin;border:1px solid var(--line);border-radius:9px;background:#fff}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:11px;text-align:center;font-variant-numeric:tabular-nums}
+th{position:sticky;top:0;z-index:1;background:#edf5f7;color:#5a7a86;font-size:10px;font-weight:600}
+th,td{padding:6px 5px;border-bottom:1px solid #e7eef2}
+tr:last-child td{border-bottom:0}
+.data-table th:first-child{width:39px}
+td input{width:100%;min-width:0;max-width:86px;height:35px;border:1px solid #d4e2e7;border-radius:7px;background:#fff;padding:5px;font-size:16px;text-align:center;color:var(--ink)}
+.is-selected-row td{background:#eaf6f3}
+.row-number{min-width:28px;min-height:32px;display:inline-grid;place-items:center;border:0;border-radius:6px;background:transparent;color:#6c8792;padding:0;font-size:11px}
+.row-number:hover{color:var(--teal);background:#d8eee9}
+.calc-table{min-width:445px;font-size:10px}
+.calc-table td,.calc-table th{white-space:nowrap}
+.sum-row td{position:sticky;bottom:0;background:#edf5f7;font-weight:700}
+.formula{padding:10px 11px;margin-top:10px;border-radius:9px;background:#f1f6fa;font-size:11px;color:#547184;line-height:1.8;overflow-wrap:anywhere}
+.formula b{color:var(--navy);font-size:12px}
+.formula-title{font-size:10px;font-weight:700;letter-spacing:.3px;margin-bottom:5px;color:#4f7486}
+.formula-expression{display:block;font-size:11px;line-height:1.7;color:var(--ink);margin-bottom:8px}
+.formula-note{font-size:10px;color:#6a8290;line-height:1.65;margin:8px 0 0}
+.guide{font-size:12px;line-height:1.75;color:#5d7683;display:grid;gap:10px}
+.guide p{margin:0}
+.guide strong{color:var(--ink)}
+.guide a{color:var(--teal);text-decoration-thickness:1px;text-underline-offset:3px}
+.strength-table{text-align:left;font-size:11px;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.strength-table td,.strength-table th{padding:6px 7px;white-space:normal;position:static}
+.strength-table tr.current td{background:#e2f2ed;font-weight:600;color:#22625e}
+.strength-table th:first-child{width:39%}
+.brand-footer{background:linear-gradient(180deg,#17395f,#102f52);border-top:4px solid #f4cf32;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:40px;padding:9px 24px;box-sizing:border-box;font-size:12px;font-weight:900;line-height:1;flex:0 0 auto}
+.footer-note{font-weight:400;font-size:10px;color:#d2e4f0;text-align:right;line-height:1.4}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:1180px){.layout{grid-template-columns:minmax(0,1fr) 310px;gap:12px}.workspace{padding:16px}.graph-card{padding:14px}.metric{padding:12px}.metric-top{font-size:10px}.r-number,.percent-number{font-size:31px}.chart-wrap{height:390px}.selection-controls{width:100%}.graph-toggles{gap:10px}}
+@media(max-width:900px){.layout{grid-template-columns:1fr;grid-template-areas:"controls" "plot" "inspector";grid-template-rows:auto}.control-panel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:18px;padding:16px}.panel-heading{grid-column:1/-1;margin-bottom:12px}.source-controls{min-width:0}.pattern-controls{min-width:0}.pattern-box{margin-top:0}.btn-row{margin-top:9px}.status{min-height:0}.book-check{margin-top:10px}.chart-wrap{height:clamp(330px,56vw,450px)}.selection-controls{width:auto}.metric{padding:15px}.r-number,.percent-number{font-size:36px}.info-panel .table-wrap{max-height:260px}.info-panel .data-table td input{max-width:120px}}
+@media(max-width:720px){body{background-attachment:scroll}.app{width:calc(100% - 10px);margin:5px auto;border-radius:14px}.brand-header{min-height:62px;padding:7px 9px;gap:9px;border-bottom-width:4px}.brand-logo-wrap,.interactive-logo-wrap{width:42px;height:42px;border-radius:9px}.brand-title{font-size:clamp(19px,6vw,26px);overflow-wrap:anywhere}.logo-fallback{width:23px;height:23px}.workspace{padding:13px 10px 15px}.intro{gap:5px;margin-bottom:12px}.breadcrumb{font-size:10px;gap:5px}.explore-note{font-size:10px}.brand-footer{min-height:38px;padding:8px 10px;font-size:11px;gap:8px}.footer-note{font-size:9px}.control-panel{padding:14px;column-gap:14px}.card{border-radius:13px}.graph-card{padding:13px 11px}.metric{padding:12px}.metric-main{gap:5px}.metric-top{font-size:10px}.summary-grid{gap:9px;margin-bottom:14px}.strength{font-size:11px}.r-number,.percent-number{font-size:32px}.chart-wrap{height:350px}.graph-toggles{margin-bottom:11px}.plot-bottom{font-size:10px}.line-equation{font-size:10px}}
+@media(max-width:540px){.intro{align-items:flex-start}.explore-note{display:none}.control-panel{display:block;padding:14px}.panel-heading small{font-size:10px}.panel-heading{margin-bottom:12px}.dataset-note{min-height:0;margin-top:7px;font-size:10px}.btn-row{margin-top:10px}.status{font-size:10px;min-height:16px;margin-top:7px}.pattern-box{margin-top:10px}.book-check{margin-top:9px;padding:7px 9px}.metric{padding:11px 10px}.metric-top{display:block;font-size:9px;min-height:37px}.direction{margin-top:5px;font-size:9px;padding:1px 5px}.determ .metric-top{min-height:37px;line-height:1.6;max-width:135px}.r-number,.percent-number{font-size:31px}.r2-decimal{font-size:10px}.strength{min-height:30px;font-size:10px;line-height:1.5}.scale{margin-top:7px}.scale-labels{font-size:9px}.variance-legend{font-size:9px;flex-wrap:wrap;gap:3px;line-height:1.4}.variance-bar{margin-top:7px}.metric-main{margin-top:7px}.summary-grid{align-items:stretch}.chart-wrap{height:320px}.plot-title{font-size:12px}.source-pill{font-size:9px}.plot-top{font-size:10px}.selection{padding:10px;min-height:61px;gap:8px}.selection-label{min-width:100%;font-size:11px}.selection-controls{width:100%;gap:7px}.number-field input{width:62px}.insight{font-size:11px;line-height:1.7}.graph-toggles{gap:9px;padding:8px 9px}.switch{font-size:10px}.line-equation{font-size:10px}.plot-bottom{gap:6px}.legend{gap:12px}.footer-note{max-width:200px}summary{padding:14px}.details-body{padding:0 13px 13px}}
+@media(max-width:350px){.workspace{padding:12px 8px}.graph-card{padding:12px 8px}.metric{padding:10px 8px}.r-number,.percent-number{font-size:28px}.r-number.long-value{font-size:20px}.metric-top{font-size:8.5px}.summary-grid{gap:7px}.strength{font-size:9px}.variance-legend{font-size:8px}.source-pill{font-size:8px}.chart-wrap{height:300px}.number-field{gap:4px}.number-field input{width:56px}.selection-controls{gap:6px}.btn.delete{padding:7px}.brand-title{font-size:19px}.footer-note{max-width:180px}}
+@media(orientation:landscape) and (max-height:620px){.interactive-logo-wrap{width:36px;height:36px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
 </head>
-
 <body>
-  <div class="app">
-    <header class="brand-header">
-      <div class="brand-logo-wrap">
-        <svg class="logo-fallback" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-          <path d="M5 4v19h19M8 18l5-5 5 2 6-8" stroke="white" stroke-width="1.6" stroke-linecap="round"
-            stroke-linejoin="round" />
-          <circle cx="9" cy="13" r="1.7" fill="white" />
-          <circle cx="16" cy="8" r="1.7" fill="white" />
-          <circle cx="22" cy="14" r="1.7" fill="white" />
-        </svg>
-        <img class="brand-logo" data-local-asset="bahan/logo-identitas.png" alt="Logo identitas" hidden>
-      </div>
-      <h1 class="brand-title">Simulasi Korelasi</h1>
-      <div class="interactive-logo-wrap">
-        <svg class="logo-fallback" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-          <path d="M4 21V7m0 14h20M8 19l5-6 5 3 6-10" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" />
-          <circle cx="8" cy="10" r="2" fill="#c16a3e" />
-          <circle cx="18" cy="6" r="2" fill="currentColor" />
-        </svg>
-        <img class="interactive-logo" data-local-asset="bahan/logo-interaktif.png" alt="Logo interaktif" hidden>
-      </div>
-    </header>
-
-    <div class="workspace">
-      <div class="intro">
-        <div class="breadcrumb"><b>Matematika XII</b><span class="sep">/</span><span>Bab 1 Statistika</span><span
-            class="sep">/</span><b>B. Korelasi</b></div><span class="explore-note">Geser titik, amati hubungannya</span>
-      </div>
-      <main class="layout">
-        <aside class="card control-panel" aria-label="Kontrol eksperimen">
-          <div class="panel-heading"><span class="panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none">
-                <path d="M5 7h14M5 17h14M9 4v6m6 4v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-              </svg></span>
-            <div>
-              <h2>Ruang eksperimen</h2><small>Ubah data, lihat hasilnya langsung</small>
-            </div>
-          </div>
-          <div class="source-controls">
-            <label class="field-label" for="presetSelect">Pilih data atau pola</label>
-            <select id="presetSelect">
-              <option value="book">Data buku · Matematika &amp; Fisika</option>
-              <option value="posStrong">Positif sangat kuat</option>
-              <option value="posWeak">Positif lemah</option>
-              <option value="negStrong">Negatif sangat kuat</option>
-              <option value="negWeak">Negatif lemah</option>
-              <option value="posPerfect">Positif sempurna (r = +1)</option>
-              <option value="negPerfect">Negatif sempurna (r = −1)</option>
-              <option value="none">Tanpa korelasi linear (r = 0)</option>
-              <option value="curve">Pola melengkung (r = 0)</option>
-              <option value="constant">Semua X sama (r tak terdefinisi)</option>
-              <option value="custom" id="customOption" disabled hidden>Data diubah</option>
-            </select>
-            <p class="dataset-note" id="datasetInfo">Contoh 12 murid dari buku, hlm. 6–7 dan 13. X = nilai Matematika, Y
-              = nilai Fisika.</p>
-            <div class="btn-row"><button class="btn primary" id="addBtn" type="button">+ Tambah titik</button><button
-                class="btn" id="resetBtn" type="button">↺ Reset buku</button><button class="btn icon" id="undoBtn"
-                type="button" aria-label="Batalkan perubahan terakhir" title="Batalkan perubahan terakhir" disabled><svg
-                  viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M8 4 3 9l5 5M3 9h10a7 7 0 0 1 0 14" transform="translate(0 -2)" stroke="currentColor"
-                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                </svg></button></div>
-            <p class="status" id="actionStatus" role="status" aria-live="polite">Pilih pola, geser titik, atau edit
-              tabel data.</p>
-          </div>
-          <div class="pattern-controls">
-            <details class="pattern-box" id="patternDetails">
-              <summary><span class="summary-label">Bentuk pola sendiri</span></summary>
-              <div class="pattern-body"><label class="slider-label" for="patternR">Target korelasi (r)<output
-                    class="target-value" id="targetVal" for="patternR">0,80</output></label><input id="patternR"
-                  type="range" min="-1" max="1" step="0.05" value="0.8" aria-describedby="patternHelp">
-                <div class="slider-ends"><span>−1 · negatif</span><span>0</span><span>+1 · positif</span></div>
-                <p id="patternHelp">Slider membuat 12 titik data eksperimen. Nilai r aktual dihitung dari titik yang
-                  terbentuk dan dapat sedikit berbeda dari target.</p>
-              </div>
-            </details>
-            <div class="book-check" id="bookCheck">Sesuai contoh buku: r ≈ 0,86 dan r² ≈ 74%. Simulasi menghitung dengan
-              nilai penuh.</div>
-          </div>
-        </aside>
-
-        <section class="card graph-card" aria-label="Diagram pencar dan hasil korelasi">
-          <div class="summary-grid">
-            <div class="metric">
-              <div class="metric-top"><span>KOEFISIEN KORELASI · r</span><span class="direction" id="dirVal">—</span>
-              </div>
-              <div class="metric-main"><output class="r-number" id="rVal">—</output></div><span class="strength"
-                id="strengthVal">—</span>
-              <div class="scale" aria-label="Skala korelasi minus satu hingga satu">
-                <div class="scale-track">
-                  <div class="scale-fill" id="scaleFill"></div><span class="scale-dot" id="scaleDot"></span>
-                </div>
-                <div class="scale-labels"><span>−1</span><span>0</span><span>+1</span></div>
-              </div>
-            </div>
-            <div class="metric determ">
-              <div class="metric-top"><span>KOEFISIEN DETERMINASI · r²</span></div>
-              <div class="metric-main"><output class="percent-number" id="r2Percent">—</output><span
-                  class="r2-decimal">r² = <span id="r2Val">—</span></span></div><span class="strength">Variasi Y
-                dijelaskan model linear</span>
-              <div class="variance-bar" id="varianceBar" role="img" aria-label="Proporsi variasi Y"><i
-                  id="explainedBar"></i></div>
-              <div class="variance-legend"><span id="explainedPct">—</span><span id="remainingPct">—</span></div><span
-                class="sr-only" id="r2Pct">—</span>
-            </div>
-          </div>
-          <div class="plot-top"><span class="plot-title">Diagram pencar <span class="count" id="pointCount">12
-                titik</span></span><span class="source-pill" id="sourceBadge">DATA BUKU</span></div>
-          <div class="chart-wrap" id="chartWrap" role="group"
-            aria-label="Diagram pencar interaktif. Pilih titik lalu geser atau gunakan tombol panah."
-            aria-describedby="chartHelp"><canvas id="chart" aria-hidden="true"></canvas></div>
-          <p class="sr-only" id="chartHelp">X adalah nilai Matematika dari 40 sampai 70. Y adalah nilai Fisika dari 60
-            sampai 100. Satu titik adalah satu pasangan data. Pilih titik dengan Tab dan geser menggunakan tombol panah.
-            Angka dapat diedit pada tabel.</p>
-          <div class="plot-bottom">
-            <div class="legend"><span class="dot-key">Data</span><span class="line-key">Garis regresi</span></div><span
-              class="line-equation" id="lineEquation">—</span>
-          </div>
-          <div class="graph-toggles" aria-label="Tampilan grafik"><label class="switch"><input id="showLine"
-                type="checkbox" checked> Garis regresi</label><label class="switch"><input id="showMean"
-                type="checkbox"> Rata-rata</label><label class="switch"><input id="showResiduals" type="checkbox">
-              Residu</label></div>
-          <div class="selection">
-            <div class="selection-label" id="selectionLabel">Pilih satu titik untuk mengubah nilainya.</div>
-            <div class="selection-controls" id="selectionControls" hidden><label class="number-field">X <input
-                  id="editX" inputmode="decimal" autocomplete="off" aria-label="Nilai X titik terpilih"></label><label
-                class="number-field">Y <input id="editY" inputmode="decimal" autocomplete="off"
-                  aria-label="Nilai Y titik terpilih"></label><button class="btn delete" id="deleteBtn"
-                type="button">Hapus titik</button></div>
-          </div>
-          <p class="insight" id="insight">—</p>
-          <p class="warning" id="corrWarn" role="status" hidden></p>
-        </section>
-
-        <aside class="card info-panel" aria-label="Data, perhitungan, dan panduan">
-          <details id="dataDetails" open>
-            <summary><span class="summary-label">Tabel data</span><span class="count" id="dataCount">12 titik</span>
-            </summary>
-            <div class="details-body">
-              <p class="range-note">X: Matematika (40–70) · Y: Fisika (60–100).<br>Klik angka untuk mengedit. Klik nomor
-                untuk memilih titik.</p>
-              <div class="table-wrap">
-                <table class="data-table" aria-label="Tabel nilai Matematika dan Fisika">
-                  <thead>
-                    <tr>
-                      <th scope="col">No.</th>
-                      <th scope="col">X</th>
-                      <th scope="col">Y</th>
-                    </tr>
-                  </thead>
-                  <tbody id="dataBody"></tbody>
-                </table>
-              </div>
-            </div>
-          </details>
-          <details id="calcDetails">
-            <summary><span class="summary-label">Rumus &amp; perhitungan</span></summary>
-            <div class="details-body">
-              <div class="table-wrap" tabindex="0" role="region"
-                aria-label="Tabel perhitungan korelasi, dapat digeser ke samping">
-                <table class="calc-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">No.</th>
-                      <th scope="col">x</th>
-                      <th scope="col">y</th>
-                      <th scope="col">x²</th>
-                      <th scope="col">y²</th>
-                      <th scope="col">xy</th>
-                    </tr>
-                  </thead>
-                  <tbody id="calcBody"></tbody>
-                </table>
-              </div>
-              <div class="formula" id="formulaBox"></div>
-              <p class="formula-note">Nilai penuh dipakai dalam perhitungan. Pembulatan hanya untuk tampilan, sehingga
-                r² tidak dihitung dari r yang sudah dibulatkan.</p>
-            </div>
-          </details>
-          <details id="readingDetails">
-            <summary><span class="summary-label">Arah &amp; kekuatan hubungan</span></summary>
-            <div class="details-body guide">
-              <p><strong>Tanda r menunjukkan arah.</strong> Positif: cenderung naik. Negatif: cenderung turun.
-                <strong>|r|</strong> menunjukkan kekuatan hubungan linear, tanpa memperhatikan tanda.</p>
-              <table class="strength-table" aria-label="Kategori kekuatan hubungan dari Tabel 1.6 buku">
-                <thead>
-                  <tr>
-                    <th scope="col">Rentang |r|</th>
-                    <th scope="col">Kekuatan hubungan</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr data-strength="zero">
-                    <td>0</td>
-                    <td>Tidak ada hubungan linear</td>
-                  </tr>
-                  <tr data-strength="tiny">
-                    <td>0 &lt; |r| &lt; 0,10</td>
-                    <td>Kurang berarti</td>
-                  </tr>
-                  <tr data-strength="weak">
-                    <td>0,10–&lt;0,30</td>
-                    <td>Lemah</td>
-                  </tr>
-                  <tr data-strength="moderate">
-                    <td>0,30–&lt;0,50</td>
-                    <td>Moderat</td>
-                  </tr>
-                  <tr data-strength="strong">
-                    <td>0,50–&lt;0,70</td>
-                    <td>Kuat</td>
-                  </tr>
-                  <tr data-strength="veryStrong">
-                    <td>0,70–&lt;0,90</td>
-                    <td>Sangat kuat</td>
-                  </tr>
-                  <tr data-strength="almost">
-                    <td>0,90–&lt;1</td>
-                    <td>Mendekati sempurna</td>
-                  </tr>
-                  <tr data-strength="perfect">
-                    <td>1</td>
-                    <td>Sempurna</td>
-                  </tr>
-                </tbody>
-              </table>
-              <p class="formula-note">Label mengikuti Tabel 1.6, hlm. 12. Rentang ditulis kontinu agar tidak ada celah.
-                Nilai |r| = 0,90 dimasukkan ke kategori mendekati sempurna; |r| = 1 dibedakan sebagai sempurna.</p>
-            </div>
-          </details>
-          <details>
-            <summary><span class="summary-label">Cara membaca r² &amp; grafik</span></summary>
-            <div class="details-body guide">
-              <p><strong>Satu baris data = satu titik.</strong> Saat X atau Y diubah, posisi titik, garis regresi, r,
-                dan r² ikut diperbarui.</p>
-              <p><strong>r² × 100%</strong> adalah persentase variasi nilai Fisika (Y) yang dijelaskan oleh model
-                regresi linear dengan nilai Matematika (X). <strong>(1 − r²) × 100%</strong> adalah bagian variasi Y
-                yang belum dijelaskan model tersebut.</p>
-              <p><strong>Residu = y − ŷ.</strong> Segmen vertikal memperlihatkan selisih nilai Y sebenarnya dengan
-                prediksi garis regresi kuadrat terkecil. Semakin kecil jumlah kuadrat residu, semakin baik kecocokan
-                garis dalam arti kuadrat terkecil.</p>
-              <p><strong>r = 0 berarti tidak ada korelasi linear.</strong> Pola melengkung masih mungkin ada. Coba
-                pilihan “Pola melengkung” untuk mengamatinya.</p>
-              <p><strong>Korelasi tidak membuktikan sebab-akibat.</strong> Gunakan diagram pencar bersama nilai r. Jika
-                semua X atau semua Y sama, koefisien korelasi tidak terdefinisi.</p>
-            </div>
-          </details>
-          <details>
-            <summary><span class="summary-label">Acuan materi &amp; referensi</span></summary>
-            <div class="details-body guide">
-              <div class="book-citation"><strong>Jelajah Matematika 3 SMA/MA/SMK Kelas XII</strong><br>Bab 1 Statistika,
-                B. Korelasi, hlm. 12–14.<br>Data contoh: Tabel 1.2–1.3, hlm. 6–7, dan tabel perhitungan hlm. 13. Garis
-                kuadrat terkecil dan residu: hlm. 9–11.</div>
-              <p>Contoh buku dibulatkan menjadi r = 0,86 dan r² = 0,74. Hasil simulasi sekitar r = 0,862 dan r² = 74,4%,
-                karena perhitungan mempertahankan ketelitian penuh.</p>
-              <p>Inspirasi interaksi: <a href="https://phet.colorado.edu/en/simulations/least-squares-regression"
-                  target="_blank" rel="noopener noreferrer">PhET · Least-Squares Regression</a> dan <a
-                  href="https://www.geogebra.org/m/HtbCVAnb" target="_blank" rel="noopener noreferrer">GeoGebra ·
-                  Scatter Plots and the Line of Best Fit</a>. Referensi dipakai untuk gagasan eksplorasi titik dan umpan
-                balik langsung.</p>
-              <p class="formula-note">Pola selain data buku merupakan data eksperimen buatan. Slider membentuk data
-                untuk dipelajari, bukan menaksir hubungan dari penelitian nyata.</p>
-            </div>
-          </details>
-        </aside>
-      </main>
+<div class="app">
+  <header class="brand-header">
+    <div class="brand-logo-wrap">
+      <!-- LOGO KIRI: pasang gambarmu di bahan/logo-identitas.png. Ubah src jika nama filenya berbeda. -->
+      <img class="brand-logo" src="bahan/logo-identitas.png" alt="Logo identitas" decoding="async">
     </div>
-    <footer class="brand-footer"><span>© 2026</span><span class="footer-note">Matematika XII · Eksplorasi
-        korelasi</span></footer>
+    <h1 class="brand-title">Simulasi Korelasi</h1>
+    <div class="interactive-logo-wrap">
+      <!-- LOGO KANAN: pasang gambarmu di bahan/logo-interaktif.png. Ubah src jika nama filenya berbeda. -->
+      <img class="interactive-logo" src="bahan/logo-interaktif.png" alt="Logo interaktif" decoding="async">
+    </div>
+  </header>
+
+  <div class="workspace">
+    <main class="layout">
+      <aside class="card control-panel" aria-label="Kontrol eksperimen">
+        <div class="panel-heading"><span class="panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 7h14M5 17h14M9 4v6m6 4v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><div><h2>Ruang eksperimen</h2><small>Ubah data, lihat hasilnya langsung</small></div></div>
+        <div class="source-controls">
+          <label class="field-label" for="presetSelect">Pilih data atau pola</label>
+          <select id="presetSelect">
+            <option value="book">Data contoh · Matematika &amp; Fisika</option>
+            <option value="posStrong">Positif sangat kuat</option><option value="posWeak">Positif lemah</option>
+            <option value="negStrong">Negatif sangat kuat</option><option value="negWeak">Negatif lemah</option>
+            <option value="posPerfect">Positif sempurna (r = +1)</option><option value="negPerfect">Negatif sempurna (r = −1)</option>
+            <option value="none">Tanpa korelasi linear (r = 0)</option><option value="curve">Pola melengkung (r = 0)</option>
+            <option value="constant">Semua X sama (r tak terdefinisi)</option>
+            <option value="custom" id="customOption" disabled hidden>Data diubah</option>
+          </select>
+          <p class="dataset-note" id="datasetInfo">12 pasangan data contoh. X = nilai Matematika, Y = nilai Fisika.</p>
+          <div class="btn-row"><button class="btn primary" id="addBtn" type="button">+ Tambah titik</button><button class="btn" id="resetBtn" type="button">↺ Reset</button><button class="btn icon" id="undoBtn" type="button" aria-label="Batalkan perubahan terakhir" title="Batalkan perubahan terakhir" disabled><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 4 3 9l5 5M3 9h10a7 7 0 0 1 0 14" transform="translate(0 -2)" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <p class="status" id="actionStatus" role="status" aria-live="polite">Pilih pola, geser titik, atau edit tabel data.</p>
+        </div>
+        <div class="pattern-controls">
+          <details class="pattern-box" id="patternDetails"><summary><span class="summary-label">Bentuk pola sendiri</span></summary><div class="pattern-body"><label class="slider-label" for="patternR">Target korelasi (r)<output class="target-value" id="targetVal" for="patternR">0,80</output></label><input id="patternR" type="range" min="-1" max="1" step="0.05" value="0.8" aria-describedby="patternHelp"><div class="slider-ends"><span>−1 · negatif</span><span>0</span><span>+1 · positif</span></div><p id="patternHelp">Slider membuat 12 titik data eksperimen. Nilai r aktual dihitung dari titik yang terbentuk dan dapat sedikit berbeda dari target.</p></div></details>
+        </div>
+      </aside>
+
+      <section class="card graph-card" aria-label="Diagram pencar dan hasil korelasi">
+        <div class="summary-grid">
+          <div class="metric"><div class="metric-top"><span>KOEFISIEN KORELASI · r</span><span class="direction" id="dirVal">—</span></div><div class="metric-main"><output class="r-number" id="rVal">—</output></div><span class="strength" id="strengthVal">—</span><div class="scale" aria-label="Skala korelasi minus satu hingga satu"><div class="scale-track"><div class="scale-fill" id="scaleFill"></div><span class="scale-dot" id="scaleDot"></span></div><div class="scale-labels"><span>−1</span><span>0</span><span>+1</span></div></div></div>
+          <div class="metric determ"><div class="metric-top"><span>KOEFISIEN DETERMINASI · r²</span></div><div class="metric-main"><output class="percent-number" id="r2Percent">—</output><span class="r2-decimal">r² = <span id="r2Val">—</span></span></div><span class="strength">Variasi Y dijelaskan model linear</span><div class="variance-bar" id="varianceBar" role="img" aria-label="Proporsi variasi Y"><i id="explainedBar"></i></div><div class="variance-legend"><span id="explainedPct">—</span><span id="remainingPct">—</span></div><span class="sr-only" id="r2Pct">—</span></div>
+        </div>
+        <div class="plot-top"><span class="plot-title">Diagram pencar <span class="count" id="pointCount">12 titik</span></span><span class="source-pill" id="sourceBadge">DATA CONTOH</span></div>
+        <div class="chart-wrap" id="chartWrap" role="group" aria-label="Diagram pencar interaktif. Pilih titik lalu geser atau gunakan tombol panah." aria-describedby="chartHelp"><canvas id="chart" aria-hidden="true"></canvas></div>
+        <p class="sr-only" id="chartHelp">X adalah nilai Matematika dari 40 sampai 70. Y adalah nilai Fisika dari 60 sampai 100. Satu titik adalah satu pasangan data. Pilih titik dengan Tab dan geser menggunakan tombol panah. Angka dapat diedit pada tabel.</p>
+        <div class="plot-bottom"><div class="legend"><span class="dot-key">Data</span><span class="line-key">Garis regresi</span></div><span class="line-equation" id="lineEquation">—</span></div>
+        <div class="graph-toggles" aria-label="Tampilan grafik"><label class="switch"><input id="showLine" type="checkbox" checked> Garis regresi</label><label class="switch"><input id="showMean" type="checkbox"> Rata-rata</label><label class="switch"><input id="showResiduals" type="checkbox"> Residu</label></div>
+        <div class="selection"><div class="selection-label" id="selectionLabel">Pilih satu titik untuk mengubah nilainya.</div><div class="selection-controls" id="selectionControls" hidden><label class="number-field">X <input id="editX" inputmode="decimal" autocomplete="off" aria-label="Nilai X titik terpilih"></label><label class="number-field">Y <input id="editY" inputmode="decimal" autocomplete="off" aria-label="Nilai Y titik terpilih"></label><button class="btn delete" id="deleteBtn" type="button">Hapus titik</button></div></div>
+        <p class="insight" id="insight">—</p><p class="warning" id="corrWarn" role="status" hidden></p>
+      </section>
+
+      <aside class="card info-panel" aria-label="Data, perhitungan, dan panduan">
+        <details id="dataDetails" open><summary><span class="summary-label">Tabel data</span><span class="count" id="dataCount">12 titik</span></summary><div class="details-body"><p class="range-note">X: Matematika (40–70) · Y: Fisika (60–100).<br>Klik angka untuk mengedit. Klik nomor untuk memilih titik.</p><div class="table-wrap"><table class="data-table" aria-label="Tabel nilai Matematika dan Fisika"><thead><tr><th scope="col">No.</th><th scope="col">X</th><th scope="col">Y</th></tr></thead><tbody id="dataBody"></tbody></table></div></div></details>
+        <details id="calcDetails"><summary><span class="summary-label">Rumus &amp; perhitungan</span></summary><div class="details-body"><div class="table-wrap" tabindex="0" role="region" aria-label="Tabel perhitungan korelasi, dapat digeser ke samping"><table class="calc-table"><thead><tr><th scope="col">No.</th><th scope="col">x</th><th scope="col">y</th><th scope="col">x²</th><th scope="col">y²</th><th scope="col">xy</th></tr></thead><tbody id="calcBody"></tbody></table></div><div class="formula" id="formulaBox"></div><p class="formula-note">Nilai penuh dipakai dalam perhitungan. Pembulatan hanya untuk tampilan, sehingga r² tidak dihitung dari r yang sudah dibulatkan.</p></div></details>
+        <details id="readingDetails"><summary><span class="summary-label">Arah &amp; kekuatan hubungan</span></summary><div class="details-body guide"><p><strong>Tanda r menunjukkan arah.</strong> Positif: cenderung naik. Negatif: cenderung turun. <strong>|r|</strong> menunjukkan kekuatan hubungan linear, tanpa memperhatikan tanda.</p><table class="strength-table" aria-label="Kategori kekuatan hubungan berdasarkan nilai absolut r"><thead><tr><th scope="col">Rentang |r|</th><th scope="col">Kekuatan hubungan</th></tr></thead><tbody><tr data-strength="zero"><td>0</td><td>Tidak ada hubungan linear</td></tr><tr data-strength="tiny"><td>0 &lt; |r| &lt; 0,10</td><td>Kurang berarti</td></tr><tr data-strength="weak"><td>0,10–&lt;0,30</td><td>Lemah</td></tr><tr data-strength="moderate"><td>0,30–&lt;0,50</td><td>Moderat</td></tr><tr data-strength="strong"><td>0,50–&lt;0,70</td><td>Kuat</td></tr><tr data-strength="veryStrong"><td>0,70–&lt;0,90</td><td>Sangat kuat</td></tr><tr data-strength="almost"><td>0,90–&lt;1</td><td>Mendekati sempurna</td></tr><tr data-strength="perfect"><td>1</td><td>Sempurna</td></tr></tbody></table><p class="formula-note">Kategori digunakan sebagai panduan deskriptif. Rentang ditulis kontinu agar tidak ada celah. Nilai |r| = 0,90 dimasukkan ke kategori mendekati sempurna; |r| = 1 dibedakan sebagai sempurna.</p></div></details>
+        <details><summary><span class="summary-label">Cara membaca r² &amp; grafik</span></summary><div class="details-body guide"><p><strong>Satu baris data = satu titik.</strong> Saat X atau Y diubah, posisi titik, garis regresi, r, dan r² ikut diperbarui.</p><p><strong>r² × 100%</strong> adalah persentase variasi nilai Fisika (Y) yang dijelaskan oleh model regresi linear dengan nilai Matematika (X). <strong>(1 − r²) × 100%</strong> adalah bagian variasi Y yang belum dijelaskan model tersebut.</p><p><strong>Residu = y − ŷ.</strong> Segmen vertikal memperlihatkan selisih nilai Y sebenarnya dengan prediksi garis regresi kuadrat terkecil. Semakin kecil jumlah kuadrat residu, semakin baik kecocokan garis dalam arti kuadrat terkecil.</p><p><strong>r = 0 berarti tidak ada korelasi linear.</strong> Pola melengkung masih mungkin ada. Coba pilihan “Pola melengkung” untuk mengamatinya.</p><p><strong>Korelasi tidak membuktikan sebab-akibat.</strong> Gunakan diagram pencar bersama nilai r. Jika semua X atau semua Y sama, koefisien korelasi tidak terdefinisi.</p></div></details>
+      </aside>
+    </main>
   </div>
-  <script>
+  <footer class="brand-footer"><span>© 2026</span></footer>
+</div>
+<script>
 
-    (() => {
-      'use strict';
-      const initial = [
-        { x: 60, y: 80 }, { x: 45, y: 69 }, { x: 50, y: 71 }, { x: 60, y: 85 },
-        { x: 50, y: 80 }, { x: 65, y: 82 }, { x: 60, y: 89 }, { x: 65, y: 93 },
-        { x: 50, y: 76 }, { x: 65, y: 86 }, { x: 45, y: 71 }, { x: 50, y: 69 }
-      ];
-      const presets = {
-        posStrong: [65, 76, 62, 72, 81, 74, 90, 81, 77, 91, 89, 91],
-        posWeak: [68, 62, 83, 78, 79, 92, 82, 79, 90, 68, 94, 64],
-        negStrong: [80, 94, 90, 87, 79, 82, 87, 72, 72, 71, 72, 66],
-        negWeak: [84, 75, 77, 85, 63, 65, 64, 80, 86, 64, 82, 67],
-        none: [91, 68, 73, 68, 86, 79, 81, 84, 89, 65, 85, 73],
-        curve: [96, 86, 78, 72, 68, 66, 66, 68, 72, 78, 86, 96]
-      };
-      const $ = s => document.querySelector(s);
-      const chart = $('#chart'), wrap = $('#chartWrap'), dataBody = $('#dataBody');
-      const bounds = { xmin: 40, xmax: 70, ymin: 60, ymax: 100 };
-      const pad = { l: 53, r: 17, t: 24, b: 49 };
-      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-      const round = v => Math.round((v + Number.EPSILON) * 10) / 10;
-      const fmt = (v, d = 3) => Number.isFinite(v) ? v.toLocaleString('id-ID', { minimumFractionDigits: d, maximumFractionDigits: d }) : '—';
-      const compact = v => Number.isFinite(v) ? v.toLocaleString('id-ID', { maximumFractionDigits: 2 }) : '—';
-      const raw = v => String(round(v));
-      let points = initial.map(p => ({ ...p })), selected = -1, drag = null, handles = [];
-      let size = { w: 1, h: 1 }, stats = null;
-      let origin = 'book', currentPreset = 'book', currentTarget = .8, sliderGesture = false;
-      const history = [];
+(() => {
+  'use strict';
+  const initial = [
+    {x:60,y:80},{x:45,y:69},{x:50,y:71},{x:60,y:85},
+    {x:50,y:80},{x:65,y:82},{x:60,y:89},{x:65,y:93},
+    {x:50,y:76},{x:65,y:86},{x:45,y:71},{x:50,y:69}
+  ];
+  const presets = {
+    posStrong:[65,76,62,72,81,74,90,81,77,91,89,91],
+    posWeak:[68,62,83,78,79,92,82,79,90,68,94,64],
+    negStrong:[80,94,90,87,79,82,87,72,72,71,72,66],
+    negWeak:[84,75,77,85,63,65,64,80,86,64,82,67],
+    none:[91,68,73,68,86,79,81,84,89,65,85,73],
+    curve:[96,86,78,72,68,66,66,68,72,78,86,96]
+  };
+  const $ = s => document.querySelector(s);
+  const chart = $('#chart'), wrap = $('#chartWrap'), dataBody = $('#dataBody');
+  const bounds = {xmin:40,xmax:70,ymin:60,ymax:100};
+  const pad = {l:53,r:17,t:24,b:49};
+  const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+  const round = v => Math.round((v + Number.EPSILON)*10)/10;
+  const fmt = (v,d=3) => Number.isFinite(v) ? v.toLocaleString('id-ID',{minimumFractionDigits:d,maximumFractionDigits:d}) : '—';
+  const compact = v => Number.isFinite(v) ? v.toLocaleString('id-ID',{maximumFractionDigits:2}) : '—';
+  const raw = v => String(round(v));
+  let points = initial.map(p => ({...p})), selected = -1, drag = null, handles = [];
+  let size = {w:1,h:1}, stats = null;
+  let origin='book', currentPreset='book', currentTarget=.8, sliderGesture=false;
+  const history=[];
 
-      function recordUndo() {
-        history.push({ points: points.map(p => ({ ...p })), selected, origin, preset: currentPreset, target: currentTarget });
-        if (history.length > 50) history.shift();
-        $('#undoBtn').disabled = false;
+  function recordUndo() {
+    history.push({points:points.map(p=>({...p})),selected,origin,preset:currentPreset,target:currentTarget});
+    if(history.length>50)history.shift();
+    $('#undoBtn').disabled=false;
+  }
+
+  function undo() {
+    endDrag();
+    const state=history.pop();if(!state)return;
+    points=state.points.map(p=>({...p}));selected=state.selected;origin=state.origin;currentPreset=state.preset;currentTarget=state.target;
+    $('#customOption').hidden=currentPreset!=='custom';$('#presetSelect').value=currentPreset;
+    $('#patternR').value=String(currentTarget);$('#targetVal').textContent=fmt(currentTarget,2);
+    buildHandles();buildTable();refresh();announce('Perubahan data terakhir dibatalkan.');
+  }
+
+  function sameAsBook() { return points.length===initial.length&&points.every((p,i)=>Math.abs(p.x-initial[i].x)<1e-9&&Math.abs(p.y-initial[i].y)<1e-9); }
+
+  function calculate() {
+    const n = points.length;
+    const sx = points.reduce((s,p)=>s+p.x,0), sy = points.reduce((s,p)=>s+p.y,0);
+    const sx2 = points.reduce((s,p)=>s+p.x*p.x,0), sy2 = points.reduce((s,p)=>s+p.y*p.y,0);
+    const sxy = points.reduce((s,p)=>s+p.x*p.y,0);
+    const totals = {n,sx,sy,sx2,sy2,sxy};
+    if(n < 2) return {...totals,valid:false,reason:'Tambahkan minimal dua pasangan data.'};
+    const mx=sx/n, my=sy/n;
+    let xx=0, yy=0, xy=0;
+    for(const p of points) { const dx=p.x-mx, dy=p.y-my; xx+=dx*dx; yy+=dy*dy; xy+=dx*dy; }
+    const lineValid=xx>=1e-12, m=lineValid?xy/xx:NaN, b=lineValid?my-m*mx:NaN;
+    const sse=lineValid?points.reduce((sum,p)=>sum+(p.y-(m*p.x+b))**2,0):NaN;
+    const geometry={mx,my,lineValid,m,b,sse};
+    if(xx < 1e-12 || yy < 1e-12) return {...totals,...geometry,valid:false,reason:'Nilai r tidak terdefinisi karena semua nilai X atau semua nilai Y sama. Geser salah satu titik agar datanya bervariasi.'};
+    let r = clamp(xy/Math.sqrt(xx*yy),-1,1);
+    if(Math.abs(r)<1e-12) r=0;
+    if(1-Math.abs(r)<1e-12)r=Math.sign(r);
+    return {...totals,...geometry,valid:true,r,r2:r*r,num:n*xy,den:n*Math.sqrt(xx*yy)};
+  }
+
+  function strength(r) {
+    const a=Math.abs(r);
+    if(a===0) return 'Tanpa korelasi linear';
+    if(a>1-1e-12) return 'Hubungan sempurna';
+    if(a<.1) return 'Hubungan kurang berarti';
+    if(a<.3) return 'Hubungan lemah';
+    if(a<.5) return 'Hubungan moderat';
+    if(a<.7) return 'Hubungan kuat';
+    if(a<.9) return 'Hubungan sangat kuat';
+    return 'Mendekati sempurna';
+  }
+
+  function strengthKey(r) {
+    const a=Math.abs(r);
+    if(a===0)return 'zero';if(a>1-1e-12)return 'perfect';
+    if(a<.1)return 'tiny';if(a<.3)return 'weak';if(a<.5)return 'moderate';
+    if(a<.7)return 'strong';if(a<.9)return 'veryStrong';return 'almost';
+  }
+
+  function px(x) { return pad.l+(x-bounds.xmin)/(bounds.xmax-bounds.xmin)*(size.w-pad.l-pad.r); }
+  function py(y) { return size.h-pad.b-(y-bounds.ymin)/(bounds.ymax-bounds.ymin)*(size.h-pad.t-pad.b); }
+
+  function draw() {
+    const c=chart.getContext('2d'), {w,h}=size;
+    c.clearRect(0,0,w,h);
+    c.fillStyle='#fbfdfc'; c.fillRect(pad.l,pad.t,w-pad.l-pad.r,h-pad.t-pad.b);
+    c.lineWidth=1;
+    for(let x=40;x<=70;x++) {
+      const major=x%5===0, xp=px(x);
+      c.strokeStyle=major?'#c6dce5':'#e6eff3';
+      c.beginPath();c.moveTo(xp,pad.t);c.lineTo(xp,h-pad.b);c.stroke();
+      if(major) { c.fillStyle='#65778d';c.font='11px Arial';c.textAlign='center';c.textBaseline='top';c.fillText(String(x),xp,h-pad.b+9); }
+    }
+    for(let y=60;y<=100;y+=2) {
+      const major=y%10===0, yp=py(y);
+      c.strokeStyle=major?'#c6dce5':'#e6eff3';
+      c.beginPath();c.moveTo(pad.l,yp);c.lineTo(w-pad.r,yp);c.stroke();
+      if(major) { c.fillStyle='#65778d';c.font='11px Arial';c.textAlign='right';c.textBaseline='middle';c.fillText(String(y),pad.l-9,yp); }
+    }
+    c.strokeStyle='#90a8c4';c.lineWidth=1.1;
+    c.beginPath();c.moveTo(pad.l,pad.t);c.lineTo(pad.l,h-pad.b);c.lineTo(w-pad.r,h-pad.b);c.stroke();
+    c.fillStyle='#536d8a';c.font='12px Arial';c.textAlign='center';c.textBaseline='middle';
+    c.fillText('Nilai Matematika (X)',pad.l+(w-pad.l-pad.r)/2,h-10);
+    c.save();c.translate(12,pad.t+(h-pad.t-pad.b)/2);c.rotate(-Math.PI/2);c.fillText('Nilai Fisika (Y)',0,0);c.restore();
+    if(stats && Number.isFinite(stats.mx)) {
+      c.save();c.beginPath();c.rect(pad.l,pad.t,w-pad.l-pad.r,h-pad.t-pad.b);c.clip();
+      if($('#showMean').checked) {
+        c.strokeStyle='#819ca9';c.lineWidth=1;c.setLineDash([4,4]);
+        c.beginPath();c.moveTo(px(stats.mx),pad.t);c.lineTo(px(stats.mx),h-pad.b);c.moveTo(pad.l,py(stats.my));c.lineTo(w-pad.r,py(stats.my));c.stroke();c.setLineDash([]);
+        c.fillStyle='#617f8d';c.font='11px Arial';c.textAlign='left';c.textBaseline='top';
+        c.fillText('x̄',px(stats.mx)+5,pad.t+4);c.fillText('ȳ',pad.l+5,py(stats.my)-15);
       }
-
-      function undo() {
-        endDrag();
-        const state = history.pop(); if (!state) return;
-        points = state.points.map(p => ({ ...p })); selected = state.selected; origin = state.origin; currentPreset = state.preset; currentTarget = state.target;
-        $('#customOption').hidden = currentPreset !== 'custom'; $('#presetSelect').value = currentPreset;
-        $('#patternR').value = String(currentTarget); $('#targetVal').textContent = fmt(currentTarget, 2);
-        buildHandles(); buildTable(); refresh(); announce('Perubahan data terakhir dibatalkan.');
+      if(stats.lineValid && $('#showResiduals').checked) {
+        c.strokeStyle='#c16a3e99';c.lineWidth=1.1;c.setLineDash([3,3]);
+        points.forEach(p=>{c.beginPath();c.moveTo(px(p.x),py(p.y));c.lineTo(px(p.x),py(stats.m*p.x+stats.b));c.stroke();});c.setLineDash([]);
       }
-
-      function sameAsBook() { return points.length === initial.length && points.every((p, i) => Math.abs(p.x - initial[i].x) < 1e-9 && Math.abs(p.y - initial[i].y) < 1e-9); }
-
-      function calculate() {
-        const n = points.length;
-        const sx = points.reduce((s, p) => s + p.x, 0), sy = points.reduce((s, p) => s + p.y, 0);
-        const sx2 = points.reduce((s, p) => s + p.x * p.x, 0), sy2 = points.reduce((s, p) => s + p.y * p.y, 0);
-        const sxy = points.reduce((s, p) => s + p.x * p.y, 0);
-        const totals = { n, sx, sy, sx2, sy2, sxy };
-        if (n < 2) return { ...totals, valid: false, reason: 'Tambahkan minimal dua pasangan data.' };
-        const mx = sx / n, my = sy / n;
-        let xx = 0, yy = 0, xy = 0;
-        for (const p of points) { const dx = p.x - mx, dy = p.y - my; xx += dx * dx; yy += dy * dy; xy += dx * dy; }
-        const lineValid = xx >= 1e-12, m = lineValid ? xy / xx : NaN, b = lineValid ? my - m * mx : NaN;
-        const sse = lineValid ? points.reduce((sum, p) => sum + (p.y - (m * p.x + b)) ** 2, 0) : NaN;
-        const geometry = { mx, my, lineValid, m, b, sse };
-        if (xx < 1e-12 || yy < 1e-12) return { ...totals, ...geometry, valid: false, reason: 'Nilai r tidak terdefinisi karena semua nilai X atau semua nilai Y sama. Geser salah satu titik agar datanya bervariasi.' };
-        let r = clamp(xy / Math.sqrt(xx * yy), -1, 1);
-        if (Math.abs(r) < 1e-12) r = 0;
-        if (1 - Math.abs(r) < 1e-12) r = Math.sign(r);
-        return { ...totals, ...geometry, valid: true, r, r2: r * r, num: n * xy, den: n * Math.sqrt(xx * yy) };
+      if(stats.lineValid && $('#showLine').checked) {
+        c.strokeStyle='#c16a3e';c.lineWidth=2.2;
+        c.beginPath();c.moveTo(px(bounds.xmin),py(stats.m*bounds.xmin+stats.b));c.lineTo(px(bounds.xmax),py(stats.m*bounds.xmax+stats.b));c.stroke();
       }
-
-      function strength(r) {
-        const a = Math.abs(r);
-        if (a === 0) return 'Tanpa korelasi linear';
-        if (a > 1 - 1e-12) return 'Hubungan sempurna';
-        if (a < .1) return 'Hubungan kurang berarti';
-        if (a < .3) return 'Hubungan lemah';
-        if (a < .5) return 'Hubungan moderat';
-        if (a < .7) return 'Hubungan kuat';
-        if (a < .9) return 'Hubungan sangat kuat';
-        return 'Mendekati sempurna';
+      c.restore();
+    }
+    points.forEach((p,i)=>{
+      const el=handles[i]; if(!el)return;
+      el.style.left=px(p.x)+'px';el.style.top=py(p.y)+'px';
+      el.classList.toggle('is-selected',i===selected);
+      el.setAttribute('aria-pressed',String(i===selected));
+      el.setAttribute('aria-label',`Titik ${i+1}, X ${compact(p.x)}, Y ${compact(p.y)}. Gunakan tombol panah untuk menggeser.`);
+      if(i===selected) {
+        const label=String(i+1), lx=clamp(px(p.x),pad.l+11,w-pad.r-11), ly=Math.max(12,py(p.y)-23);
+        c.fillStyle='#a95c36';c.beginPath();c.roundRect(lx-13,ly-9,26,18,5);c.fill();
+        c.font='bold 10px Arial';c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';c.fillText(label,lx,ly);
       }
+    });
+  }
 
-      function strengthKey(r) {
-        const a = Math.abs(r);
-        if (a === 0) return 'zero'; if (a > 1 - 1e-12) return 'perfect';
-        if (a < .1) return 'tiny'; if (a < .3) return 'weak'; if (a < .5) return 'moderate';
-        if (a < .7) return 'strong'; if (a < .9) return 'veryStrong'; return 'almost';
-      }
+  function resize() {
+    const rect=wrap.getBoundingClientRect(), dpr=Math.min(window.devicePixelRatio||1,2);
+    size={w:rect.width,h:rect.height};
+    chart.width=Math.round(size.w*dpr);chart.height=Math.round(size.h*dpr);
+    chart.getContext('2d').setTransform(dpr,0,0,dpr,0,0);
+    draw();
+  }
 
-      function px(x) { return pad.l + (x - bounds.xmin) / (bounds.xmax - bounds.xmin) * (size.w - pad.l - pad.r); }
-      function py(y) { return size.h - pad.b - (y - bounds.ymin) / (bounds.ymax - bounds.ymin) * (size.h - pad.t - pad.b); }
+  function updateResults() {
+    $('#pointCount').textContent=points.length+' titik';
+    $('#dataCount').textContent=points.length+' titik';
+    $('#addBtn').disabled=points.length>=30;
+    $('#undoBtn').disabled=history.length===0;
+    const valid=stats.valid, r=valid?stats.r:0;
+    $('#rVal').textContent=valid?fmt(r,r!==0&&Math.abs(r)<.0005?5:3):'—';
+    $('#rVal').classList.toggle('long-value',$('#rVal').textContent.length>6);
+    const direction=valid?(r>0?'↗ Positif':r<0?'↘ Negatif':'Tanpa arah linear'):'Belum terdefinisi';
+    $('#dirVal').textContent=direction;
+    $('#dirVal').className='direction '+(!valid||r===0?'neutral':r<0?'negative':'');
+    $('#strengthVal').textContent=valid?strength(r):'Data perlu bervariasi';
+    $('#scaleDot').hidden=!valid;
+    const pos=(r+1)*50;
+    $('#scaleDot').style.left=pos+'%';
+    $('#scaleDot').style.background=r<0?'#c16a3e':'#087f82';
+    $('#scaleFill').style.left=Math.min(50,pos)+'%';
+    $('#scaleFill').style.width=(valid?Math.abs(r)*50:0)+'%';
+    $('#scaleFill').style.background=r<0?'#c16a3e':'#087f82';
+    $('#corrWarn').hidden=valid;
+    $('#corrWarn').textContent=valid?'':stats.reason;
+    $('#r2Val').textContent=valid?fmt(stats.r2):'—';
+    $('#r2Pct').textContent=valid?`${fmt(stats.r2*100,1)}% variasi Y dijelaskan model linear.`:'Belum dapat dihitung.';
+    $('#r2Percent').textContent=valid?fmt(stats.r2*100,1)+'%':'—';
+    $('#explainedBar').style.width=(valid?stats.r2*100:0)+'%';
+    $('#explainedPct').textContent=valid?fmt(stats.r2*100,1)+'% dijelaskan':'Belum terdefinisi';
+    $('#remainingPct').textContent=valid?fmt((1-stats.r2)*100,1)+'% lainnya':'—';
+    $('#varianceBar').setAttribute('aria-label',valid?`${fmt(stats.r2*100,1)} persen variasi Y dijelaskan model dan ${fmt((1-stats.r2)*100,1)} persen belum dijelaskan.`:'Koefisien determinasi belum terdefinisi.');
+    $('#lineEquation').hidden=!$('#showLine').checked;
+    $('#lineEquation').textContent=stats.lineValid?`ŷ = ${fmt(stats.b)} ${stats.m<0?'−':'+'} ${fmt(Math.abs(stats.m))}x`:'Garis tidak terdefinisi';
+    $('#showResiduals').disabled=!stats.lineValid;
+    $('#showMean').disabled=!Number.isFinite(stats.mx);
+    const isBook=sameAsBook();
+    $('#sourceBadge').textContent=isBook?'DATA CONTOH':origin==='book'?'DATA DIUBAH':'EKSPERIMEN';
+    $('#sourceBadge').classList.toggle('synthetic',!isBook);
+    $('#datasetInfo').textContent=isBook?'12 pasangan data contoh. X = nilai Matematika, Y = nilai Fisika.':origin==='book'?'Data contoh sudah diubah. Pilih Reset untuk memulihkan 12 pasangan data awal.':origin==='generated'?'Data buatan dari slider. Nilai r aktual dihitung kembali dari titik yang terbentuk.':'Pola buatan untuk eksperimen. X dan Y tetap memakai rentang nilai pada grafik.';
+    document.querySelectorAll('[data-strength]').forEach(row=>row.classList.toggle('current',valid&&row.dataset.strength===strengthKey(r)));
+    $('#insight').textContent=!valid?'Ubah satu atau beberapa titik agar X dan Y sama-sama bervariasi.':r===0?(currentPreset==='curve'?'Titik-titik membentuk pola melengkung, tetapi r = 0. Pearson r hanya mengukur hubungan linear.':'Pada data ini tidak ada korelasi linear. Pola hubungan lain masih mungkin ada.'):Math.abs(r)<.1?'Kecenderungan linear pada data ini sangat kecil. Coba susun titik menjadi pola naik atau turun.':r>0?'Nilai Matematika yang lebih tinggi cenderung diikuti nilai Fisika yang lebih tinggi.':'Nilai Matematika yang lebih tinggi cenderung diikuti nilai Fisika yang lebih rendah.';
+    $('#insight').dataset.icon=!valid?'↔':r>0?'↗':r<0?'↘':'∿';
+  }
 
-      function draw() {
-        const c = chart.getContext('2d'), { w, h } = size;
-        c.clearRect(0, 0, w, h);
-        c.fillStyle = '#fbfdfc'; c.fillRect(pad.l, pad.t, w - pad.l - pad.r, h - pad.t - pad.b);
-        c.lineWidth = 1;
-        for (let x = 40; x <= 70; x++) {
-          const major = x % 5 === 0, xp = px(x);
-          c.strokeStyle = major ? '#c6dce5' : '#e6eff3';
-          c.beginPath(); c.moveTo(xp, pad.t); c.lineTo(xp, h - pad.b); c.stroke();
-          if (major) { c.fillStyle = '#65778d'; c.font = '11px Arial'; c.textAlign = 'center'; c.textBaseline = 'top'; c.fillText(String(x), xp, h - pad.b + 9); }
-        }
-        for (let y = 60; y <= 100; y += 2) {
-          const major = y % 10 === 0, yp = py(y);
-          c.strokeStyle = major ? '#c6dce5' : '#e6eff3';
-          c.beginPath(); c.moveTo(pad.l, yp); c.lineTo(w - pad.r, yp); c.stroke();
-          if (major) { c.fillStyle = '#65778d'; c.font = '11px Arial'; c.textAlign = 'right'; c.textBaseline = 'middle'; c.fillText(String(y), pad.l - 9, yp); }
-        }
-        c.strokeStyle = '#90a8c4'; c.lineWidth = 1.1;
-        c.beginPath(); c.moveTo(pad.l, pad.t); c.lineTo(pad.l, h - pad.b); c.lineTo(w - pad.r, h - pad.b); c.stroke();
-        c.fillStyle = '#536d8a'; c.font = '12px Arial'; c.textAlign = 'center'; c.textBaseline = 'middle';
-        c.fillText('Nilai Matematika (X)', pad.l + (w - pad.l - pad.r) / 2, h - 10);
-        c.save(); c.translate(12, pad.t + (h - pad.t - pad.b) / 2); c.rotate(-Math.PI / 2); c.fillText('Nilai Fisika (Y)', 0, 0); c.restore();
-        if (stats && Number.isFinite(stats.mx)) {
-          c.save(); c.beginPath(); c.rect(pad.l, pad.t, w - pad.l - pad.r, h - pad.t - pad.b); c.clip();
-          if ($('#showMean').checked) {
-            c.strokeStyle = '#819ca9'; c.lineWidth = 1; c.setLineDash([4, 4]);
-            c.beginPath(); c.moveTo(px(stats.mx), pad.t); c.lineTo(px(stats.mx), h - pad.b); c.moveTo(pad.l, py(stats.my)); c.lineTo(w - pad.r, py(stats.my)); c.stroke(); c.setLineDash([]);
-            c.fillStyle = '#617f8d'; c.font = '11px Arial'; c.textAlign = 'left'; c.textBaseline = 'top';
-            c.fillText('x̄', px(stats.mx) + 5, pad.t + 4); c.fillText('ȳ', pad.l + 5, py(stats.my) - 15);
-          }
-          if (stats.lineValid && $('#showResiduals').checked) {
-            c.strokeStyle = '#c16a3e99'; c.lineWidth = 1.1; c.setLineDash([3, 3]);
-            points.forEach(p => { c.beginPath(); c.moveTo(px(p.x), py(p.y)); c.lineTo(px(p.x), py(stats.m * p.x + stats.b)); c.stroke(); }); c.setLineDash([]);
-          }
-          if (stats.lineValid && $('#showLine').checked) {
-            c.strokeStyle = '#c16a3e'; c.lineWidth = 2.2;
-            c.beginPath(); c.moveTo(px(bounds.xmin), py(stats.m * bounds.xmin + stats.b)); c.lineTo(px(bounds.xmax), py(stats.m * bounds.xmax + stats.b)); c.stroke();
-          }
-          c.restore();
-        }
-        points.forEach((p, i) => {
-          const el = handles[i]; if (!el) return;
-          el.style.left = px(p.x) + 'px'; el.style.top = py(p.y) + 'px';
-          el.classList.toggle('is-selected', i === selected);
-          el.setAttribute('aria-pressed', String(i === selected));
-          el.setAttribute('aria-label', `Titik ${i + 1}, X ${compact(p.x)}, Y ${compact(p.y)}. Gunakan tombol panah untuk menggeser.`);
-          if (i === selected) {
-            const label = String(i + 1), lx = clamp(px(p.x), pad.l + 11, w - pad.r - 11), ly = Math.max(12, py(p.y) - 23);
-            c.fillStyle = '#a95c36'; c.beginPath(); c.roundRect(lx - 13, ly - 9, 26, 18, 5); c.fill();
-            c.font = 'bold 10px Arial'; c.fillStyle = '#fff'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(label, lx, ly);
-          }
-        });
-      }
+  function updateSelection() {
+    const p=points[selected], has=!!p;
+    $('#selectionControls').hidden=!has;
+    $('#selectionLabel').innerHTML=has?`<strong>Titik ${selected+1}</strong>Ubah nilainya di sini.`:'Pilih satu titik untuk mengubah angkanya.';
+    if(has) {
+      if(document.activeElement!==$('#editX')) $('#editX').value=raw(p.x);
+      if(document.activeElement!==$('#editY')) $('#editY').value=raw(p.y);
+    }
+    $('#deleteBtn').disabled=!has||points.length<=2;
+    $('#deleteBtn').title=points.length<=2?'Pertahankan minimal dua titik data.':'Hapus titik terpilih';
+    [...dataBody.children].forEach((row,i)=>row.classList.toggle('is-selected-row',i===selected));
+  }
 
-      function resize() {
-        const rect = wrap.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
-        size = { w: rect.width, h: rect.height };
-        chart.width = Math.round(size.w * dpr); chart.height = Math.round(size.h * dpr);
-        chart.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
-        draw();
-      }
+  function updateTableValues() {
+    dataBody.querySelectorAll('input').forEach(input=>{
+      if(document.activeElement!==input) input.value=raw(points[+input.dataset.i][input.dataset.k]);
+    });
+  }
 
-      function updateResults() {
-        $('#pointCount').textContent = points.length + ' titik';
-        $('#dataCount').textContent = points.length + ' titik';
-        $('#addBtn').disabled = points.length >= 30;
-        $('#undoBtn').disabled = history.length === 0;
-        const valid = stats.valid, r = valid ? stats.r : 0;
-        $('#rVal').textContent = valid ? fmt(r, r !== 0 && Math.abs(r) < .0005 ? 5 : 3) : '—';
-        $('#rVal').classList.toggle('long-value', $('#rVal').textContent.length > 6);
-        const direction = valid ? (r > 0 ? '↗ Positif' : r < 0 ? '↘ Negatif' : 'Tanpa arah linear') : 'Belum terdefinisi';
-        $('#dirVal').textContent = direction;
-        $('#dirVal').className = 'direction ' + (!valid || r === 0 ? 'neutral' : r < 0 ? 'negative' : '');
-        $('#strengthVal').textContent = valid ? strength(r) : 'Data perlu bervariasi';
-        $('#scaleDot').hidden = !valid;
-        const pos = (r + 1) * 50;
-        $('#scaleDot').style.left = pos + '%';
-        $('#scaleDot').style.background = r < 0 ? '#c16a3e' : '#087f82';
-        $('#scaleFill').style.left = Math.min(50, pos) + '%';
-        $('#scaleFill').style.width = (valid ? Math.abs(r) * 50 : 0) + '%';
-        $('#scaleFill').style.background = r < 0 ? '#c16a3e' : '#087f82';
-        $('#corrWarn').hidden = valid;
-        $('#corrWarn').textContent = valid ? '' : stats.reason;
-        $('#r2Val').textContent = valid ? fmt(stats.r2) : '—';
-        $('#r2Pct').textContent = valid ? `${fmt(stats.r2 * 100, 1)}% variasi Y dijelaskan model linear.` : 'Belum dapat dihitung.';
-        $('#r2Percent').textContent = valid ? fmt(stats.r2 * 100, 1) + '%' : '—';
-        $('#explainedBar').style.width = (valid ? stats.r2 * 100 : 0) + '%';
-        $('#explainedPct').textContent = valid ? fmt(stats.r2 * 100, 1) + '% dijelaskan' : 'Belum terdefinisi';
-        $('#remainingPct').textContent = valid ? fmt((1 - stats.r2) * 100, 1) + '% lainnya' : '—';
-        $('#varianceBar').setAttribute('aria-label', valid ? `${fmt(stats.r2 * 100, 1)} persen variasi Y dijelaskan model dan ${fmt((1 - stats.r2) * 100, 1)} persen belum dijelaskan.` : 'Koefisien determinasi belum terdefinisi.');
-        $('#lineEquation').hidden = !$('#showLine').checked;
-        $('#lineEquation').textContent = stats.lineValid ? `ŷ = ${fmt(stats.b)} ${stats.m < 0 ? '−' : '+'} ${fmt(Math.abs(stats.m))}x` : 'Garis tidak terdefinisi';
-        $('#showResiduals').disabled = !stats.lineValid;
-        $('#showMean').disabled = !Number.isFinite(stats.mx);
-        const isBook = sameAsBook();
-        $('#bookCheck').hidden = !isBook;
-        $('#sourceBadge').textContent = isBook ? 'DATA BUKU' : origin === 'book' ? 'BUKU DIUBAH' : 'EKSPERIMEN';
-        $('#sourceBadge').classList.toggle('synthetic', !isBook);
-        $('#datasetInfo').textContent = isBook ? 'Contoh 12 murid dari buku, hlm. 6–7 dan 13. X = nilai Matematika, Y = nilai Fisika.' : origin === 'book' ? 'Data buku sudah diubah. Pilih Reset buku untuk memulihkan 12 pasangan data asli.' : origin === 'generated' ? 'Data buatan dari slider. Nilai r aktual dihitung kembali dari titik yang terbentuk.' : 'Pola buatan untuk eksperimen, bukan data contoh buku. X dan Y tetap memakai rentang nilai pada grafik.';
-        document.querySelectorAll('[data-strength]').forEach(row => row.classList.toggle('current', valid && row.dataset.strength === strengthKey(r)));
-        $('#insight').textContent = !valid ? 'Ubah satu atau beberapa titik agar X dan Y sama-sama bervariasi.' : r === 0 ? (currentPreset === 'curve' ? 'Titik-titik membentuk pola melengkung, tetapi r = 0. Pearson r hanya mengukur hubungan linear.' : 'Pada data ini tidak ada korelasi linear. Pola hubungan lain masih mungkin ada.') : Math.abs(r) < .1 ? 'Kecenderungan linear pada data ini sangat kecil. Coba susun titik menjadi pola naik atau turun.' : r > 0 ? 'Nilai Matematika yang lebih tinggi cenderung diikuti nilai Fisika yang lebih tinggi.' : 'Nilai Matematika yang lebih tinggi cenderung diikuti nilai Fisika yang lebih rendah.';
-        $('#insight').dataset.icon = !valid ? '↔' : r > 0 ? '↗' : r < 0 ? '↘' : '∿';
-      }
+  function renderCalc() {
+    if(!$('#calcDetails').open)return;
+    $('#calcBody').innerHTML=points.map((p,i)=>`<tr><td>${i+1}</td><td>${compact(p.x)}</td><td>${compact(p.y)}</td><td>${compact(p.x*p.x)}</td><td>${compact(p.y*p.y)}</td><td>${compact(p.x*p.y)}</td></tr>`).join('')+
+      `<tr class="sum-row"><td>Σ</td><td>${compact(stats.sx)}</td><td>${compact(stats.sy)}</td><td>${compact(stats.sx2)}</td><td>${compact(stats.sy2)}</td><td>${compact(stats.sxy)}</td></tr>`;
+    $('#formulaBox').innerHTML=`<div class="formula-title">KORELASI PEARSON · n = ${stats.n}</div><span class="formula-expression">r = (nΣxy − ΣxΣy) ÷ √[(nΣx² − (Σx)²)(nΣy² − (Σy)²)]</span>`+(stats.valid?`r = ${compact(stats.num)} ÷ ${fmt(stats.den)}<br><b>r = ${fmt(stats.r,6)}</b><br>r² = ${fmt(stats.r2,6)} = ${fmt(stats.r2*100,2)}%<br>1 − r² = ${fmt((1-stats.r2)*100,2)}%<br>Rata-rata X = ${fmt(stats.mx,2)}, Y = ${fmt(stats.my,2)}<br>Garis kuadrat terkecil: ŷ = ${fmt(stats.b)} ${stats.m<0?'−':'+'} ${fmt(Math.abs(stats.m))}x<br>Σ(y − ŷ)² = ${fmt(stats.sse,2)}`:stats.reason);
+  }
 
-      function updateSelection() {
-        const p = points[selected], has = !!p;
-        $('#selectionControls').hidden = !has;
-        $('#selectionLabel').innerHTML = has ? `<strong>Titik ${selected + 1}</strong>Ubah nilainya di sini.` : 'Pilih satu titik untuk mengubah angkanya.';
-        if (has) {
-          if (document.activeElement !== $('#editX')) $('#editX').value = raw(p.x);
-          if (document.activeElement !== $('#editY')) $('#editY').value = raw(p.y);
-        }
-        $('#deleteBtn').disabled = !has || points.length <= 2;
-        $('#deleteBtn').title = points.length <= 2 ? 'Pertahankan minimal dua titik data.' : 'Hapus titik terpilih';
-        [...dataBody.children].forEach((row, i) => row.classList.toggle('is-selected-row', i === selected));
-      }
+  function refresh() { stats=calculate();updateResults();updateSelection();updateTableValues();renderCalc();draw(); }
+  function announce(message) { $('#actionStatus').textContent=message; }
+  function markCustom() { currentPreset='custom';$('#customOption').hidden=false;$('#presetSelect').value='custom'; }
+  function selectPoint(i) { selected=i;updateSelection();draw(); }
 
-      function updateTableValues() {
-        dataBody.querySelectorAll('input').forEach(input => {
-          if (document.activeElement !== input) input.value = raw(points[+input.dataset.i][input.dataset.k]);
-        });
-      }
+  function applyValue(input,i,k) {
+    if(!points[i])return;
+    const text=input.value.trim().replace(',','.');
+    const value=text===''?NaN:Number(text);
+    if(!Number.isFinite(value)) { input.value=raw(points[i][k]);announce('Masukkan angka yang valid. Nilai sebelumnya dipertahankan.');return; }
+    const lo=k==='x'?bounds.xmin:bounds.ymin, hi=k==='x'?bounds.xmax:bounds.ymax;
+    const next=round(clamp(value,lo,hi)), changed=points[i][k]!==next;
+    if(changed){recordUndo();points[i][k]=next;markCustom();}selected=i;
+    input.value=raw(points[i][k]);refresh();
+    announce(value<lo||value>hi?`Nilai ${k.toUpperCase()} dibatasi pada rentang ${lo}–${hi}.`:`Titik ${i+1} diperbarui.`);
+  }
 
-      function renderCalc() {
-        if (!$('#calcDetails').open) return;
-        $('#calcBody').innerHTML = points.map((p, i) => `<tr><td>${i + 1}</td><td>${compact(p.x)}</td><td>${compact(p.y)}</td><td>${compact(p.x * p.x)}</td><td>${compact(p.y * p.y)}</td><td>${compact(p.x * p.y)}</td></tr>`).join('') +
-          `<tr class="sum-row"><td>Σ</td><td>${compact(stats.sx)}</td><td>${compact(stats.sy)}</td><td>${compact(stats.sx2)}</td><td>${compact(stats.sy2)}</td><td>${compact(stats.sxy)}</td></tr>`;
-        $('#formulaBox').innerHTML = `<div class="formula-title">KORELASI PEARSON · n = ${stats.n}</div><span class="formula-expression">r = (nΣxy − ΣxΣy) ÷ √[(nΣx² − (Σx)²)(nΣy² − (Σy)²)]</span>` + (stats.valid ? `r = ${compact(stats.num)} ÷ ${fmt(stats.den)}<br><b>r = ${fmt(stats.r, 6)}</b><br>r² = ${fmt(stats.r2, 6)} = ${fmt(stats.r2 * 100, 2)}%<br>1 − r² = ${fmt((1 - stats.r2) * 100, 2)}%<br>Rata-rata X = ${fmt(stats.mx, 2)}, Y = ${fmt(stats.my, 2)}<br>Garis kuadrat terkecil: ŷ = ${fmt(stats.b)} ${stats.m < 0 ? '−' : '+'} ${fmt(Math.abs(stats.m))}x<br>Σ(y − ŷ)² = ${fmt(stats.sse, 2)}` : stats.reason);
-      }
+  function buildTable() {
+    dataBody.innerHTML=points.map((p,i)=>`<tr><td><button class="row-number" type="button" data-row="${i}" aria-label="Pilih titik ${i+1}">${i+1}</button></td><td><input inputmode="decimal" autocomplete="off" data-i="${i}" data-k="x" value="${raw(p.x)}" aria-label="X titik ${i+1}"></td><td><input inputmode="decimal" autocomplete="off" data-i="${i}" data-k="y" value="${raw(p.y)}" aria-label="Y titik ${i+1}"></td></tr>`).join('');
+  }
 
-      function refresh() { stats = calculate(); updateResults(); updateSelection(); updateTableValues(); renderCalc(); draw(); }
-      function announce(message) { $('#actionStatus').textContent = message; }
-      function markCustom() { currentPreset = 'custom'; $('#customOption').hidden = false; $('#presetSelect').value = 'custom'; }
-      function selectPoint(i) { selected = i; updateSelection(); draw(); }
+  function beginDrag(event,i) {
+    if(!event.isPrimary||event.button!==0||drag)return;
+    event.preventDefault();
+    // Use the closest point where touch targets overlap.
+    const rect=wrap.getBoundingClientRect(), x=event.clientX-rect.left, y=event.clientY-rect.top;
+    let distance=Infinity, nearest=i;
+    points.forEach((p,j)=>{const d=Math.hypot(px(p.x)-x,py(p.y)-y);if(d<distance){distance=d;nearest=j;}});
+    selected=nearest;
+    const handle=handles[selected];
+    handle.focus({preventScroll:true});
+    drag={index:selected,pointerId:event.pointerId,handle,startX:event.clientX,startY:event.clientY,offsetX:px(points[selected].x)-x,offsetY:py(points[selected].y)-y,moved:false};
+    handle.setPointerCapture(event.pointerId);handle.classList.add('is-dragging');updateSelection();draw();
+  }
 
-      function applyValue(input, i, k) {
-        if (!points[i]) return;
-        const text = input.value.trim().replace(',', '.');
-        const value = text === '' ? NaN : Number(text);
-        if (!Number.isFinite(value)) { input.value = raw(points[i][k]); announce('Masukkan angka yang valid. Nilai sebelumnya dipertahankan.'); return; }
-        const lo = k === 'x' ? bounds.xmin : bounds.ymin, hi = k === 'x' ? bounds.xmax : bounds.ymax;
-        const next = round(clamp(value, lo, hi)), changed = points[i][k] !== next;
-        if (changed) { recordUndo(); points[i][k] = next; markCustom(); } selected = i;
-        input.value = raw(points[i][k]); refresh();
-        announce(value < lo || value > hi ? `Nilai ${k.toUpperCase()} dibatasi pada rentang ${lo}–${hi}.` : `Titik ${i + 1} diperbarui.`);
-      }
+  function moveDrag(event) {
+    if(!drag||drag.pointerId!==event.pointerId)return;
+    if(!drag.moved&&Math.hypot(event.clientX-drag.startX,event.clientY-drag.startY)<2)return;
+    event.preventDefault();if(!drag.moved)recordUndo();drag.moved=true;
+    const rect=wrap.getBoundingClientRect(), x=event.clientX-rect.left+drag.offsetX, y=event.clientY-rect.top+drag.offsetY;
+    const p=points[drag.index];
+    p.x=round(clamp(bounds.xmin+(x-pad.l)/(size.w-pad.l-pad.r)*(bounds.xmax-bounds.xmin),bounds.xmin,bounds.xmax));
+    p.y=round(clamp(bounds.ymin+(size.h-pad.b-y)/(size.h-pad.t-pad.b)*(bounds.ymax-bounds.ymin),bounds.ymin,bounds.ymax));
+    markCustom();refresh();
+  }
 
-      function buildTable() {
-        dataBody.innerHTML = points.map((p, i) => `<tr><td><button class="row-number" type="button" data-row="${i}" aria-label="Pilih titik ${i + 1}">${i + 1}</button></td><td><input inputmode="decimal" autocomplete="off" data-i="${i}" data-k="x" value="${raw(p.x)}" aria-label="X titik ${i + 1}"></td><td><input inputmode="decimal" autocomplete="off" data-i="${i}" data-k="y" value="${raw(p.y)}" aria-label="Y titik ${i + 1}"></td></tr>`).join('');
-      }
+  function endDrag(event) {
+    if(!drag||(event&&event.pointerId!==drag.pointerId))return;
+    const old=drag;drag=null;old.handle.classList.remove('is-dragging');
+    if(old.handle.hasPointerCapture(old.pointerId))old.handle.releasePointerCapture(old.pointerId);
+    if(old.moved)announce(`Titik ${old.index+1} diperbarui.`);
+    refresh();
+  }
 
-      function beginDrag(event, i) {
-        if (!event.isPrimary || event.button !== 0 || drag) return;
-        event.preventDefault();
-        // Use the closest point where touch targets overlap.
-        const rect = wrap.getBoundingClientRect(), x = event.clientX - rect.left, y = event.clientY - rect.top;
-        let distance = Infinity, nearest = i;
-        points.forEach((p, j) => { const d = Math.hypot(px(p.x) - x, py(p.y) - y); if (d < distance) { distance = d; nearest = j; } });
-        selected = nearest;
-        const handle = handles[selected];
-        handle.focus({ preventScroll: true });
-        drag = { index: selected, pointerId: event.pointerId, handle, startX: event.clientX, startY: event.clientY, offsetX: px(points[selected].x) - x, offsetY: py(points[selected].y) - y, moved: false };
-        handle.setPointerCapture(event.pointerId); handle.classList.add('is-dragging'); updateSelection(); draw();
-      }
-
-      function moveDrag(event) {
-        if (!drag || drag.pointerId !== event.pointerId) return;
-        if (!drag.moved && Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) < 2) return;
-        event.preventDefault(); if (!drag.moved) recordUndo(); drag.moved = true;
-        const rect = wrap.getBoundingClientRect(), x = event.clientX - rect.left + drag.offsetX, y = event.clientY - rect.top + drag.offsetY;
-        const p = points[drag.index];
-        p.x = round(clamp(bounds.xmin + (x - pad.l) / (size.w - pad.l - pad.r) * (bounds.xmax - bounds.xmin), bounds.xmin, bounds.xmax));
-        p.y = round(clamp(bounds.ymin + (size.h - pad.b - y) / (size.h - pad.t - pad.b) * (bounds.ymax - bounds.ymin), bounds.ymin, bounds.ymax));
-        markCustom(); refresh();
-      }
-
-      function endDrag(event) {
-        if (!drag || (event && event.pointerId !== drag.pointerId)) return;
-        const old = drag; drag = null; old.handle.classList.remove('is-dragging');
-        if (old.handle.hasPointerCapture(old.pointerId)) old.handle.releasePointerCapture(old.pointerId);
-        if (old.moved) announce(`Titik ${old.index + 1} diperbarui.`);
-        refresh();
-      }
-
-      function buildHandles() {
-        handles.forEach(handle => handle.remove());
-        handles = points.map((p, i) => {
-          const handle = document.createElement('button'); handle.type = 'button'; handle.className = 'point';
-          handle.addEventListener('pointerdown', event => beginDrag(event, i));
-          handle.addEventListener('pointermove', moveDrag);
-          handle.addEventListener('pointerup', endDrag);
-          handle.addEventListener('pointercancel', endDrag);
-          handle.addEventListener('lostpointercapture', endDrag);
-          handle.addEventListener('focus', () => selectPoint(i));
-          handle.addEventListener('click', () => selectPoint(i));
-          handle.addEventListener('keydown', event => {
-            const move = { ArrowLeft: [-.5, 0], ArrowRight: [.5, 0], ArrowUp: [0, .5], ArrowDown: [0, -.5] }[event.key];
-            if (!move) return;
-            event.preventDefault(); recordUndo(); selected = i;
-            points[i].x = round(clamp(points[i].x + move[0], bounds.xmin, bounds.xmax));
-            points[i].y = round(clamp(points[i].y + move[1], bounds.ymin, bounds.ymax)); markCustom(); refresh();
-          });
-          wrap.appendChild(handle); return handle;
-        });
-      }
-
-      function loadPreset(type) {
-        endDrag(); recordUndo(); selected = -1;
-        if (type === 'book') points = initial.map(p => ({ ...p }));
-        else if (type === 'posPerfect' || type === 'negPerfect') points = Array.from({ length: 12 }, (_, i) => ({ x: 44 + 2 * i, y: round(80 + (type === 'posPerfect' ? 1 : -1) * (44 + 2 * i - 55) * 1.2) }));
-        else if (type === 'constant') points = presets.none.map(y => ({ x: 55, y }));
-        else points = presets[type].map((y, i) => ({ x: 44 + 2 * i, y }));
-        origin = type === 'book' ? 'book' : 'synthetic'; currentPreset = type;
-        $('#presetSelect').value = type; $('#customOption').hidden = true;
-        buildHandles(); buildTable(); refresh();
-        announce(type === 'book' ? 'Data awal dipulihkan.' : `Pola ${$('#presetSelect').selectedOptions[0].text.toLowerCase()} dimuat.`);
-      }
-
-      function generatePattern(target) {
-        endDrag(); selected = -1; origin = 'generated'; currentTarget = target;
-        const xs = Array.from({ length: 12 }, (_, i) => 44 + 2 * i), rawNoise = [1.2, -.8, .55, -.2, -1.1, .35, .35, -1.1, -.2, .55, -.8, 1.2];
-        const xm = xs.reduce((s, x) => s + x, 0) / 12, em = rawNoise.reduce((s, e) => s + e, 0) / 12;
-        const xnorm = Math.sqrt(xs.reduce((s, x) => s + (x - xm) ** 2, 0)), enorm = Math.sqrt(rawNoise.reduce((s, e) => s + (e - em) ** 2, 0));
-        // The noise is symmetric about the X mean and orthogonal to centered X.
-        // Combining two normalized orthogonal vectors gives the requested r before rounding.
-        const vector = xs.map((x, i) => target * (x - xm) / xnorm + Math.sqrt(Math.max(0, 1 - target * target)) * (rawNoise[i] - em) / enorm);
-        const extent = Math.max(...vector.map(Math.abs)), gain = 16 / extent;
-        points = xs.map((x, i) => ({ x, y: Math.abs(target) === 1 ? round(80 + target * (x - xm) * 1.2) : round(80 + gain * vector[i]) }));
-        markCustom(); $('#targetVal').textContent = fmt(target, 2); buildHandles(); buildTable(); refresh();
-        announce(`Target r = ${fmt(target, 2)} · r aktual = ${fmt(stats.r)}.`);
-      }
-
-      $('#presetSelect').addEventListener('change', event => { if (event.target.value !== 'custom') loadPreset(event.target.value); });
-      $('#resetBtn').addEventListener('click', () => loadPreset('book'));
-      $('#undoBtn').addEventListener('click', undo);
-      $('#addBtn').addEventListener('click', () => {
-        if (points.length >= 30) return;
-        endDrag(); recordUndo();
-        // Avoid placing new points directly on existing points.
-        let newPoint = { x: 55, y: 80 }, best = -1;
-        for (const x of [55, 53, 57, 51, 59, 49, 61, 47, 63]) for (const y of [80, 76, 84, 72, 88, 68, 92]) {
-          const distance = Math.min(...points.map(p => Math.hypot((p.x - x) / 30, (p.y - y) / 40)));
-          if (distance > best) { best = distance; newPoint = { x, y }; }
-        }
-        points.push(newPoint); selected = points.length - 1; markCustom(); buildHandles(); buildTable(); refresh();
-        announce(points.length === 30 ? '30 titik tercapai. Geser atau edit titik yang sudah ada.' : `Titik ${points.length} ditambahkan. Geser titik yang dipilih.`);
+  function buildHandles() {
+    handles.forEach(handle=>handle.remove());
+    handles=points.map((p,i)=>{
+      const handle=document.createElement('button');handle.type='button';handle.className='point';
+      handle.addEventListener('pointerdown',event=>beginDrag(event,i));
+      handle.addEventListener('pointermove',moveDrag);
+      handle.addEventListener('pointerup',endDrag);
+      handle.addEventListener('pointercancel',endDrag);
+      handle.addEventListener('lostpointercapture',endDrag);
+      handle.addEventListener('focus',()=>selectPoint(i));
+      handle.addEventListener('click',()=>selectPoint(i));
+      handle.addEventListener('keydown',event=>{
+        const move={ArrowLeft:[-.5,0],ArrowRight:[.5,0],ArrowUp:[0,.5],ArrowDown:[0,-.5]}[event.key];
+        if(!move)return;
+        event.preventDefault();recordUndo();selected=i;
+        points[i].x=round(clamp(points[i].x+move[0],bounds.xmin,bounds.xmax));
+        points[i].y=round(clamp(points[i].y+move[1],bounds.ymin,bounds.ymax));markCustom();refresh();
       });
-      $('#deleteBtn').addEventListener('click', () => {
-        if (selected < 0 || points.length <= 2) return;
-        endDrag(); recordUndo(); const old = selected + 1; points.splice(selected, 1); selected = -1; markCustom(); buildHandles(); buildTable(); refresh(); announce(`Titik ${old} dihapus. Tersisa ${points.length} titik.`);
-      });
-      dataBody.addEventListener('change', event => { const input = event.target; if (input.matches('input[data-i]')) applyValue(input, +input.dataset.i, input.dataset.k); });
-      dataBody.addEventListener('focusin', event => { if (event.target.matches('input[data-i]')) selectPoint(+event.target.dataset.i); });
-      dataBody.addEventListener('click', event => { const button = event.target.closest('[data-row]'); if (button) selectPoint(+button.dataset.row); });
-      for (const [id, k] of [['editX', 'x'], ['editY', 'y']]) $('#' + id).addEventListener('change', event => applyValue(event.target, selected, k));
-      document.querySelectorAll('input[inputmode="decimal"]').forEach(input => input.addEventListener('keydown', event => { if (event.key === 'Enter') input.blur(); }));
-      dataBody.addEventListener('keydown', event => { if (event.key === 'Enter' && event.target.matches('input')) event.target.blur(); });
-      $('#showLine').addEventListener('change', () => { if (!$('#showLine').checked) $('#showResiduals').checked = false; updateResults(); draw(); });
-      $('#showMean').addEventListener('change', draw);
-      $('#showResiduals').addEventListener('change', () => { if ($('#showResiduals').checked) $('#showLine').checked = true; updateResults(); draw(); });
-      $('#patternR').addEventListener('pointerdown', () => { endDrag(); recordUndo(); sliderGesture = true; });
-      $('#patternR').addEventListener('input', event => { if (!sliderGesture) recordUndo(); generatePattern(Number(event.target.value)); });
-      $('#patternR').addEventListener('change', () => { sliderGesture = false; });
-      window.addEventListener('pointerup', () => { sliderGesture = false; });
-      window.addEventListener('pointercancel', () => { sliderGesture = false; });
-      $('#calcDetails').addEventListener('toggle', renderCalc);
-      if ('ResizeObserver' in window) new ResizeObserver(resize).observe(wrap); else window.addEventListener('resize', resize);
-      buildHandles(); buildTable(); stats = calculate(); resize(); refresh();
-      document.querySelectorAll('[data-local-asset]').forEach(img => { img.onload = () => { img.hidden = false; }; img.onerror = () => { img.hidden = true; }; img.src = img.dataset.localAsset; });
-    })();
+      wrap.appendChild(handle);return handle;
+    });
+  }
 
-  </script>
+  function loadPreset(type) {
+    endDrag();recordUndo();selected=-1;
+    if(type==='book')points=initial.map(p=>({...p}));
+    else if(type==='posPerfect'||type==='negPerfect')points=Array.from({length:12},(_,i)=>({x:44+2*i,y:round(80+(type==='posPerfect'?1:-1)*(44+2*i-55)*1.2)}));
+    else if(type==='constant')points=presets.none.map(y=>({x:55,y}));
+    else points=presets[type].map((y,i)=>({x:44+2*i,y}));
+    origin=type==='book'?'book':'synthetic';currentPreset=type;
+    $('#presetSelect').value=type;$('#customOption').hidden=true;
+    buildHandles();buildTable();refresh();
+    announce(type==='book'?'Data awal dipulihkan.':`Pola ${$('#presetSelect').selectedOptions[0].text.toLowerCase()} dimuat.`);
+  }
+
+  function generatePattern(target) {
+    endDrag();selected=-1;origin='generated';currentTarget=target;
+    const xs=Array.from({length:12},(_,i)=>44+2*i), rawNoise=[1.2,-.8,.55,-.2,-1.1,.35,.35,-1.1,-.2,.55,-.8,1.2];
+    const xm=xs.reduce((s,x)=>s+x,0)/12, em=rawNoise.reduce((s,e)=>s+e,0)/12;
+    const xnorm=Math.sqrt(xs.reduce((s,x)=>s+(x-xm)**2,0)), enorm=Math.sqrt(rawNoise.reduce((s,e)=>s+(e-em)**2,0));
+    // The noise is symmetric about the X mean and orthogonal to centered X.
+    // Combining two normalized orthogonal vectors gives the requested r before rounding.
+    const vector=xs.map((x,i)=>target*(x-xm)/xnorm+Math.sqrt(Math.max(0,1-target*target))*(rawNoise[i]-em)/enorm);
+    const extent=Math.max(...vector.map(Math.abs)), gain=16/extent;
+    points=xs.map((x,i)=>({x,y:Math.abs(target)===1?round(80+target*(x-xm)*1.2):round(80+gain*vector[i])}));
+    markCustom();$('#targetVal').textContent=fmt(target,2);buildHandles();buildTable();refresh();
+    announce(`Target r = ${fmt(target,2)} · r aktual = ${fmt(stats.r)}.`);
+  }
+
+  $('#presetSelect').addEventListener('change',event=>{if(event.target.value!=='custom')loadPreset(event.target.value);});
+  $('#resetBtn').addEventListener('click',()=>loadPreset('book'));
+  $('#undoBtn').addEventListener('click',undo);
+  $('#addBtn').addEventListener('click',()=>{
+    if(points.length>=30)return;
+    endDrag();recordUndo();
+    // Avoid placing new points directly on existing points.
+    let newPoint={x:55,y:80}, best=-1;
+    for(const x of [55,53,57,51,59,49,61,47,63])for(const y of [80,76,84,72,88,68,92]) {
+      const distance=Math.min(...points.map(p=>Math.hypot((p.x-x)/30,(p.y-y)/40)));
+      if(distance>best){best=distance;newPoint={x,y};}
+    }
+    points.push(newPoint);selected=points.length-1;markCustom();buildHandles();buildTable();refresh();
+    announce(points.length===30?'30 titik tercapai. Geser atau edit titik yang sudah ada.':`Titik ${points.length} ditambahkan. Geser titik yang dipilih.`);
+  });
+  $('#deleteBtn').addEventListener('click',()=>{
+    if(selected<0||points.length<=2)return;
+    endDrag();recordUndo();const old=selected+1;points.splice(selected,1);selected=-1;markCustom();buildHandles();buildTable();refresh();announce(`Titik ${old} dihapus. Tersisa ${points.length} titik.`);
+  });
+  dataBody.addEventListener('change',event=>{const input=event.target;if(input.matches('input[data-i]'))applyValue(input,+input.dataset.i,input.dataset.k);});
+  dataBody.addEventListener('focusin',event=>{if(event.target.matches('input[data-i]'))selectPoint(+event.target.dataset.i);});
+  dataBody.addEventListener('click',event=>{const button=event.target.closest('[data-row]');if(button)selectPoint(+button.dataset.row);});
+  for(const [id,k] of [['editX','x'],['editY','y']])$('#'+id).addEventListener('change',event=>applyValue(event.target,selected,k));
+  document.querySelectorAll('input[inputmode="decimal"]').forEach(input=>input.addEventListener('keydown',event=>{if(event.key==='Enter')input.blur();}));
+  dataBody.addEventListener('keydown',event=>{if(event.key==='Enter'&&event.target.matches('input'))event.target.blur();});
+  $('#showLine').addEventListener('change',()=>{if(!$('#showLine').checked)$('#showResiduals').checked=false;updateResults();draw();});
+  $('#showMean').addEventListener('change',draw);
+  $('#showResiduals').addEventListener('change',()=>{if($('#showResiduals').checked)$('#showLine').checked=true;updateResults();draw();});
+  $('#patternR').addEventListener('pointerdown',()=>{endDrag();recordUndo();sliderGesture=true;});
+  $('#patternR').addEventListener('input',event=>{if(!sliderGesture)recordUndo();generatePattern(Number(event.target.value));});
+  $('#patternR').addEventListener('change',()=>{sliderGesture=false;});
+  window.addEventListener('pointerup',()=>{sliderGesture=false;});
+  window.addEventListener('pointercancel',()=>{sliderGesture=false;});
+  $('#calcDetails').addEventListener('toggle',renderCalc);
+  if('ResizeObserver' in window)new ResizeObserver(resize).observe(wrap);else window.addEventListener('resize',resize);
+  buildHandles();buildTable();stats=calculate();resize();refresh();
+  // Gambar logo dimuat langsung dari src. Jika belum dipasang, slot tetap rapi.
+  document.querySelectorAll('.brand-logo,.interactive-logo').forEach(img=>{
+    const setLogoState=()=>{
+      const missing=img.complete&&img.naturalWidth===0;
+      img.hidden=missing;
+      img.parentElement.classList.toggle('logo-empty',missing);
+    };
+    img.addEventListener('load',setLogoState);
+    img.addEventListener('error',setLogoState);
+    if(img.complete)setLogoState();
+  });
+})();
+
+</script>
 </body>
-
 </html>
