@@ -954,6 +954,27 @@ dialog{width:min(680px,calc(100% - 24px));max-height:calc(100dvh - 24px);border:
 /* FIX NAVIGASI HALAMAN: halaman yang hidden harus benar-benar hilang meski ada display:flex !important */
 .page-stack > .dash-page[hidden]{display:none!important;visibility:hidden!important;}
 .page-stack > .dash-page:not([hidden]){visibility:visible;}
+
+/* ===== 10 LEVEL: 1–6 berbasis buku, 7–10 tantangan lanjutan ===== */
+@media (min-width:900px){
+  #page-challenge .level-strip{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:7px!important}
+  #page-challenge .level-tab{min-height:58px!important;padding:7px 8px!important}
+  #page-challenge .level-tab .level-icon{width:29px!important;height:29px!important;flex:0 0 29px!important}
+  #page-challenge .level-tab b{font-size:10.5px!important}
+  #page-challenge .level-tab small{font-size:8px!important;line-height:1.25!important}
+  #page-challenge .challenge-level-title{min-height:23px}
+}
+.level-tab.advanced{border-color:#dccdf5!important;background:#fcfaff!important}
+.level-tab.advanced .level-icon{background:linear-gradient(180deg,#7b55d9,#9a4fc5)!important}
+.level-tab.advanced.active{background:linear-gradient(135deg,#f4efff,#fff8ff)!important;border-color:#8b68d6!important;box-shadow:inset 0 0 0 1px #e6dafb!important}
+.level-badge.advanced{background:#f3ebff;color:#6d4a9b}
+.challenge-head.advanced-head{border-color:#e4d9f4;background:#fbf8ff}
+.challenge-head.advanced-head .material-kicker{color:#7950a2}
+.challenge-source-tag{display:inline-flex;align-items:center;gap:5px;margin-left:8px;padding:3px 7px;border-radius:999px;border:1px solid #d9e5ec;background:#fff;color:#69808d;font-size:8px;font-weight:700;vertical-align:middle}
+.challenge-source-tag.custom{border-color:#dfd2f1;background:#faf6ff;color:#76529a}
+@media(max-width:899px){#page-challenge .level-strip{grid-template-columns:repeat(2,minmax(0,1fr))!important}.challenge-source-tag{margin-left:0;margin-top:5px}}
+@media(max-width:540px){#page-challenge .level-strip{grid-template-columns:1fr!important}}
+
 </style></head><body><div class="app"><header class="brand-header">
     <div class="brand-logo-wrap">
       <!-- LOGO KIRI: pasang gambarmu di bahan/logo-identitas.png. Ubah src jika nama filenya berbeda. -->
@@ -1059,97 +1080,134 @@ dialog{width:min(680px,calc(100% - 24px));max-height:calc(100dvh - 24px);border:
    </section>
 
    <section class="dash-page card challenge-page" id="page-challenge" hidden>
-    <div class="challenge-intro"><div><h3>Tantangan Korelasi Berlevel</h3><p>Setiap level memiliki tipe aktivitas yang berbeda supaya latihan lebih padat dan tidak monoton. Selesaikan level secara berurutan untuk membuka level berikutnya.</p></div><span class="mini-note">6 level · 30+ aktivitas</span></div>
-    <div class="challenge-level-title"><strong>Pilih Level Tantangan</strong><span>6 level · tingkat kesulitan meningkat</span></div>
+    <div class="challenge-intro"><div><h3>Tantangan Korelasi Berlevel</h3><p>Level 1–6 mengikuti kompetensi Bab 1 Statistika pada buku. Level 7–10 merupakan tantangan lanjutan untuk menggabungkan beberapa konsep sekaligus.</p></div><span class="mini-note">10 level · 57 aktivitas</span></div>
+    <div class="challenge-level-title"><strong>Pilih Level Tantangan</strong><span>Level 1–6 berbasis buku · Level 7–10 kreasi lanjutan</span></div>
     <div class="level-strip">
-     <button type="button" class="level-tab active" data-challenge-level="1"><span class="level-icon"><svg viewBox="0 0 24 24"><path d="M5 19V5M5 19h14M8 15l3-3 3 2 4-5"/></svg></span><span><b>Level 1 · Arah Hubungan</b><small>Baca positif, negatif, atau tidak ada korelasi.</small></span></button>
-     <button type="button" class="level-tab locked" data-challenge-level="2" disabled><span class="level-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/><circle cx="12" cy="12" r="8"/></svg></span><span><b>Level 2 · Kekuatan</b><small>Tentukan kategori hubungan dari nilai r.</small></span></button>
-     <button type="button" class="level-tab locked" data-challenge-level="3" disabled><span class="level-icon"><svg viewBox="0 0 24 24"><path d="M6 4h12v16H6z"/><path d="M9 8h6M9 12h3"/></svg></span><span><b>Level 3 · Tebak Nilai r</b><small>Perkirakan nilai r yang paling masuk akal.</small></span></button>
-     <button type="button" class="level-tab locked" data-challenge-level="4" disabled><span class="level-icon"><svg viewBox="0 0 24 24"><path d="M8 12l2 2 6-6"/><circle cx="12" cy="12" r="9"/></svg></span><span><b>Level 4 · True / False</b><small>Uji konsep inti secara cepat.</small></span></button>
-     <button type="button" class="level-tab locked" data-challenge-level="5" disabled><span class="level-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/><path d="M10.5 10.5l3 3"/></svg></span><span><b>Level 5 · Pasangkan Konsep</b><small>Cocokkan istilah dengan maknanya.</small></span></button>
-     <button type="button" class="level-tab locked" data-challenge-level="6" disabled><span class="level-icon"><svg viewBox="0 0 24 24"><path d="M12 7v5l3 2"/><circle cx="12" cy="13" r="8"/><path d="M9 3h6"/></svg></span><span><b>Level 6 · Time Challenge</b><small>Jawab cepat sebanyak mungkin.</small></span></button>
+     <button type="button" class="level-tab active" data-challenge-level="1"><span class="level-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M8 9h3M8 13h5M15 9h1M15 13h1"/></svg></span><span><b>Level 1 · Variabel & Pencar</b><small>Berbasis buku · dasar data bivariat.</small></span></button>
+     <button type="button" class="level-tab locked" data-challenge-level="2" disabled><span class="level-icon"><svg viewBox="0 0 24 24"><path d="M5 19V5M5 19h14M8 15l3-3 3 2 4-5"/></svg></span><span><b>Level 2 · Arah & Tren</b><small>Berbasis buku · baca pola diagram.</small></span></button>
+     <button type="button" class="level-tab locked" data-challenge-level="3" disabled><span class="level-icon"><svg viewBox="0 0 24 24"><path d="M4 18l5-5 4 2 7-9"/><path d="M5 5v14h14"/></svg></span><span><b>Level 3 · Regresi Linear</b><small>Berbasis buku · garis, a, dan b.</small></span></button>
+     <button type="button" class="level-tab locked" data-challenge-level="4" disabled><span class="level-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M8 14l3-4 2 3 3-5"/></svg></span><span><b>Level 4 · Korelasi</b><small>Berbasis buku · nilai r & kekuatan.</small></span></button>
+     <button type="button" class="level-tab locked" data-challenge-level="5" disabled><span class="level-icon"><svg viewBox="0 0 24 24"><path d="M4 19h16M6 16V9M10 16V5M14 16v-4M18 16V7"/></svg></span><span><b>Level 5 · Determinasi</b><small>Berbasis buku · tafsir r².</small></span></button>
+     <button type="button" class="level-tab locked" data-challenge-level="6" disabled><span class="level-icon"><svg viewBox="0 0 24 24"><path d="M5 12h14M15 8l4 4-4 4"/><path d="M9 5H5v14h4"/></svg></span><span><b>Level 6 · Prediksi</b><small>Berbasis buku · interpolasi & ekstrapolasi.</small></span></button>
+     <button type="button" class="level-tab advanced locked" data-challenge-level="7" disabled><span class="level-icon"><svg viewBox="0 0 24 24"><path d="M4 18l5-6 4 3 7-9"/><circle cx="9" cy="12" r="2"/></svg></span><span><b>Level 7 · Detektif Data</b><small>Kreasi lanjutan · bandingkan hasil.</small></span></button>
+     <button type="button" class="level-tab advanced locked" data-challenge-level="8" disabled><span class="level-icon"><svg viewBox="0 0 24 24"><path d="M6 4h12v16H6z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><span><b>Level 8 · Audit Kesimpulan</b><small>Kreasi lanjutan · temukan kesalahan.</small></span></button>
+     <button type="button" class="level-tab advanced locked" data-challenge-level="9" disabled><span class="level-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M8 10h8M8 14h5"/></svg></span><span><b>Level 9 · Case Lab</b><small>Kreasi lanjutan · analisis multi-langkah.</small></span></button>
+     <button type="button" class="level-tab advanced locked" data-challenge-level="10" disabled><span class="level-icon"><svg viewBox="0 0 24 24"><path d="M12 7v5l3 2"/><circle cx="12" cy="13" r="8"/><path d="M9 3h6"/></svg></span><span><b>Level 10 · Expert</b><small>Kreasi lanjutan · final berwaktu.</small></span></button>
     </div>
     <div class="challenge-body">
+
      <section class="challenge-level" data-level-panel="1">
-      <div class="challenge-head"><div><span class="material-kicker">LEVEL 1 · DASAR</span><h3>Membaca arah hubungan</h3><p>Fokus pada tanda nilai r dan arah sebaran titik.</p></div><span class="level-badge">6 soal</span></div>
+      <div class="challenge-head"><div><span class="material-kicker">LEVEL 1 · DASAR</span><span class="challenge-source-tag">BERBASIS BUKU</span><h3>Variabel dan diagram pencar</h3><p>Gunakan konsep data bivariat dan contoh lama belajar–nilai ujian pada Bab 1.</p></div><span class="level-badge">5 soal</span></div>
       <div class="question-grid">
-       <article class="question-card" data-question="l1q1"><span class="question-no">SOAL 01</span><h4>Jika r = 0,72 maka arah hubungan kedua variabel adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Positif</button><button class="answer-btn" data-answer="wrong">Negatif</button><button class="answer-btn" data-answer="wrong">Tidak ada hubungan linear</button></div><div class="q-feedback" aria-live="polite"></div></article>
-       <article class="question-card" data-question="l1q2"><span class="question-no">SOAL 02</span><h4>Jika r = -0,65 maka arah hubungan kedua variabel adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Positif</button><button class="answer-btn" data-answer="correct">Negatif</button><button class="answer-btn" data-answer="wrong">Tidak bisa ditentukan</button></div><div class="q-feedback" aria-live="polite"></div></article>
-       <article class="question-card" data-question="l1q3"><span class="question-no">SOAL 03</span><h4>Pada diagram pencar, titik-titik naik dari kiri bawah ke kanan atas. Polanya adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Korelasi positif</button><button class="answer-btn" data-answer="wrong">Korelasi negatif</button><button class="answer-btn" data-answer="wrong">Tidak ada korelasi linear</button></div><div class="q-feedback" aria-live="polite"></div></article>
-       <article class="question-card" data-question="l1q4"><span class="question-no">SOAL 04</span><h4>Titik-titik turun dari kiri atas ke kanan bawah. Ini menunjukkan ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Korelasi positif</button><button class="answer-btn" data-answer="correct">Korelasi negatif</button><button class="answer-btn" data-answer="wrong">Korelasi nol</button></div><div class="q-feedback" aria-live="polite"></div></article>
-       <article class="question-card" data-question="l1q5"><span class="question-no">SOAL 05</span><h4>Jika r = 0, pola hubungan linear yang tepat adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Positif lemah</button><button class="answer-btn" data-answer="wrong">Negatif sedang</button><button class="answer-btn" data-answer="correct">Tidak ada hubungan linear</button></div><div class="q-feedback" aria-live="polite"></div></article>
-       <article class="question-card" data-question="l1q6"><span class="question-no">SOAL 06</span><h4>Nilai mana yang menunjukkan hubungan berlawanan arah?</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">r = 0,48</button><button class="answer-btn" data-answer="correct">r = -0,48</button><button class="answer-btn" data-answer="wrong">r = 0</button></div><div class="q-feedback" aria-live="polite"></div></article>
-      </div><div class="level-status" id="level1Status"><span>Selesaikan semua soal untuk membuka Level 2.</span><strong>0 / 6</strong></div>
+       <article class="question-card" data-question="l1q1"><span class="question-no">SOAL 01</span><h4>Pada data “lama belajar” dan “nilai ujian”, variabel bebas yang paling tepat adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Lama belajar</button><button class="answer-btn" data-answer="wrong">Nilai ujian</button><button class="answer-btn" data-answer="wrong">Jumlah murid</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l1q2"><span class="question-no">SOAL 02</span><h4>Pada data yang sama, variabel terikatnya adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Lama belajar</button><button class="answer-btn" data-answer="correct">Nilai ujian</button><button class="answer-btn" data-answer="wrong">Nomor urut data</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l1q3"><span class="question-no">SOAL 03</span><h4>Satu pasangan nilai X dan Y pada diagram pencar ditampilkan sebagai ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Satu batang</button><button class="answer-btn" data-answer="correct">Satu titik</button><button class="answer-btn" data-answer="wrong">Satu sektor lingkaran</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l1q4"><span class="question-no">SOAL 04</span><h4>Fungsi utama diagram pencar pada materi ini adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Melihat hubungan antara dua variabel kuantitatif</button><button class="answer-btn" data-answer="wrong">Mengurutkan data dari kecil ke besar</button><button class="answer-btn" data-answer="wrong">Menghitung median satu variabel</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l1q5"><span class="question-no">SOAL 05</span><h4>Jika titik-titik pada diagram cenderung bergerak dari kiri bawah ke kanan atas, hubungan yang terlihat adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Positif</button><button class="answer-btn" data-answer="wrong">Negatif</button><button class="answer-btn" data-answer="wrong">Pasti tidak berkorelasi</button></div><div class="q-feedback"></div></article>
+      </div><div class="level-status" id="level1Status"><span>Selesaikan semua soal untuk membuka Level 2.</span><strong>0 / 5</strong></div>
      </section>
 
      <section class="challenge-level" data-level-panel="2" hidden>
-      <div class="challenge-head"><div><span class="material-kicker">LEVEL 2 · MENENGAH</span><h3>Membaca kekuatan hubungan</h3><p>Gunakan rentang kekuatan hubungan pada Tabel 1.6.</p></div><span class="level-badge medium">6 soal</span></div>
+      <div class="challenge-head"><div><span class="material-kicker">LEVEL 2 · DASAR+</span><span class="challenge-source-tag">BERBASIS BUKU</span><h3>Arah dan bentuk tren</h3><p>Baca pola positif, negatif, dan tidak berkorelasi linear.</p></div><span class="level-badge">5 soal</span></div>
       <div class="question-grid">
-       <article class="question-card" data-question="l2q1"><span class="question-no">SOAL 01</span><h4>r = 0,04 berada pada kategori ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Hubungan kurang berarti</button><button class="answer-btn" data-answer="wrong">Hubungan lemah</button><button class="answer-btn" data-answer="wrong">Hubungan kuat</button></div><div class="q-feedback"></div></article>
-       <article class="question-card" data-question="l2q2"><span class="question-no">SOAL 02</span><h4>r = -0,22 menunjukkan hubungan ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Moderat</button><button class="answer-btn" data-answer="correct">Lemah</button><button class="answer-btn" data-answer="wrong">Sangat kuat</button></div><div class="q-feedback"></div></article>
-       <article class="question-card" data-question="l2q3"><span class="question-no">SOAL 03</span><h4>r = 0,37 termasuk kategori ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Lemah</button><button class="answer-btn" data-answer="correct">Moderat</button><button class="answer-btn" data-answer="wrong">Kuat</button></div><div class="q-feedback"></div></article>
-       <article class="question-card" data-question="l2q4"><span class="question-no">SOAL 04</span><h4>r = -0,66 memiliki kekuatan hubungan ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Moderat</button><button class="answer-btn" data-answer="correct">Kuat</button><button class="answer-btn" data-answer="wrong">Mendekati sempurna</button></div><div class="q-feedback"></div></article>
-       <article class="question-card" data-question="l2q5"><span class="question-no">SOAL 05</span><h4>r = 0,86 berada pada kategori ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Kuat</button><button class="answer-btn" data-answer="correct">Sangat kuat</button><button class="answer-btn" data-answer="wrong">Sempurna</button></div><div class="q-feedback"></div></article>
-       <article class="question-card" data-question="l2q6"><span class="question-no">SOAL 06</span><h4>Nilai mana yang mendekati korelasi sempurna?</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">0,58</button><button class="answer-btn" data-answer="wrong">0,78</button><button class="answer-btn" data-answer="correct">0,95</button></div><div class="q-feedback"></div></article>
-      </div><div class="level-status" id="level2Status"><span>Selesaikan semua soal untuk membuka Level 3.</span><strong>0 / 6</strong></div>
+       <article class="question-card" data-question="l2q1"><span class="question-no">SOAL 01</span><h4>Ketika X meningkat dan Y cenderung ikut meningkat, arah tren adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Positif</button><button class="answer-btn" data-answer="wrong">Negatif</button><button class="answer-btn" data-answer="wrong">Nol</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l2q2"><span class="question-no">SOAL 02</span><h4>Ketika X meningkat tetapi Y cenderung menurun, arah tren adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Positif</button><button class="answer-btn" data-answer="correct">Negatif</button><button class="answer-btn" data-answer="wrong">Tidak dapat diamati</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l2q3"><span class="question-no">SOAL 03</span><h4>Jika titik menyebar tanpa kecenderungan garis lurus yang jelas, kesimpulan yang tepat adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Korelasi positif sempurna</button><button class="answer-btn" data-answer="wrong">Korelasi negatif sempurna</button><button class="answer-btn" data-answer="correct">Tidak ada hubungan linear yang jelas</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l2q4"><span class="question-no">SOAL 04</span><h4>Nilai r = 0 menunjukkan ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Hubungan positif sempurna</button><button class="answer-btn" data-answer="correct">Tidak ada hubungan linear</button><button class="answer-btn" data-answer="wrong">Hubungan negatif sempurna</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l2q5"><span class="question-no">SOAL 05</span><h4>Nilai r = −1 menggambarkan ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Korelasi positif sempurna</button><button class="answer-btn" data-answer="correct">Korelasi negatif sempurna</button><button class="answer-btn" data-answer="wrong">Tidak ada korelasi linear</button></div><div class="q-feedback"></div></article>
+      </div><div class="level-status" id="level2Status"><span>Selesaikan semua soal untuk membuka Level 3.</span><strong>0 / 5</strong></div>
      </section>
 
      <section class="challenge-level" data-level-panel="3" hidden>
-      <div class="challenge-head"><div><span class="material-kicker">LEVEL 3 · APLIKASI</span><h3>Menebak nilai r yang paling mungkin</h3><p>Baca deskripsi pola, lalu pilih nilai r yang paling sesuai.</p></div><span class="level-badge medium">5 soal</span></div>
+      <div class="challenge-head"><div><span class="material-kicker">LEVEL 3 · MENENGAH</span><span class="challenge-source-tag">BERBASIS BUKU</span><h3>Regresi linear dan arti koefisien</h3><p>Gunakan contoh garis regresi buku ŷ = 29,529 + 0,897x.</p></div><span class="level-badge medium">5 soal</span></div>
       <div class="question-grid">
-       <article class="question-card" data-question="l3q1"><span class="question-no">SOAL 01</span><h4>Titik hampir tepat pada garis naik. Nilai r yang paling mungkin adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">0,18</button><button class="answer-btn" data-answer="wrong">0,54</button><button class="answer-btn" data-answer="correct">0,97</button></div><div class="q-feedback"></div></article>
-       <article class="question-card" data-question="l3q2"><span class="question-no">SOAL 02</span><h4>Titik menyebar turun dengan pola cukup jelas, tetapi tidak rapat. Nilai r yang paling mungkin adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">0,74</button><button class="answer-btn" data-answer="correct">-0,52</button><button class="answer-btn" data-answer="wrong">0,02</button></div><div class="q-feedback"></div></article>
-       <article class="question-card" data-question="l3q3"><span class="question-no">SOAL 03</span><h4>Titik acak tanpa pola garis lurus. Nilai r yang paling mungkin adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">0,91</button><button class="answer-btn" data-answer="correct">0,01</button><button class="answer-btn" data-answer="wrong">-0,72</button></div><div class="q-feedback"></div></article>
-       <article class="question-card" data-question="l3q4"><span class="question-no">SOAL 04</span><h4>Titik naik, tetapi penyebarannya cukup renggang. Nilai r yang paling mungkin adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">-0,43</button><button class="answer-btn" data-answer="correct">0,42</button><button class="answer-btn" data-answer="wrong">0,98</button></div><div class="q-feedback"></div></article>
-       <article class="question-card" data-question="l3q5"><span class="question-no">SOAL 05</span><h4>Titik turun hampir lurus sempurna. Nilai r yang paling mungkin adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">0,88</button><button class="answer-btn" data-answer="correct">-0,96</button><button class="answer-btn" data-answer="wrong">-0,21</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l3q1"><span class="question-no">SOAL 01</span><h4>Tujuan analisis regresi pada bab ini adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Membentuk model untuk memprediksi Y berdasarkan X</button><button class="answer-btn" data-answer="wrong">Membuktikan X selalu menyebabkan Y</button><button class="answer-btn" data-answer="wrong">Menghapus semua titik yang menyimpang</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l3q2"><span class="question-no">SOAL 02</span><h4>Pada ŷ = 29,529 + 0,897x, nilai 0,897 adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Intersep</button><button class="answer-btn" data-answer="correct">Kemiringan/koefisien regresi b</button><button class="answer-btn" data-answer="wrong">Koefisien determinasi</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l3q3"><span class="question-no">SOAL 03</span><h4>Makna b = 0,897 adalah: setiap X bertambah 1 satuan, nilai Y yang diprediksi ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Bertambah sekitar 0,897 satuan</button><button class="answer-btn" data-answer="wrong">Berkurang sekitar 0,897 satuan</button><button class="answer-btn" data-answer="wrong">Selalu menjadi 0,897</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l3q4"><span class="question-no">SOAL 04</span><h4>Pada persamaan yang sama, 29,529 merupakan nilai prediksi Y ketika ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">X = 0</button><button class="answer-btn" data-answer="wrong">X = 1</button><button class="answer-btn" data-answer="wrong">r = 0</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l3q5"><span class="question-no">SOAL 05</span><h4>Dengan ŷ = 29,529 + 0,897x, prediksi Y untuk x = 58 paling dekat dengan ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">71,6</button><button class="answer-btn" data-answer="correct">81,6</button><button class="answer-btn" data-answer="wrong">91,6</button></div><div class="q-feedback"></div></article>
       </div><div class="level-status" id="level3Status"><span>Selesaikan semua soal untuk membuka Level 4.</span><strong>0 / 5</strong></div>
      </section>
 
      <section class="challenge-level" data-level-panel="4" hidden>
-      <div class="challenge-head"><div><span class="material-kicker">LEVEL 4 · KONSEP</span><h3>True or false</h3><p>Pilih pernyataan benar atau salah sesuai materi pada buku.</p></div><span class="level-badge">6 pernyataan</span></div>
+      <div class="challenge-head"><div><span class="material-kicker">LEVEL 4 · MENENGAH+</span><span class="challenge-source-tag">BERBASIS BUKU</span><h3>Koefisien korelasi</h3><p>Gunakan batas −1 ≤ r ≤ 1 dan Tabel 1.6 kekuatan hubungan.</p></div><span class="level-badge medium">5 soal</span></div>
       <div class="question-grid">
-       <article class="question-card" data-question="l4q1"><span class="question-no">PERNYATAAN 01</span><h4>Nilai r selalu berada di antara -1 dan 1.</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Benar</button><button class="answer-btn" data-answer="wrong">Salah</button></div><div class="q-feedback"></div></article>
-       <article class="question-card" data-question="l4q2"><span class="question-no">PERNYATAAN 02</span><h4>Jika r mendekati 0, maka hubungan linear cenderung lemah atau tidak ada.</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Benar</button><button class="answer-btn" data-answer="wrong">Salah</button></div><div class="q-feedback"></div></article>
-       <article class="question-card" data-question="l4q3"><span class="question-no">PERNYATAAN 03</span><h4>Korelasi kuat selalu membuktikan bahwa X menyebabkan Y.</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Benar</button><button class="answer-btn" data-answer="correct">Salah</button></div><div class="q-feedback"></div></article>
-       <article class="question-card" data-question="l4q4"><span class="question-no">PERNYATAAN 04</span><h4>Jika r² = 0,64 maka 64% variasi Y dijelaskan oleh model linear.</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Benar</button><button class="answer-btn" data-answer="wrong">Salah</button></div><div class="q-feedback"></div></article>
-       <article class="question-card" data-question="l4q5"><span class="question-no">PERNYATAAN 05</span><h4>Nilai r = -1 menunjukkan korelasi negatif sempurna.</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Benar</button><button class="answer-btn" data-answer="wrong">Salah</button></div><div class="q-feedback"></div></article>
-       <article class="question-card" data-question="l4q6"><span class="question-no">PERNYATAAN 06</span><h4>Semakin besar |r|, semakin lemah hubungan linear.</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Benar</button><button class="answer-btn" data-answer="correct">Salah</button></div><div class="q-feedback"></div></article>
-      </div><div class="level-status" id="level4Status"><span>Selesaikan semua pernyataan untuk membuka Level 5.</span><strong>0 / 6</strong></div>
+       <article class="question-card" data-question="l4q1"><span class="question-no">SOAL 01</span><h4>Rentang nilai yang mungkin untuk koefisien korelasi r adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">0 ≤ r ≤ 1</button><button class="answer-btn" data-answer="correct">−1 ≤ r ≤ 1</button><button class="answer-btn" data-answer="wrong">−10 ≤ r ≤ 10</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l4q2"><span class="question-no">SOAL 02</span><h4>Contoh buku memperoleh r = 0,86. Arah hubungannya adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Positif</button><button class="answer-btn" data-answer="wrong">Negatif</button><button class="answer-btn" data-answer="wrong">Tidak ada hubungan linear</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l4q3"><span class="question-no">SOAL 03</span><h4>Menurut Tabel 1.6, |r| = 0,86 termasuk ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Hubungan moderat</button><button class="answer-btn" data-answer="wrong">Hubungan kuat</button><button class="answer-btn" data-answer="correct">Hubungan sangat kuat</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l4q4"><span class="question-no">SOAL 04</span><h4>Nilai |r| = 0,55 termasuk kategori ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Moderat</button><button class="answer-btn" data-answer="correct">Kuat</button><button class="answer-btn" data-answer="wrong">Sangat kuat</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l4q5"><span class="question-no">SOAL 05</span><h4>Nilai |r| = 0,94 menurut tabel buku termasuk ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Hubungan kuat</button><button class="answer-btn" data-answer="wrong">Hubungan sangat kuat</button><button class="answer-btn" data-answer="correct">Hubungan mendekati sempurna</button></div><div class="q-feedback"></div></article>
+      </div><div class="level-status" id="level4Status"><span>Selesaikan semua soal untuk membuka Level 5.</span><strong>0 / 5</strong></div>
      </section>
 
      <section class="challenge-level" data-level-panel="5" hidden>
-      <div class="challenge-head"><div><span class="material-kicker">LEVEL 5 · KREATIF</span><h3>Pasangkan istilah dengan maknanya</h3><p>Pilih satu istilah di kolom kiri, lalu pilih definisi yang cocok di kolom kanan.</p></div><span class="level-badge hard">4 pasangan</span></div>
-      <div class="match-board">
-       <div class="match-column"><h4>Istilah</h4>
-        <button class="match-option" type="button" data-match-term="scatter">Diagram pencar</button>
-        <button class="match-option" type="button" data-match-term="regression">Regresi linear</button>
-        <button class="match-option" type="button" data-match-term="correlation">Koefisien korelasi</button>
-        <button class="match-option" type="button" data-match-term="determination">Koefisien determinasi</button>
-       </div>
-       <div class="match-column"><h4>Makna</h4>
-        <button class="match-option" type="button" data-match-def="regression">Model garis terbaik untuk memprediksi nilai Y dari nilai X.</button>
-        <button class="match-option" type="button" data-match-def="determination">Persentase variasi Y yang dapat dijelaskan model linear.</button>
-        <button class="match-option" type="button" data-match-def="scatter">Tampilan titik-titik pasangan data untuk membaca pola hubungan.</button>
-        <button class="match-option" type="button" data-match-def="correlation">Ukuran arah dan kekuatan hubungan linear yang nilainya dari -1 sampai 1.</button>
-       </div>
-      </div>
-      <div class="match-feedback" id="matchFeedback">Mulai dengan memilih satu istilah, lalu satu definisi.</div>
-      <div class="level-status" id="level5Status"><span>Pasangkan semua istilah dengan benar untuk membuka Level 6.</span><strong>0 / 4</strong></div>
+      <div class="challenge-head"><div><span class="material-kicker">LEVEL 5 · SULIT</span><span class="challenge-source-tag">BERBASIS BUKU</span><h3>Koefisien determinasi</h3><p>Tafsirkan r² sebagai bagian variasi Y yang dijelaskan model linear.</p></div><span class="level-badge hard">5 soal</span></div>
+      <div class="question-grid">
+       <article class="question-card" data-question="l5q1"><span class="question-no">SOAL 01</span><h4>Jika r² = 0,74, persentase variasi Y yang dapat dijelaskan model adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">26%</button><button class="answer-btn" data-answer="correct">74%</button><button class="answer-btn" data-answer="wrong">86%</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l5q2"><span class="question-no">SOAL 02</span><h4>Jika r² = 0,74, bagian variasi Y yang tidak dijelaskan model adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">26%</button><button class="answer-btn" data-answer="wrong">74%</button><button class="answer-btn" data-answer="wrong">0%</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l5q3"><span class="question-no">SOAL 03</span><h4>Jika r = 0,80, maka r² adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">0,40</button><button class="answer-btn" data-answer="correct">0,64</button><button class="answer-btn" data-answer="wrong">0,80</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l5q4"><span class="question-no">SOAL 04</span><h4>Jika r = −0,70, nilai r² adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">−0,49</button><button class="answer-btn" data-answer="correct">0,49</button><button class="answer-btn" data-answer="wrong">0,70</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l5q5"><span class="question-no">SOAL 05</span><h4>Pernyataan yang tepat tentang r² adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Menjelaskan proporsi variasi Y yang diterangkan model regresi linear</button><button class="answer-btn" data-answer="wrong">Menentukan apakah X pasti menyebabkan Y</button><button class="answer-btn" data-answer="wrong">Menunjukkan arah positif atau negatif</button></div><div class="q-feedback"></div></article>
+      </div><div class="level-status" id="level5Status"><span>Selesaikan semua soal untuk membuka Level 6.</span><strong>0 / 5</strong></div>
      </section>
 
      <section class="challenge-level" data-level-panel="6" hidden>
-      <div class="challenge-head"><div><span class="material-kicker">LEVEL 6 · FINAL</span><h3>Time challenge</h3><p>Jawab cepat 10 soal. Raih minimal 7 jawaban benar agar level selesai.</p></div><span class="level-badge hard">10 soal cepat</span></div>
+      <div class="challenge-head"><div><span class="material-kicker">LEVEL 6 · SULIT+</span><span class="challenge-source-tag">BERBASIS BUKU</span><h3>Prediksi, interpolasi, dan ekstrapolasi</h3><p>Gunakan studi kasus buku tentang prediksi nilai dari garis regresi.</p></div><span class="level-badge hard">5 soal</span></div>
+      <div class="question-grid">
+       <article class="question-card" data-question="l6q1"><span class="question-no">SOAL 01</span><h4>Pada studi kasus buku, prediksi untuk nilai X = 58 disebut ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Interpolasi</button><button class="answer-btn" data-answer="wrong">Ekstrapolasi</button><button class="answer-btn" data-answer="wrong">Korelasi nol</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l6q2"><span class="question-no">SOAL 02</span><h4>Pada studi kasus yang sama, prediksi untuk X = 70 disebut ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Interpolasi</button><button class="answer-btn" data-answer="correct">Ekstrapolasi</button><button class="answer-btn" data-answer="wrong">Determinasi</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l6q3"><span class="question-no">SOAL 03</span><h4>Mengapa ekstrapolasi umumnya perlu lebih hati-hati?</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Karena memprediksi di luar rentang data yang diamati</button><button class="answer-btn" data-answer="wrong">Karena selalu menghasilkan r = 0</button><button class="answer-btn" data-answer="wrong">Karena tidak menggunakan persamaan regresi</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l6q4"><span class="question-no">SOAL 04</span><h4>Dengan ŷ = 29,529 + 0,897x, prediksi Y untuk x = 70 paling dekat dengan ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">82,3</button><button class="answer-btn" data-answer="correct">92,3</button><button class="answer-btn" data-answer="wrong">102,3</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l6q5"><span class="question-no">SOAL 05</span><h4>Walaupun korelasi kuat, kesimpulan yang tetap harus dihindari adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Ada hubungan linear yang kuat</button><button class="answer-btn" data-answer="correct">X pasti menjadi penyebab Y</button><button class="answer-btn" data-answer="wrong">Model dapat digunakan untuk membantu prediksi</button></div><div class="q-feedback"></div></article>
+      </div><div class="level-status" id="level6Status"><span>Selesaikan semua soal untuk membuka Tantangan Lanjutan Level 7.</span><strong>0 / 5</strong></div>
+     </section>
+
+     <section class="challenge-level" data-level-panel="7" hidden>
+      <div class="challenge-head advanced-head"><div><span class="material-kicker">LEVEL 7 · TANTANGAN LANJUTAN</span><span class="challenge-source-tag custom">KREASI TAMBAHAN</span><h3>Detektif data</h3><p>Bandingkan beberapa hasil analisis dan pilih kesimpulan paling kuat.</p></div><span class="level-badge advanced">5 soal</span></div>
+      <div class="question-grid">
+       <article class="question-card" data-question="l7q1"><span class="question-no">SOAL 01</span><h4>Dua penelitian memiliki r = 0,93 dan r = −0,88. Manakah hubungan linear yang lebih kuat?</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">r = 0,93 karena |0,93| lebih besar</button><button class="answer-btn" data-answer="wrong">r = −0,88 karena bertanda negatif</button><button class="answer-btn" data-answer="wrong">Keduanya selalu sama kuat</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l7q2"><span class="question-no">SOAL 02</span><h4>Jika r = −0,82, maka sekitar berapa persen variasi Y dijelaskan model linear?</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">18%</button><button class="answer-btn" data-answer="correct">67,24%</button><button class="answer-btn" data-answer="wrong">82%</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l7q3"><span class="question-no">SOAL 03</span><h4>Sebuah diagram memiliki satu titik yang sangat jauh dari pola utama. Langkah paling tepat sebelum menyimpulkan dari r adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Periksa diagram pencar dan pengaruh titik menyimpang tersebut</button><button class="answer-btn" data-answer="wrong">Hapus titik itu tanpa alasan</button><button class="answer-btn" data-answer="wrong">Abaikan diagram dan gunakan r saja</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l7q4"><span class="question-no">SOAL 04</span><h4>Penelitian A: r = 0,95 dengan 4 data. Penelitian B: r = 0,88 dengan 40 data. Kesimpulan paling hati-hati adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">A pasti lebih dapat dipercaya hanya karena r lebih besar</button><button class="answer-btn" data-answer="correct">Nilai r saja belum cukup; jumlah dan pola data juga perlu diperiksa</button><button class="answer-btn" data-answer="wrong">B pasti salah karena r lebih kecil</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l7q5"><span class="question-no">SOAL 05</span><h4>Jika pola titik terlihat melengkung kuat tetapi r mendekati 0, maka ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Mungkin ada hubungan non-linear yang tidak tertangkap oleh r Pearson</button><button class="answer-btn" data-answer="wrong">Pasti tidak ada hubungan apa pun</button><button class="answer-btn" data-answer="wrong">r harus diubah menjadi 1</button></div><div class="q-feedback"></div></article>
+      </div><div class="level-status" id="level7Status"><span>Selesaikan semua soal untuk membuka Level 8.</span><strong>0 / 5</strong></div>
+     </section>
+
+     <section class="challenge-level" data-level-panel="8" hidden>
+      <div class="challenge-head advanced-head"><div><span class="material-kicker">LEVEL 8 · TANTANGAN LANJUTAN</span><span class="challenge-source-tag custom">KREASI TAMBAHAN</span><h3>Audit kesimpulan</h3><p>Temukan kesalahan penalaran dalam interpretasi statistik.</p></div><span class="level-badge advanced">5 soal</span></div>
+      <div class="question-grid">
+       <article class="question-card" data-question="l8q1"><span class="question-no">SOAL 01</span><h4>Ditemukan r = 0,91 antara penggunaan aplikasi belajar dan nilai ujian. Kesimpulan “aplikasi pasti menyebabkan nilai tinggi” bermasalah karena ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Korelasi tidak otomatis membuktikan sebab-akibat</button><button class="answer-btn" data-answer="wrong">r positif tidak boleh digunakan</button><button class="answer-btn" data-answer="wrong">r harus selalu negatif</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l8q2"><span class="question-no">SOAL 02</span><h4>Data diamati untuk X antara 10–30, tetapi model dipakai memprediksi X = 100. Masalah utamanya adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Ekstrapolasi terlalu jauh dari rentang data</button><button class="answer-btn" data-answer="wrong">Interpolasi terlalu dekat</button><button class="answer-btn" data-answer="wrong">Koefisien korelasi menjadi tidak mungkin dihitung</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l8q3"><span class="question-no">SOAL 03</span><h4>Jika r² = 0,81, pernyataan “81% Y disebabkan oleh X” adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Selalu benar</button><button class="answer-btn" data-answer="correct">Tidak tepat; r² menjelaskan variasi dalam model, bukan bukti sebab-akibat</button><button class="answer-btn" data-answer="wrong">Benar hanya jika r negatif</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l8q4"><span class="question-no">SOAL 04</span><h4>Seorang murid berkata “r = −0,90 lebih lemah daripada r = 0,70 karena nilainya lebih kecil.” Kesalahannya adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Kekuatan dibaca dari |r|, bukan tanda atau nilai aljabarnya</button><button class="answer-btn" data-answer="wrong">Semua r negatif harus diabaikan</button><button class="answer-btn" data-answer="wrong">r tidak boleh dibandingkan</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l8q5"><span class="question-no">SOAL 05</span><h4>Seorang murid hanya melihat r = 0,96 tanpa melihat diagram pencar. Perbaikan paling baik adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Periksa juga diagram, jumlah data, titik menyimpang, dan konteks</button><button class="answer-btn" data-answer="wrong">Langsung simpulkan hubungan sebab-akibat</button><button class="answer-btn" data-answer="wrong">Ubah r menjadi r² lalu berhenti</button></div><div class="q-feedback"></div></article>
+      </div><div class="level-status" id="level8Status"><span>Selesaikan semua soal untuk membuka Level 9.</span><strong>0 / 5</strong></div>
+     </section>
+
+     <section class="challenge-level" data-level-panel="9" hidden>
+      <div class="challenge-head advanced-head"><div><span class="material-kicker">LEVEL 9 · TANTANGAN LANJUTAN</span><span class="challenge-source-tag custom">KREASI TAMBAHAN</span><h3>Case Lab multi-langkah</h3><p>Satu kasus dipakai untuk menguji arah, kekuatan, determinasi, prediksi, dan batas penggunaan model.</p></div><span class="level-badge advanced">5 soal</span></div>
+      <div class="question-grid">
+       <article class="question-card" data-question="l9q1"><span class="question-no">KASUS · SOAL 01</span><h4>Sebuah model memiliki ŷ = 18 + 4x dan r = 0,91. Arah hubungan X dan Y adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Positif</button><button class="answer-btn" data-answer="wrong">Negatif</button><button class="answer-btn" data-answer="wrong">Tidak ada hubungan linear</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l9q2"><span class="question-no">KASUS · SOAL 02</span><h4>Dari r = 0,91, koefisien determinasi model sekitar ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">9,1%</button><button class="answer-btn" data-answer="wrong">81%</button><button class="answer-btn" data-answer="correct">82,81%</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l9q3"><span class="question-no">KASUS · SOAL 03</span><h4>Dengan ŷ = 18 + 4x, prediksi Y saat x = 6 adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">36</button><button class="answer-btn" data-answer="correct">42</button><button class="answer-btn" data-answer="wrong">48</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l9q4"><span class="question-no">KASUS · SOAL 04</span><h4>Jika data asli X berada pada rentang 2–8, prediksi saat x = 6 termasuk ...</h4><div class="answer-set"><button class="answer-btn" data-answer="correct">Interpolasi</button><button class="answer-btn" data-answer="wrong">Ekstrapolasi</button><button class="answer-btn" data-answer="wrong">Korelasi sempurna</button></div><div class="q-feedback"></div></article>
+       <article class="question-card" data-question="l9q5"><span class="question-no">KASUS · SOAL 05</span><h4>Jika model yang sama digunakan untuk x = 20, tindakan paling tepat adalah ...</h4><div class="answer-set"><button class="answer-btn" data-answer="wrong">Percaya penuh karena r tinggi</button><button class="answer-btn" data-answer="correct">Tandai sebagai ekstrapolasi jauh dan tafsirkan dengan sangat hati-hati</button><button class="answer-btn" data-answer="wrong">Nyatakan X pasti menyebabkan Y</button></div><div class="q-feedback"></div></article>
+      </div><div class="level-status" id="level9Status"><span>Selesaikan semua soal untuk membuka Expert Challenge.</span><strong>0 / 5</strong></div>
+     </section>
+
+     <section class="challenge-level" data-level-panel="10" hidden>
+      <div class="challenge-head advanced-head"><div><span class="material-kicker">LEVEL 10 · EXPERT</span><span class="challenge-source-tag custom">KREASI TAMBAHAN</span><h3>Expert Challenge berwaktu</h3><p>12 soal campuran. Target kelulusan minimal 9 benar dalam 75 detik.</p></div><span class="level-badge advanced">12 soal cepat</span></div>
       <div class="time-quiz">
-       <div class="time-top"><span class="time-badge">Waktu: <b id="timeLeft">45</b> detik</span><span class="time-badge">Skor: <b id="timeScore">0</b> / 10</span><button class="btn primary" type="button" id="startTimeChallenge">Mulai Tantangan</button></div>
+       <div class="time-top"><span class="time-badge">Waktu: <b id="timeLeft">75</b> detik</span><span class="time-badge">Skor: <b id="timeScore">0</b> / 12</span><button class="btn primary" type="button" id="startTimeChallenge">Mulai Expert Challenge</button></div>
        <div class="time-card">
         <div class="question-no" id="timeQuestionNo">SIAP?</div>
-        <h4 id="timeQuestionText">Tekan tombol mulai, lalu jawab secepat mungkin. Setiap pertanyaan langsung berpindah ke soal berikutnya.</h4>
+        <h4 id="timeQuestionText">Tekan tombol mulai. Soal menggabungkan korelasi, determinasi, regresi, prediksi, dan penafsiran.</h4>
         <div class="answer-set time-answer-set" id="timeAnswerSet"></div>
-        <div class="q-feedback" id="timeFeedback">Target kelulusan: minimal 7 benar.</div>
+        <div class="q-feedback" id="timeFeedback">Target: minimal 9 benar.</div>
        </div>
       </div>
-      <div class="level-status" id="level6Status"><span>Selesaikan time challenge untuk menuntaskan semua level.</span><strong>Belum mulai</strong></div>
-      <div class="challenge-complete" id="challengeComplete" hidden>✓ Semua level tantangan selesai. Kamu sudah berlatih membaca arah, kekuatan, tafsir r, r², dan konsep inti korelasi.</div>
+      <div class="level-status" id="level10Status"><span>Selesaikan Expert Challenge untuk menuntaskan seluruh 10 level.</span><strong>Belum mulai</strong></div>
+      <div class="challenge-complete" id="challengeComplete" hidden>✓ Seluruh 10 level selesai. Kamu sudah menuntaskan tantangan berbasis buku dan tantangan analisis lanjutan.</div>
      </section>
     </div>
    </section>
@@ -1521,7 +1579,7 @@ dialog{width:min(680px,calc(100% - 24px));max-height:calc(100dvh - 24px);border:
     const titles={home:'Dashboard',material:'Tujuan & Materi',challenge:'Tantangan Berlevel',cases:'Contoh Kasus',custom:'Analisis Data Baru',graph:'Grafik & Hasil',formula:'Rumus & Perhitungan',strength:'Arah & Kekuatan',r2:'Arti r² & Batas Analisis'};
     const eyebrows={home:'EKSPLORASI DATA',material:'',challenge:'LATIHAN BERTAHAP',cases:'PILIH · EDIT · TAMBAH',custom:'PENGAMATANMU SENDIRI',graph:'AMATI POLANYA',formula:'PAHAMI PERHITUNGANNYA',strength:'BACA HUBUNGANNYA',r2:'TAFSIRKAN DENGAN TEPAT'};
     $('pageTitle').textContent=titles[page];$('pageEyebrow').textContent=eyebrows[page];$('pageEyebrow').hidden=!eyebrows[page];
-    if(page==='challenge'){const el=$('page-challenge');if(el){el.scrollTop=0;const body=el.querySelector('.challenge-body');if(body)body.scrollTop=0;}requestAnimationFrame(()=>openChallengeLevel(Math.min(challengeState?.level||1,6)));}
+    if(page==='challenge'){const el=$('page-challenge');if(el){el.scrollTop=0;const body=el.querySelector('.challenge-body');if(body)body.scrollTop=0;}requestAnimationFrame(()=>openChallengeLevel(Math.min(challengeState?.level||1,10)));}
     if(page==='material'){const el=$('page-material');if(el)el.scrollTop=0;}
     renderCalc();syncDashboard();
     requestAnimationFrame(resize);
@@ -1553,28 +1611,28 @@ dialog{width:min(680px,calc(100% - 24px));max-height:calc(100dvh - 24px);border:
     prev.addEventListener('click',()=>moveMaterial(-1));next.addEventListener('click',()=>moveMaterial(1));
   });
 
-  // ===== Tantangan berlevel =====
-  const challengeState={level:1,solved:new Set(),matched:new Set(),timeDone:false,timeBest:0,questionPage:{1:0,2:0,3:0,4:0}};
+  // ===== Tantangan berlevel: 1–6 berbasis buku, 7–10 kreasi lanjutan =====
+  const challengeState={level:1,solved:new Set(),timeDone:false,timeBest:0,questionPage:{}};
   const levelTabs=[...document.querySelectorAll('[data-challenge-level]')];
   const levelPanels=[...document.querySelectorAll('[data-level-panel]')];
-  function panelFor(level){return levelPanels.find(p=>Number(p.dataset.levelPanel)===level);}
-  function questionCards(level){return [...(panelFor(level)?.querySelectorAll('.question-card')||[])];}
+  function questionCards(level){const panel=levelPanels.find(p=>Number(p.dataset.levelPanel)===level);return panel?[...panel.querySelectorAll('.question-card')]:[];}
   function totalQuestions(level){return questionCards(level).length;}
   function renderQuestionPage(level){
-    if(level<1||level>4)return;
+    const panel=levelPanels.find(p=>Number(p.dataset.levelPanel)===level);if(!panel||level===10)return;
     const cards=questionCards(level);if(!cards.length)return;
     const max=cards.length-1;challengeState.questionPage[level]=clamp(challengeState.questionPage[level]||0,0,max);
     const index=challengeState.questionPage[level];cards.forEach((card,i)=>card.hidden=i!==index);
-    const pager=panelFor(level).querySelector('.question-pager');if(!pager)return;
-    pager.querySelector('[data-q-prev]').disabled=index===0;pager.querySelector('[data-q-next]').disabled=index===max;
-    pager.querySelector('.question-page-count').textContent=`Soal ${index+1} / ${cards.length}`;
+    let pager=panel.querySelector('.question-pager');
+    if(pager){pager.querySelector('.question-page-count').textContent=`Soal ${index+1} / ${cards.length}`;const prev=pager.querySelector('[data-q-prev]'),next=pager.querySelector('[data-q-next]');prev.disabled=index===0;next.disabled=index===max;}
   }
   function ensureQuestionPagers(){
-    for(let level=1;level<=4;level++){
-      const panel=panelFor(level),grid=panel?.querySelector('.question-grid');if(!panel||!grid)continue;
-      if(!panel.querySelector('.question-pager')){
-        const pager=document.createElement('div');pager.className='question-pager';pager.innerHTML='<button class="btn" type="button" data-q-prev>← Soal sebelumnya</button><span class="question-page-count"></span><button class="btn primary" type="button" data-q-next>Soal berikutnya →</button>';
-        grid.insertAdjacentElement('afterend',pager);
+    for(let level=1;level<=9;level++){
+      const panel=levelPanels.find(p=>Number(p.dataset.levelPanel)===level),cards=questionCards(level);if(!panel||!cards.length)continue;
+      let pager=panel.querySelector('.question-pager');
+      if(!pager){
+        pager=document.createElement('div');pager.className='question-pager';
+        pager.innerHTML='<button class="btn" type="button" data-q-prev>← Soal sebelumnya</button><span class="question-page-count"></span><button class="btn primary" type="button" data-q-next>Soal berikutnya →</button>';
+        const status=panel.querySelector('.level-status');panel.insertBefore(pager,status);
         pager.querySelector('[data-q-prev]').addEventListener('click',()=>{challengeState.questionPage[level]--;renderQuestionPage(level);});
         pager.querySelector('[data-q-next]').addEventListener('click',()=>{challengeState.questionPage[level]++;renderQuestionPage(level);});
       }
@@ -1585,24 +1643,25 @@ dialog{width:min(680px,calc(100% - 24px));max-height:calc(100dvh - 24px);border:
     if(level>challengeState.level)return;
     levelTabs.forEach(tab=>tab.classList.toggle('active',Number(tab.dataset.challengeLevel)===level));
     levelPanels.forEach(panel=>panel.hidden=Number(panel.dataset.levelPanel)!==level);
-    if(level<=4){const cards=questionCards(level);const firstUnsolved=cards.findIndex(c=>!challengeState.solved.has(c.dataset.question));if(firstUnsolved>=0)challengeState.questionPage[level]=firstUnsolved;renderQuestionPage(level);}
+    if(level<=9){const cards=questionCards(level);const firstUnsolved=cards.findIndex(c=>!challengeState.solved.has(c.dataset.question));if(firstUnsolved>=0)challengeState.questionPage[level]=firstUnsolved;renderQuestionPage(level);}
   }
   function unlockLevel(level){
     if(level<=challengeState.level)return;
     challengeState.level=level;const tab=levelTabs.find(t=>Number(t.dataset.challengeLevel)===level);if(tab){tab.disabled=false;tab.classList.remove('locked');}
   }
-  function markLevelDone(level){levelTabs.find(t=>Number(t.dataset.challengeLevel)===level)?.classList.add('done');if(level<6)unlockLevel(level+1);else $('challengeComplete').hidden=false;}
+  function markLevelDone(level){
+    levelTabs.find(t=>Number(t.dataset.challengeLevel)===level)?.classList.add('done');
+    if(level<10)unlockLevel(level+1);else $('challengeComplete').hidden=false;
+  }
   function updateChallengeStatus(level){
-    if(level>=1&&level<=4){
+    if(level>=1&&level<=9){
       const prefix=`l${level}q`,count=[...challengeState.solved].filter(id=>id.startsWith(prefix)).length,total=totalQuestions(level),status=$(`level${level}Status`);
-      status.querySelector('strong').textContent=`${count} / ${total}`;
-      if(count===total){markLevelDone(level);const next=level+1;if(next<=6)status.querySelector('span').textContent=`Level ${next} terbuka. Lanjutkan saat siap.`;}
-    }else if(level===5){
-      const count=challengeState.matched.size,status=$('level5Status');status.querySelector('strong').textContent=`${count} / 4`;
-      if(count===4){markLevelDone(5);status.querySelector('span').textContent='Level 6 terbuka. Saatnya tantangan cepat.';}
-    }else if(level===6){
-      const status=$('level6Status');status.querySelector('strong').textContent=challengeState.timeDone?`Skor terbaik ${challengeState.timeBest} / 10`:'Belum mulai';
-      if(challengeState.timeDone&&challengeState.timeBest>=7){status.querySelector('span').textContent='Semua tantangan selesai. Kerja bagus!';markLevelDone(6);}else if(challengeState.timeDone){status.querySelector('span').textContent='Belum mencapai target 7. Coba ulangi lagi.';}
+      if(!status)return;status.querySelector('strong').textContent=`${count} / ${total}`;
+      if(count===total){markLevelDone(level);const next=level+1;status.querySelector('span').textContent=level===6?'Tantangan Lanjutan Level 7 terbuka.':`Level ${next} terbuka. Lanjutkan saat siap.`;}
+    }else if(level===10){
+      const status=$('level10Status');if(!status)return;
+      status.querySelector('strong').textContent=challengeState.timeDone?`Skor terbaik ${challengeState.timeBest} / 12`:'Belum mulai';
+      if(challengeState.timeDone&&challengeState.timeBest>=9){status.querySelector('span').textContent='Expert Challenge selesai. Seluruh 10 level tuntas!';markLevelDone(10);}else if(challengeState.timeDone){status.querySelector('span').textContent='Belum mencapai target 9. Coba ulangi Expert Challenge.';}
     }
   }
   ensureQuestionPagers();
@@ -1612,77 +1671,50 @@ dialog{width:min(680px,calc(100% - 24px));max-height:calc(100dvh - 24px);border:
     if(challengeState.solved.has(id))return;
     card.querySelectorAll('.answer-btn').forEach(b=>b.classList.remove('wrong'));
     if(button.dataset.answer==='correct'){
-      challengeState.solved.add(id);card.classList.add('solved');button.classList.add('correct');card.querySelectorAll('.answer-btn').forEach(b=>b.disabled=true);feedback.textContent='Benar ✓';feedback.className='q-feedback ok';const level=Number(id[1]);updateChallengeStatus(level);
+      challengeState.solved.add(id);card.classList.add('solved');button.classList.add('correct');card.querySelectorAll('.answer-btn').forEach(b=>b.disabled=true);feedback.textContent='Benar ✓';feedback.className='q-feedback ok';
+      const match=id.match(/^l(\d+)q/),level=match?Number(match[1]):1;updateChallengeStatus(level);
       const cards=questionCards(level),idx=cards.indexOf(card);if(idx<cards.length-1){setTimeout(()=>{challengeState.questionPage[level]=idx+1;renderQuestionPage(level);},350);}
     }else{button.classList.add('wrong');feedback.textContent='Belum tepat. Coba lagi.';feedback.className='q-feedback no';}
   }));
 
-  // Matching challenge
-  let selectedTerm=null,selectedDef=null;
-  const matchFeedback=$('matchFeedback');
-  function resetMatchSelection(){selectedTerm?.classList.remove('selected');selectedDef?.classList.remove('selected');selectedTerm=null;selectedDef=null;}
-  function handleMatch(){
-    if(!selectedTerm||!selectedDef)return;
-    const ok=selectedTerm.dataset.matchTerm===selectedDef.dataset.matchDef;
-    if(ok){
-      const key=selectedTerm.dataset.matchTerm;challengeState.matched.add(key);
-      [selectedTerm,selectedDef].forEach(el=>{el.classList.remove('selected');el.classList.add('matched');el.disabled=true;});
-      matchFeedback.textContent='Pasangan benar ✓';matchFeedback.className='match-feedback ok';resetMatchSelection();updateChallengeStatus(5);
-    }else{
-      matchFeedback.textContent='Belum cocok. Pilih lagi pasangan yang tepat.';matchFeedback.className='match-feedback no';
-      [selectedTerm,selectedDef].forEach(el=>el.classList.remove('selected'));selectedTerm=null;selectedDef=null;
-    }
-  }
-  document.querySelectorAll('[data-match-term]').forEach(btn=>btn.addEventListener('click',()=>{if(btn.disabled)return;selectedTerm?.classList.remove('selected');selectedTerm=btn;btn.classList.add('selected');matchFeedback.textContent='Istilah dipilih. Sekarang pilih definisinya.';matchFeedback.className='match-feedback';handleMatch();}));
-  document.querySelectorAll('[data-match-def]').forEach(btn=>btn.addEventListener('click',()=>{if(btn.disabled)return;selectedDef?.classList.remove('selected');selectedDef=btn;btn.classList.add('selected');handleMatch();}));
-
-  // Time challenge
+  // Level 10: Expert Challenge berwaktu
   const quickPool=[
-    {q:'Nilai r selalu berada pada rentang ...',options:['0 sampai 1','-1 sampai 1','-10 sampai 10'],correct:1},
-    {q:'Jika r bernilai negatif, arah hubungan adalah ...',options:['searah','berlawanan arah','acak'],correct:1},
-    {q:'Nilai r = 0 menunjukkan ...',options:['korelasi positif sempurna','tidak ada hubungan linear','hubungan kuat'],correct:1},
-    {q:'Jika r = 0,84 maka kekuatan hubungannya ...',options:['sangat kuat','lemah','tidak ada'],correct:0},
-    {q:'Jika r² = 0,49 maka variasi Y yang dijelaskan model adalah ...',options:['49%','51%','94%'],correct:0},
-    {q:'Semakin mendekati |r| = 1, hubungan linear menjadi ...',options:['semakin kuat','semakin lemah','tidak berubah'],correct:0},
-    {q:'Diagram pencar digunakan untuk ...',options:['melihat hubungan dua variabel','menghitung akar kuadrat','mengubah satuan data'],correct:0},
-    {q:'r = -1 berarti ...',options:['korelasi negatif sempurna','korelasi nol','korelasi positif sempurna'],correct:0},
-    {q:'Pernyataan yang benar adalah ...',options:['korelasi selalu sebab-akibat','korelasi tidak selalu sebab-akibat','r² selalu lebih besar dari 1'],correct:1},
-    {q:'Rentang 0,30–0,49 pada buku termasuk ...',options:['moderat','kuat','kurang berarti'],correct:0}
+    {q:'Jika r = −0,92, kategori kekuatannya adalah ...',options:['Hubungan mendekati sempurna','Hubungan moderat','Tidak ada hubungan'],correct:0},
+    {q:'Jika r = −0,80, nilai r² adalah ...',options:['−0,64','0,64','0,80'],correct:1},
+    {q:'r² = 0,64 berarti bagian variasi Y yang belum dijelaskan model adalah ...',options:['36%','64%','80%'],correct:0},
+    {q:'Model ŷ = 12 + 3x memberi prediksi saat x = 8 sebesar ...',options:['24','36','48'],correct:1},
+    {q:'Data X diamati dari 2 sampai 10. Prediksi pada x = 7 termasuk ...',options:['Interpolasi','Ekstrapolasi','Korelasi'],correct:0},
+    {q:'Data X diamati dari 2 sampai 10. Prediksi pada x = 18 termasuk ...',options:['Interpolasi','Ekstrapolasi','Determinasi'],correct:1},
+    {q:'Mana hubungan yang lebih kuat?',options:['r = −0,94','r = 0,90','Sama kuat'],correct:0},
+    {q:'Jika diagram terlihat melengkung kuat tetapi r ≈ 0, tindakan terbaik adalah ...',options:['Periksa pola non-linear','Simpulkan tidak ada hubungan apa pun','Ubah r menjadi 1'],correct:0},
+    {q:'Pernyataan paling tepat untuk r = 0,88 adalah ...',options:['Hubungan positif sangat kuat','X pasti menyebabkan Y','88% variasi Y dijelaskan'],correct:0},
+    {q:'Jika r = 0,60, nilai r² adalah ...',options:['0,36','0,60','0,40'],correct:0},
+    {q:'Satu titik pencilan yang jauh dari pola dapat ...',options:['Mempengaruhi nilai r','Tidak pernah berpengaruh','Membuat r selalu 1'],correct:0},
+    {q:'Kesimpulan terbaik dari korelasi tinggi adalah ...',options:['Ada hubungan linear kuat, tetapi sebab-akibat perlu bukti lain','X pasti menyebabkan Y','Semua prediksi pasti tepat'],correct:0}
   ];
-  let timeOrder=[],timeIndex=0,timeScore=0,timeLeft=45,timeTimer=null,timeActive=false;
+  let timeOrder=[],timeIndex=0,timeScore=0,timeLeft=75,timeTimer=null,timeActive=false;
   function shuffle(arr){return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]);}
   function renderTimeQuestion(){
-    const item=timeOrder[timeIndex];
-    if(!item){finishTimeChallenge();return;}
-    $('timeQuestionNo').textContent=`SOAL CEPAT ${timeIndex+1}`;
-    $('timeQuestionText').textContent=item.q;
+    const item=timeOrder[timeIndex];if(!item){finishTimeChallenge();return;}
+    $('timeQuestionNo').textContent=`EXPERT ${timeIndex+1} / ${timeOrder.length}`;$('timeQuestionText').textContent=item.q;
     $('timeAnswerSet').innerHTML=item.options.map((opt,i)=>`<button class="answer-btn" type="button" data-time-option="${i}">${opt}</button>`).join('');
-    $('timeFeedback').textContent='Pilih jawaban yang paling tepat.';
+    $('timeFeedback').textContent='Pilih jawaban paling tepat.';$('timeFeedback').className='q-feedback';
     [...$('timeAnswerSet').querySelectorAll('[data-time-option]')].forEach(btn=>btn.addEventListener('click',()=>{
-      if(!timeActive)return;
-      const idx=Number(btn.dataset.timeOption);
-      if(idx===item.correct){timeScore++;$('timeFeedback').textContent='Benar ✓';$('timeFeedback').className='q-feedback ok';}
-      else{$('timeFeedback').textContent='Kurang tepat.';$('timeFeedback').className='q-feedback no';}
-      $('timeScore').textContent=timeScore;
-      timeIndex++;
-      setTimeout(()=>{if(timeActive)renderTimeQuestion();},220);
+      if(!timeActive)return;const idx=Number(btn.dataset.timeOption);
+      if(idx===item.correct){timeScore++;$('timeFeedback').textContent='Benar ✓';$('timeFeedback').className='q-feedback ok';}else{$('timeFeedback').textContent='Kurang tepat.';$('timeFeedback').className='q-feedback no';}
+      $('timeScore').textContent=timeScore;timeIndex++;setTimeout(()=>{if(timeActive)renderTimeQuestion();},220);
     },{once:true}));
   }
   function finishTimeChallenge(){
     clearInterval(timeTimer);timeActive=false;challengeState.timeDone=true;challengeState.timeBest=Math.max(challengeState.timeBest,timeScore);
-    $('timeQuestionNo').textContent='SELESAI';
-    $('timeQuestionText').textContent=`Skor kamu ${timeScore} dari ${timeOrder.length} soal.`;
-    $('timeAnswerSet').innerHTML='';
-    $('timeFeedback').textContent=timeScore>=7?'Target tercapai! Kamu bisa lanjut atau ulangi untuk skor lebih baik.':'Target belum tercapai. Tekan mulai untuk mencoba lagi.';
-    $('timeFeedback').className=timeScore>=7?'q-feedback ok':'q-feedback no';
-    $('startTimeChallenge').textContent='Ulangi Tantangan';
-    updateChallengeStatus(6);
+    $('timeQuestionNo').textContent='SELESAI';$('timeQuestionText').textContent=`Skor kamu ${timeScore} dari ${timeOrder.length} soal.`;$('timeAnswerSet').innerHTML='';
+    $('timeFeedback').textContent=timeScore>=9?'Target Expert tercapai!':'Target belum tercapai. Ulangi untuk memperoleh minimal 9 benar.';$('timeFeedback').className=timeScore>=9?'q-feedback ok':'q-feedback no';
+    $('startTimeChallenge').textContent='Ulangi Expert Challenge';updateChallengeStatus(10);
   }
   function startTimeChallenge(){
-    clearInterval(timeTimer);timeOrder=shuffle([...quickPool]);timeIndex=0;timeScore=0;timeLeft=45;timeActive=true;
-    $('timeLeft').textContent=timeLeft;$('timeScore').textContent='0';$('startTimeChallenge').textContent='Sedang berjalan';
-    renderTimeQuestion();
-    timeTimer=setInterval(()=>{timeLeft--; $('timeLeft').textContent=timeLeft; if(timeLeft<=0)finishTimeChallenge();},1000);
+    clearInterval(timeTimer);timeOrder=shuffle([...quickPool]);timeIndex=0;timeScore=0;timeLeft=75;timeActive=true;
+    $('timeLeft').textContent=timeLeft;$('timeScore').textContent='0';$('startTimeChallenge').textContent='Sedang berjalan';renderTimeQuestion();
+    timeTimer=setInterval(()=>{timeLeft--; $('timeLeft').textContent=timeLeft;if(timeLeft<=0)finishTimeChallenge();},1000);
   }
   $('startTimeChallenge').addEventListener('click',()=>{if(timeActive)return;startTimeChallenge();});
 
