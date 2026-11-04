@@ -1,271 +1,236 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Simulasi Regresi</title>
-<style>
-:root{--bg:#f1f5f9;--card:#fff;--line:#d9e2ec;--ink:#1e293b;--mute:#64748b;--blue:#1d6fd8;--navy:#1e3a8a;--res:#f0627a;--act:#facc15}
-*{box-sizing:border-box}
-html,body{margin:0}
-body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45;font-size:15px}
-.wrap{max-width:1240px;margin:0 auto;padding:16px}
-header{margin-bottom:14px}
-h1{margin:0;font-size:26px;color:var(--navy)}
-header p{margin:4px 0 0;color:var(--mute);font-size:14px}
-h2{font-size:16px;margin:0 0 10px;color:var(--navy)}
-h3{font-size:13px;margin:10px 0 2px;color:var(--navy)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 2px 8px rgba(30,58,138,.07);padding:14px;min-width:0}
-.top{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(300px,1fr);gap:14px;align-items:start}
-.side{display:flex;flex-direction:column;gap:14px;min-width:0}
-.bottom{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-top:14px}
-.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-button{font:inherit;font-size:14px;padding:9px 14px;min-height:40px;border-radius:8px;border:1px solid var(--blue);background:var(--blue);color:#fff;cursor:pointer}
-button.sec{background:#fff;color:var(--blue)}
-button:disabled{opacity:.45;cursor:not-allowed}
-.hint{font-size:13px;color:var(--mute);margin:8px 0 0}
-.gw{position:relative}
-svg{display:block;width:100%;height:auto;touch-action:none;user-select:none;background:#fff;border:1px solid var(--line);border-radius:8px}
-.tt{position:absolute;pointer-events:none;background:#fff;border:1px solid var(--navy);border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,.18);padding:7px 10px;font-size:12.5px;line-height:1.5;display:none;white-space:nowrap;z-index:3}
-.eq{font-size:21px;font-weight:bold;color:var(--blue);padding:8px 10px;background:#eef5ff;border-radius:8px;margin-bottom:10px;overflow-wrap:anywhere}
-.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.kv div{border:1px solid var(--line);border-radius:8px;padding:8px 10px}
-.kv b{display:block;font-size:19px;color:var(--navy)}
-.kv span{font-size:12px;color:var(--mute)}
-.note{font-size:13px;color:var(--mute);margin:6px 0 0}
-.warn{background:#fff7e0;border:1px solid #f2d27a;border-radius:8px;padding:8px 10px;font-size:13px;margin-top:8px}
-.ok{background:#eaf6ee;border-color:#a9d9b9}
-label{font-size:14px}
-input[type=number]{font:inherit;width:100%;padding:7px 8px;min-height:38px;border:1px solid #b8c4d2;border-radius:6px}
-.pred{display:flex;gap:10px;align-items:center;margin-bottom:6px}
-.pred input{max-width:110px}
-.pv{font-size:18px;font-weight:bold;color:var(--navy)}
-.ts{overflow:auto;max-height:340px;border:1px solid var(--line);border-radius:8px}
-table{border-collapse:collapse;width:100%;font-size:13.5px}
-th,td{padding:6px 8px;border-bottom:1px solid #e8eef5;text-align:right;white-space:nowrap}
-th:first-child,td:first-child{text-align:center}
-thead th{position:sticky;top:0;background:#e8f0fb;color:var(--navy);z-index:1}
-tr.sel td{background:#fff6c7}
-tbody tr{cursor:pointer}
-tfoot td{font-weight:bold;background:#f5f8fc}
-td input{width:90px;text-align:right}
-.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:6px 18px;margin-top:10px;font-size:14px}
-.sum p{margin:0;overflow-wrap:anywhere}
-.ket p{margin:0 0 2px;font-size:13.5px}
-@media(max-width:900px){.top{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:520px){.wrap{padding:10px}h1{font-size:22px}.eq{font-size:18px}button{flex:1 1 auto}td input{width:76px}}
-</style>
-</head>
-<body>
-<div class="wrap">
-<header><h1>Simulasi Regresi</h1><p>Geser titik pada grafik atau ubah angka pada tabel. Garis regresi, a, b, prediksi, residual, dan SSE berubah otomatis.</p></header>
-
-<div class="top">
- <section class="card">
-  <div class="toolbar">
-   <button id="add">Tambah Data</button>
-   <button id="del" class="sec">Hapus Data Terpilih</button>
-   <button id="reset" class="sec">Reset</button>
-  </div>
-  <div class="gw" id="gw"><svg id="svg" viewBox="0 0 640 440" role="img" aria-label="Diagram pencar nilai Matematika dan Fisika"></svg><div class="tt" id="tt"></div></div>
-  <p class="hint">Garis biru: garis regresi. Garis merah muda: residual (jarak vertikal titik ke garis). Klik atau seret titik untuk memilihnya.</p>
- </section>
-
- <div class="side">
-  <section class="card">
-   <h2>Hasil Regresi</h2>
-   <div class="eq" id="eq">—</div>
-   <div class="kv">
-    <div><span>a — Intercept</span><b id="va">—</b></div>
-    <div><span>b — Kemiringan</span><b id="vb">—</b></div>
-    <div><span>Jumlah Data</span><b id="vn">—</b></div>
-    <div><span>SSE</span><b id="vsse">—</b></div>
-   </div>
-   <p class="note"><b>a:</b> perpotongan garis regresi dengan sumbu Y.</p>
-   <p class="note"><b>b:</b> perubahan prediksi Y untuk setiap kenaikan satu satuan X. <span id="bdir"></span></p>
-   <p class="note"><b>SSE</b> adalah jumlah kuadrat residual seluruh data. Garis regresi kuadrat terkecil dipilih agar SSE sekecil mungkin.</p>
-   <div class="warn" id="msg" style="display:none"></div>
-  </section>
-
-  <section class="card">
-   <h2>Prediksi</h2>
-   <div class="pred"><label for="px">Nilai X</label><input type="number" id="px" value="58" step="any"></div>
-   <div class="pv" id="pv">—</div>
-   <div class="warn" id="pmsg" style="display:none"></div>
-  </section>
-
-  <section class="card ket">
-   <h2>Keterangan Grafik, Tabel, dan Data</h2>
-   <h3>Tabel → Grafik</h3><p>Setiap baris X dan Y menghasilkan satu titik pada diagram pencar.</p>
-   <h3>Grafik → Garis Regresi</h3><p>Garis biru adalah garis yang paling sesuai dengan keseluruhan data berdasarkan metode kuadrat terkecil.</p>
-   <h3>Garis → Prediksi</h3><p>Untuk nilai X tertentu, posisi garis menunjukkan nilai prediksi ŷ.</p>
-   <h3>Titik → Residual</h3><p>Jarak vertikal antara nilai aktual Y dan prediksi ŷ disebut residual.</p>
-   <h3>Residual → SSE</h3><p>Residual setiap titik dikuadratkan lalu dijumlahkan menjadi SSE.</p>
-  </section>
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Eksplorasi regresi linear melalui lima contoh kasus dan data sendiri, dengan interpretasi, prediksi, dan residual interaktif."><title>Simulasi Regresi</title><style>:root{--ink:#233d54;--navy:#17395f;--muted:#718795;--line:#d5e3ec;--blue:#3166c1;--teal:#0c8587;--orange:#b66d36;--rose:#ca6983}
+*{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden;color-scheme:light}body{font:14px/1.5 Arial,Helvetica,sans-serif;color:var(--ink);background-color:#edf3f5;background-image:url('bahan/bg.png'),radial-gradient(ellipse at 3% 4%,#d9ede9,transparent 46%),radial-gradient(ellipse at 98% 90%,#f8ecdd,transparent 42%);background-size:cover;background-position:center}
+button,input,select{font:inherit;font-family:Arial,Helvetica,sans-serif}button,select{cursor:pointer}button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}button:disabled{opacity:.4;cursor:default}button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid #75a6dd;outline-offset:2px}[hidden]{display:none!important}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;margin:-1px;padding:0}
+.app{width:calc(100% - 20px);max-width:1600px;height:calc(100dvh - 20px);margin:10px auto;border:3px solid #8fb7d7;border-radius:17px;overflow:hidden;background:#f5f8f9;display:flex;flex-direction:column;min-height:0;box-shadow:0 15px 45px #17395f12}
+.brand-header{background:linear-gradient(180deg,#17395f,#102f52);border-bottom:6px solid #2f9be8;display:flex;align-items:center;gap:14px;min-height:82px;padding:10px 22px;color:#fff;flex:none}.brand-logo-wrap,.interactive-logo-wrap{position:relative;width:52px;height:52px;border-radius:12px;overflow:hidden;flex:none;background:linear-gradient(135deg,#20b8ef,#075687);border:3px solid #fff;box-shadow:0 0 0 2px #ffffff2e,0 3px 8px #0004;display:grid;place-items:center}.interactive-logo-wrap{margin-left:auto;background:#fff}.brand-logo,.interactive-logo{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;z-index:1;padding:2px}.logo-empty:after{content:'LOGO';font-size:9px;font-weight:700;letter-spacing:.5px;color:#fff}.interactive-logo-wrap.logo-empty:after{color:var(--navy)}.brand-title{flex:1;min-width:0;margin:0;font-size:clamp(24px,3vw,40px);font-weight:900;line-height:1.05;color:#fff;text-shadow:0 3px 0 #0007}.brand-footer{background:linear-gradient(180deg,#17395f,#102f52);border-top:4px solid #f4cf32;color:#fff;display:flex;align-items:center;min-height:33px;padding:8px 22px;font-size:11px;font-weight:900;line-height:1;flex:none}
+.workspace{display:flex;flex-direction:column;flex:1;min-height:0;min-width:0;padding:15px 18px 18px;gap:10px}.workspace-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;flex:none}.mode-tabs{display:flex;gap:5px;border:1px solid #d5e2ec;border-radius:11px;padding:4px;background:#eaf1f6}.mode-tabs button{border:0;background:transparent;color:#7b90a1;font-size:12px;font-weight:700;min-height:34px;padding:6px 21px;border-radius:8px}.mode-tabs button[aria-selected=true]{background:#fff;color:var(--navy);box-shadow:0 2px 6px #17395f12}.text-btn{border:0;background:transparent;color:var(--teal);font-size:11px;font-weight:600;min-height:30px;padding:5px 2px}.text-btn:hover{color:#075f67}.workspace-nav>.text-btn{color:#8198a6;font-size:10px}.workspace-nav>.text-btn span{display:inline-grid;place-items:center;background:#e6edf6;border-radius:50%;width:20px;height:20px;font-size:11px;margin-left:5px}.btn,.icon-btn{border:1px solid #cbdde7;border-radius:8px;background:#fff;color:var(--navy);font-size:11px;font-weight:600;min-height:35px;padding:6px 12px;white-space:nowrap}.btn:hover:enabled,.icon-btn:hover:enabled{background:#edf5f9;border-color:#9bbdcd}.btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}.btn.primary:hover:enabled{background:#086c73}.btn.small{font-size:10px;min-height:31px;padding:5px 10px}.icon-btn{font-size:20px;line-height:1;min-height:30px;width:30px;padding:4px}
+.source-bar{display:flex;align-items:center;gap:15px;flex:none;min-height:49px;border:1px solid var(--line);border-radius:11px;background:#fff;padding:7px 12px}.source-bar>section{display:flex;align-items:center;gap:14px;flex:1;min-width:0}.source-bar select{width:min(530px,100%);min-width:0;height:33px;padding:4px 10px;font-size:12px;color:var(--navy);border:1px solid #ccdde7;border-radius:7px;background:#fafcfd}.source-bar .text-btn{white-space:nowrap;font-size:10px}.source-badge{font-size:9px;letter-spacing:.3px;font-weight:700;color:#a06b43;background:#fff4e8;padding:4px 8px;border-radius:6px;white-space:nowrap}.source-badge.custom{background:#edf7f3;color:#367d6c}.variable-summary{display:flex;gap:15px;flex:1;min-width:0}.variable-summary>span{display:flex;align-items:center;gap:6px;min-width:0;max-width:50%;font-size:11px;color:#658192}.variable-summary b{font-size:10px;color:var(--teal);background:#e7f4f0;border-radius:4px;padding:1px 5px;flex:none}.variable-summary>span:nth-child(2) b{color:var(--orange);background:#fff1e6}.variable-summary span span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.experiment{display:flex;flex-direction:column;flex:1;min-height:0;min-width:0;overflow:hidden;background:#fff;border:1px solid var(--line);border-radius:15px}.model-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 16px;background:linear-gradient(100deg,#f1f6fd,#fff);border-bottom:1px solid var(--line);flex:none}.equation-group{min-width:0}.eyebrow{display:block;font-size:8px;letter-spacing:.8px;font-weight:700;color:#8ba1b0}.equation-group output{font-size:23px;font-weight:700;line-height:1.35;color:var(--blue);display:block;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.model-tools{display:flex;align-items:center;gap:12px;flex:none}.model-count{font-size:10px;color:#8b9fab;white-space:nowrap}
+.lab-body{display:grid;grid-template-columns:300px minmax(0,1fr);flex:1;min-height:0;min-width:0}.data-pane{display:flex;flex-direction:column;min-width:0;min-height:0;padding:13px;border-right:1px solid var(--line);background:#fbfdff;overflow:hidden}.pane-heading{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:6px;flex:none}.pane-heading strong{font-size:13px;color:var(--navy)}.data-actions{display:flex;gap:8px;align-items:center}.data-actions>.text-btn{font-size:10px}.data-hint{margin:0 0 8px;font-size:9px;color:#8aa0af;line-height:1.5;flex:none}.entry-table{overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;border:1px solid var(--line);border-radius:8px;background:#fff;min-height:40px;flex:1}.data-table{table-layout:fixed;width:100%;border-spacing:0;text-align:center;font-size:10px}.data-table th{position:sticky;top:0;z-index:1;background:#eef5f9;padding:5px 3px;line-height:1.3;font-weight:600;color:#608094}.data-table th:first-child{width:29px}.data-table th:last-child{width:27px}.data-table th>b{font-size:10px;margin-right:3px;color:var(--teal);vertical-align:middle}.data-table th:nth-child(3)>b{color:var(--orange)}.data-table th>span:not(.sr-only){display:inline-block;max-width:calc(100% - 14px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle;font-size:10px}.data-table th>small{display:block;font-size:8px;font-weight:400;margin-top:1px}.data-table td{padding:4px 3px;border-bottom:1px solid #e8eff4}.data-table tr:last-child td{border-bottom:0}.data-table input{font-size:16px;width:100%;height:33px;min-width:0;text-align:center;padding:4px;border:1px solid #d0e0e9;border-radius:6px;color:var(--ink);background:#fff}.data-table input[aria-invalid=true]{background:#fff4f1;border-color:#ba7865}.data-table tr.selected td{background:#e9f5f1}.row-number,.row-delete{display:grid;place-items:center;border:0;background:transparent;border-radius:5px;padding:0;width:22px;min-height:30px;color:#8ba0ad;font-size:10px}.row-delete{color:#b3816a;font-size:19px}.row-delete:hover{background:#fff0e8;color:#a35838}.row-number:hover{background:#e4f1f5;color:var(--teal)}.entry-feedback{font-size:9px;color:#819aa9;line-height:1.4;margin:5px 0;min-height:13px;flex:none}.entry-feedback.has-errors{color:#a75f4c}.add-row{min-height:32px;font-size:11px;flex:none}.save-status{font-size:8px;line-height:1.3;margin:5px 0 0;color:#93a5b0;flex:none}
+.plot-pane{display:flex;flex-direction:column;min-height:0;min-width:0;padding:12px 15px 10px;overflow:hidden}.plot-heading{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:9px;color:#8298a8;min-height:21px;flex:none}.plot-heading>span:first-child{display:flex;align-items:center;gap:6px}.data-key{display:inline-block;background:var(--teal);width:6px;height:6px;border-radius:50%}.line-key{display:inline-block;background:var(--blue);width:17px;height:2px;margin-left:10px}.drag-hint{font-size:9px;color:#a0b0bb}.chart-wrap{position:relative;flex:1;min-height:115px;min-width:0;isolation:isolate;touch-action:pan-y}canvas{display:block;width:100%;height:100%;pointer-events:none}.point{position:absolute;width:32px;height:32px;padding:0;border:0;border-radius:50%;background:transparent;transform:translate(-50%,-50%);touch-action:none;cursor:grab;z-index:1}.point:before{content:'';display:block;background:var(--teal);width:12px;height:12px;border:2px solid #fff;border-radius:50%;margin:auto;box-shadow:0 0 0 1px #0c858733}.point.selected{z-index:2}.point.selected:before{background:var(--orange);box-shadow:0 0 0 5px #b66d3629,0 0 0 6px #b66d3666}.point.dragging{cursor:grabbing}.point:focus-visible{outline-offset:-2px}.empty-chart{position:absolute;left:19%;right:5%;top:27%;bottom:25%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;text-align:center;padding:10px;background:#ffffffdf;color:#8296a2;border-radius:10px;pointer-events:none}.empty-chart strong{font-size:13px;color:#587587}.empty-chart span{font-size:10px;line-height:1.5}.graph-controls{display:flex;gap:15px;align-items:center;padding:5px 8px;border:1px solid #e2ebf1;border-radius:7px;background:#f8fbfd;flex:none}.graph-controls label{display:inline-flex;align-items:center;gap:5px;font-size:9px;color:#7894a7;white-space:nowrap;cursor:pointer;min-height:20px}.graph-controls input{width:13px;height:13px;margin:0;accent-color:var(--teal)}.selection-info{font-size:10px;line-height:1.4;color:#8a9fac;margin:5px 1px 0;min-height:14px;flex:none;overflow-wrap:anywhere}
+.prediction-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 16px;border-top:1px solid #dce7ef;background:#fcfdff;flex:none}.prediction-bar>label{font-size:10px;max-width:28%;min-width:0;color:#7893a5;line-height:1.4}.prediction-bar>label>span:last-child{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.prediction-bar>input{height:34px;width:95px;min-width:0;padding:4px 8px;text-align:center;border:1px solid #cbdde8;border-radius:7px;color:var(--navy);font-size:16px}.prediction-bar>input[aria-invalid=true]{border-color:#b57766;background:#fff4f0}.prediction-arrow{color:#9ab0bf}.prediction-bar>output{color:var(--orange);font-size:19px;font-weight:700;line-height:1.3;overflow-wrap:anywhere}.prediction-type{padding:3px 7px;border-radius:6px;background:#edf6f0;color:#498875;font-size:9px;white-space:nowrap}.prediction-type.outside{background:#fff1e5;color:#a46c3c}.prediction-type.unavailable{background:#edf2f6;color:#899eac}.prediction-bar>.text-btn{font-size:10px;margin-left:auto;white-space:nowrap}.prediction-warning{flex-basis:100%;font-size:10px;color:#ae7650;line-height:1.45;margin:0;padding:5px 8px;background:#fff6eb;border-radius:5px}
+.interpretation{border-top:1px solid var(--line);padding:10px 16px 13px;background:#f5f9fc;flex:none}.interpretation-top{display:flex;justify-content:space-between;gap:10px;align-items:center}.meaning-tabs{display:flex;align-items:center;gap:13px}.meaning-tabs button{border:0;background:transparent;border-bottom:2px solid transparent;padding:3px 0 5px;color:#91a5b2;font-weight:600;font-size:10px;white-space:nowrap}.meaning-tabs button[aria-selected=true]{border-color:var(--teal);color:var(--teal)}.interpretation-top>.text-btn{font-size:10px;min-height:25px;padding:3px 0;white-space:nowrap}#interpretationText{font-size:12px;line-height:1.65;color:#57788f;min-height:39px;margin:7px 0 0;overflow-wrap:anywhere}.compact-meaning{display:none}
+dialog{width:min(660px,calc(100% - 24px));max-height:calc(100dvh - 30px);overflow:auto;border:1px solid #bed3df;background:#fff;border-radius:15px;padding:22px;color:var(--ink);box-shadow:0 20px 70px #17395f40;font:14px/1.65 Arial,Helvetica,sans-serif}dialog::backdrop{background:#17395f75;backdrop-filter:blur(3px)}.dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:15px}.dialog-head h2{margin:0;font-size:19px;color:var(--navy);line-height:1.3}.dialog-head .text-btn{flex:none;font-size:11px}.dialog-intro{font-size:12px;color:#7b93a4;margin:0 0 15px}.variable-fields{display:grid;gap:16px}.variable-fields label{font-size:11px;font-weight:600;color:#6e8a9c;display:block;margin:0 0 5px}.name-unit{display:flex;gap:8px}.name-unit input{width:100%;min-width:0;height:42px;border:1px solid #cbdde7;border-radius:7px;padding:7px 9px;color:var(--ink);font-size:16px}.name-unit input:last-child{width:115px;max-width:34%;flex:none}.meaning-dialog h3,dialog>h3{font-size:25px;line-height:1.3;margin:8px 0 14px;color:var(--navy)}.meaning-dialog>p{font-size:14px;line-height:1.85;overflow-wrap:anywhere;margin:12px 0}.meaning-extra{padding:12px 14px;font-size:12px;line-height:1.7;background:#edf6f2;color:#4b7b72;border-radius:9px}.meaning-dialog .meaning-extra{font-size:12px}.meaning-dialog .causality-note{border-top:1px solid #e1eaf0;padding-top:12px;font-size:10px;color:#8ea1af;line-height:1.7}.dialog-pager{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding-top:13px;margin-top:18px}.dialog-pager>span{font-size:11px;color:#91a4b1}.help-steps{padding-left:22px;font-size:13px;color:#607f94}.help-steps li{padding:4px 0 8px}.help-steps b{color:var(--navy)}#caseContext{font-size:13px;color:#698599;overflow-wrap:anywhere}
+.calc-dialog{width:min(900px,calc(100% - 24px))}.calc-tabs{display:flex;gap:6px;background:#edf3f7;border-radius:8px;padding:4px;margin:0 0 13px}.calc-tabs button{flex:1;border:0;background:transparent;border-radius:6px;font-size:11px;color:#8ca1b1;padding:7px}.calc-tabs button[aria-pressed=true]{background:#fff;color:var(--navy);font-weight:700}.formula-expression{font-size:15px;line-height:1.9;background:#f1f6fd;color:var(--blue);padding:12px 15px;border-radius:8px;overflow-wrap:anywhere}.calculation-values{display:grid;grid-template-columns:1fr 1fr;gap:7px 20px}.calculation-values>div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #e5edf3;padding:6px 0;font-size:12px;color:#6c899d;min-width:0}.calculation-values b{color:var(--navy);overflow-wrap:anywhere;text-align:right}.formula-note{font-size:10px;line-height:1.6;color:#8a9fac;margin:10px 0 0}.calc-table-wrap{max-height:45dvh;overflow:auto;border:1px solid var(--line);border-radius:8px;margin-top:8px;scrollbar-width:thin}.calc-table{border-spacing:0;min-width:900px;width:100%;text-align:right;font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}.calc-table th{position:sticky;top:0;background:#edf4f8;color:#66859c;font-size:10px;z-index:1}.calc-table td,.calc-table th{padding:7px 9px;border-bottom:1px solid #e7eef3}.calc-table tr.selected td{background:#e8f5ef}.calc-table td:first-child,.calc-table th:first-child{text-align:center}
+@media(max-width:1099px){.lab-body{grid-template-columns:265px minmax(0,1fr)}.data-pane{padding:10px}.plot-pane{padding:10px 12px}.workspace{padding:12px;gap:9px}.drag-hint{display:none}.selection-info{font-size:9px}.prediction-bar{gap:9px;padding:8px 13px}.prediction-bar>output{font-size:18px}.source-bar .source-badge{display:none}.model-count{display:none}#interpretationText{font-size:11px;min-height:36px}}
+@media(max-width:760px){.app{width:calc(100% - 10px);height:calc(100dvh - 10px);margin:5px auto;border-width:2px;border-radius:12px}.brand-header{min-height:62px;padding:7px 9px;gap:9px;border-bottom-width:4px}.brand-title{font-size:clamp(19px,5.5vw,28px)}.brand-logo-wrap,.interactive-logo-wrap{width:39px;height:39px;border-width:2px;border-radius:8px}.brand-footer{min-height:29px;padding:7px 11px;font-size:10px}.workspace{padding:9px;gap:7px}.workspace-nav{gap:6px}.mode-tabs{flex:1;gap:3px;padding:3px;border-radius:9px}.mode-tabs button{padding:5px 8px;min-height:31px;font-size:10px;flex:1}.workspace-nav>.text-btn{font-size:0;min-height:24px;padding:0}.workspace-nav>.text-btn span{font-size:11px;margin:0;width:24px;height:24px}.source-bar{min-height:40px;padding:5px 8px;gap:5px}.source-bar>section{gap:7px}.source-bar select{height:29px;font-size:10px;padding:3px 5px}.source-bar .text-btn{font-size:8px;min-height:25px;white-space:normal;line-height:1.3;max-width:46px;flex:none}.variable-summary{gap:8px}.variable-summary>span{font-size:9px}.variable-summary b{font-size:9px;padding:0 4px}.source-bar .btn.small{font-size:9px;min-height:27px;padding:4px 7px}.model-bar{padding:7px 10px;gap:8px;min-height:47px}.equation-group .eyebrow{font-size:7px;letter-spacing:.5px}.equation-group output{font-size:18px}.model-tools .btn{font-size:8px;padding:4px 6px;min-height:27px}.lab-body{grid-template-columns:minmax(0,1fr);grid-template-rows:155px minmax(0,1fr)}.data-pane{border-right:0;border-bottom:1px solid var(--line);padding:6px 9px}.pane-heading{min-height:24px;margin-bottom:3px}.pane-heading strong{font-size:11px}.data-actions{gap:7px}.data-actions>.text-btn{font-size:9px;min-height:24px;padding:1px 0}.icon-btn{min-height:24px;width:25px;font-size:17px}.data-hint{display:none}.data-table th{padding:2px 3px;font-size:9px}.data-table th>span:not(.sr-only){font-size:9px;max-width:calc(100% - 12px)}.data-table th>small{display:none}.data-table th>b{font-size:9px}.data-table td{padding:2px 3px}.data-table input{height:29px}.row-number,.row-delete{min-height:26px}.add-row{min-height:26px;font-size:10px;padding:3px 8px}.entry-feedback{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;min-height:0;padding:0;margin:0}.entry-feedback.has-errors{position:static;width:auto;height:auto;clip:auto;white-space:normal;font-size:8px;line-height:1.3;margin:2px 0;min-height:0}.save-status{display:none}.entry-table{min-height:35px;margin-bottom:4px}.plot-pane{padding:5px 8px}.plot-heading{font-size:8px;min-height:18px}.chart-wrap{min-height:100px}.graph-controls{padding:2px 5px;gap:7px;justify-content:space-between}.graph-controls label{font-size:8px;gap:3px;min-height:19px}.graph-controls input{width:12px;height:12px}.selection-info{font-size:8px;min-height:11px;line-height:1.35;margin-top:3px}.prediction-bar{gap:7px;padding:7px 9px}.prediction-bar>label{max-width:25%;font-size:8px}.prediction-bar>label .eyebrow{font-size:7px}.prediction-bar>input{width:69px;height:30px;padding:3px 5px;font-size:16px}.prediction-bar>output{font-size:16px}.prediction-arrow{font-size:11px}.prediction-type{font-size:8px;padding:2px 5px}.prediction-bar>.text-btn{font-size:9px;min-height:25px;padding:2px 0}.prediction-warning{font-size:8px;padding:4px 6px;line-height:1.4}.interpretation{padding:6px 10px 8px}.meaning-tabs{gap:11px}.meaning-tabs button{font-size:9px;padding:2px 0 4px}.interpretation-top>.text-btn{font-size:8px;min-height:22px;max-width:65px;white-space:normal;text-align:right;line-height:1.3}#interpretationText{font-size:10px;line-height:1.55;margin-top:5px;min-height:32px}dialog{padding:17px;max-height:calc(100dvh - 22px)}.dialog-head{margin-bottom:12px}.dialog-head h2{font-size:17px}.dialog-head .text-btn{font-size:10px}.dialog-intro{font-size:11px}.name-unit input{font-size:16px;height:40px}.name-unit input:last-child{width:86px}.meaning-dialog h3,dialog>h3{font-size:21px}.meaning-dialog>p{font-size:12px;line-height:1.8}.meaning-dialog .meaning-extra{font-size:11px;padding:10px 11px}.meaning-dialog .causality-note{font-size:9px}.dialog-pager{margin-top:13px;padding-top:11px}.dialog-pager .btn{font-size:10px;padding:5px 10px;min-height:32px}.dialog-pager>span{font-size:10px}.formula-expression{font-size:12px;padding:10px}.calculation-values{gap:4px 13px}.calculation-values>div{font-size:10px;padding:4px 0}.formula-note{font-size:9px}.calc-tabs button{font-size:10px;padding:6px}}
+@media(max-height:700px) and (min-width:761px){.workspace{padding:10px 14px;gap:8px}.model-bar{padding:7px 13px}.equation-group output{font-size:20px}.data-hint,.save-status{display:none}.source-bar{min-height:43px;padding:5px 10px}.source-bar select{height:31px}.data-pane{padding:10px}.plot-pane{padding:7px 10px}.prediction-bar{padding:6px 13px;gap:9px}.prediction-bar>input{height:30px}.interpretation{padding:5px 13px 8px}.interpretation-top>.text-btn{min-height:23px}#interpretationText{font-size:11px;line-height:1.5;min-height:32px;margin-top:4px}}
+@media(max-width:760px) and (max-height:700px) and (min-height:461px){.workspace{padding:7px;gap:5px}.source-bar{min-height:35px;padding:3px 6px}.source-bar select{height:27px}.mode-tabs button{min-height:28px}.model-bar{padding:5px 8px;min-height:34px}.equation-group .eyebrow{display:none}.equation-group output{font-size:16px}.model-tools .btn{min-height:24px}.lab-body{grid-template-rows:121px minmax(0,1fr)}.data-pane{padding:4px 7px}.pane-heading{min-height:22px;margin-bottom:2px}.data-table input{height:27px}.data-table td{padding:1px 3px}.row-number,.row-delete{min-height:25px}.add-row{min-height:24px;font-size:9px}.entry-table{margin-bottom:3px}.plot-pane{padding:4px 7px}.plot-heading{display:none}.selection-info{font-size:8px}.chart-wrap{min-height:100px}.prediction-bar{padding:5px 7px;gap:6px}.prediction-bar>label{max-width:23%}.prediction-bar>label .eyebrow{display:none}.prediction-bar>label>span:last-child{margin:0}.prediction-bar>input{height:28px;width:60px}.prediction-bar>output{font-size:14px}.prediction-bar>.text-btn{display:none}.prediction-type{font-size:7px;padding:2px 4px}.prediction-warning{padding:3px 5px;font-size:8px}.interpretation{padding:4px 8px 6px}.interpretation .meaning-tabs{display:none}.interpretation-top{justify-content:flex-end;float:right;margin-left:7px}.interpretation-top>.text-btn{max-width:none;min-height:19px;font-size:8px;padding:0;white-space:nowrap}#interpretationText{display:none}.compact-meaning{display:block;font-size:9px;line-height:1.5;margin:0;min-height:20px;color:#608095}.graph-controls{padding:1px 4px}.graph-controls label{font-size:7px;min-height:18px}}
+@media(max-height:460px){.app{margin:4px auto;height:calc(100dvh - 8px)}.brand-header{min-height:44px;padding:4px 10px;border-bottom-width:3px;gap:9px}.brand-title{font-size:23px}.brand-logo-wrap,.interactive-logo-wrap{width:30px;height:30px;border-width:2px;border-radius:7px}.brand-footer{min-height:23px;padding:5px 11px;font-size:9px}.workspace{padding:6px 9px;gap:5px}.workspace-nav .mode-tabs{max-width:360px}.mode-tabs{padding:2px}.mode-tabs button{font-size:10px;min-height:26px;padding:4px 15px}.source-bar{min-height:32px;padding:2px 7px}.source-bar select{height:26px;font-size:10px}.source-bar .btn.small{min-height:24px;font-size:9px}.source-bar .text-btn{min-height:23px}.model-bar{padding:4px 9px;min-height:28px}.equation-group .eyebrow{display:none}.equation-group output{font-size:16px}.model-tools .btn{font-size:8px;min-height:22px;padding:2px 6px}.lab-body{grid-template-columns:225px minmax(0,1fr);grid-template-rows:minmax(0,1fr)}.data-pane{padding:5px 7px;border-bottom:0;border-right:1px solid var(--line)}.pane-heading{min-height:22px;margin-bottom:2px}.pane-heading strong{font-size:10px}.data-actions .text-btn{font-size:8px;min-height:22px}.icon-btn{min-height:22px;width:23px;font-size:16px}.data-hint,.save-status{display:none}.data-table th{padding:2px}.data-table th>small{display:none}.data-table th>span:not(.sr-only){font-size:8px}.data-table th>b{font-size:8px}.data-table td{padding:1px 2px}.data-table input{height:25px;font-size:14px}.row-number,.row-delete{min-height:23px}.entry-table{min-height:30px;margin-bottom:3px}.add-row{min-height:23px;font-size:9px;padding:2px 7px}.entry-feedback{display:none}.entry-feedback.has-errors{display:block;font-size:7px;line-height:1.2;margin:1px 0}.plot-pane{padding:3px 7px}.plot-heading{display:none}.chart-wrap{min-height:80px}.graph-controls{padding:0 3px;gap:5px}.graph-controls label{font-size:7px;min-height:17px;gap:3px}.graph-controls input{width:11px;height:11px}.selection-info{font-size:7px;line-height:1.2;min-height:9px;margin-top:2px}.prediction-bar{padding:4px 9px;gap:8px}.prediction-bar>label{font-size:8px;max-width:24%}.prediction-bar>label .eyebrow{display:none}.prediction-bar>label>span:last-child{margin:0}.prediction-bar>input{height:25px;width:65px;font-size:14px}.prediction-bar>output{font-size:14px}.prediction-bar>.text-btn{font-size:8px;min-height:23px}.prediction-type{font-size:8px}.prediction-warning{font-size:8px;line-height:1.3;padding:2px 5px}.interpretation{padding:3px 9px}.interpretation .meaning-tabs{display:none}.interpretation-top{float:right;margin-left:10px}.interpretation-top>.text-btn{font-size:8px;min-height:20px;max-width:none;white-space:nowrap;padding:0}#interpretationText{display:none}.compact-meaning{display:block;font-size:8px;color:#6d8a9e;margin:0;line-height:1.5;min-height:20px}.dialog-head{margin-bottom:8px}.dialog-head h2{font-size:15px}.meaning-dialog h3,dialog>h3{font-size:19px;margin:5px 0 9px}.meaning-dialog>p{font-size:11px;line-height:1.6;margin:8px 0}.meaning-dialog .meaning-extra{font-size:10px;padding:7px 10px;line-height:1.5}.meaning-dialog .causality-note{font-size:8px;padding-top:7px;margin-top:9px}.dialog-pager{margin-top:9px;padding-top:8px}.dialog-pager .btn{min-height:27px;font-size:9px;padding:3px 9px}.variable-fields{grid-template-columns:1fr 1fr;gap:12px}.dialog-intro{font-size:10px;margin-bottom:9px}.variable-fields label{font-size:10px}.name-unit input{height:33px;font-size:13px}.name-unit input:last-child{width:75px}.help-steps{font-size:11px}.help-steps li{padding-bottom:5px}.formula-expression{font-size:11px;line-height:1.6;padding:8px}.calculation-values{gap:0 15px}.calculation-values>div{font-size:10px;padding:2px 0}.calc-tabs{margin-bottom:8px}.calc-tabs button{padding:4px}.calc-table-wrap{max-height:43dvh}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+.calc-symbol{display:none}
+.prediction-type{border:0;font-family:Arial,Helvetica,sans-serif;min-height:23px;line-height:1.4}
+@media(min-width:761px) and (max-height:700px){
+ .workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);grid-template-rows:auto minmax(0,1fr)}
+ .workspace-nav{grid-column:1;grid-row:1}
+ .source-bar{grid-column:2;grid-row:1}
+ .experiment{grid-column:1/-1;grid-row:2}
+ .source-badge{display:none}
+ .workspace-nav>.text-btn{font-size:0;flex:none}
+ .workspace-nav>.text-btn span{font-size:10px;margin:0}
+ .mode-tabs button{font-size:11px;padding:5px 14px}
+ .chart-wrap{min-height:100px}
+ .plot-heading{display:none}
+ .prediction-bar>.text-btn{min-height:25px}
+}
+@media(max-width:760px) and (max-height:700px) and (min-height:461px){
+ .prediction-bar{flex-wrap:nowrap;gap:6px;padding:4px 7px}
+ .prediction-bar>label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;margin:0;padding:0}
+ .prediction-bar:before{content:'X';font-size:10px;color:#8199aa}
+ .prediction-bar>output{font-size:14px;flex:1;min-width:0}
+ .prediction-bar .prediction-type{font-size:7px;min-height:20px;padding:2px 4px}
+ .prediction-warning{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;margin:0;padding:0}
+ .model-tools .calc-label{display:none}
+ .model-tools .calc-symbol{display:inline;font-size:13px}
+ .model-tools .btn{width:26px;min-height:24px;padding:1px 4px}
+ .plot-pane{padding-top:3px;padding-bottom:3px}
+ .selection-info{min-height:10px;line-height:1.2;font-size:7px;margin-top:2px}
+ .interpretation{padding-top:3px;padding-bottom:3px}
+}
+@media(max-height:460px){
+ .workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);grid-template-rows:auto minmax(0,1fr)}
+ .workspace-nav{grid-column:1;grid-row:1}
+ .source-bar{grid-column:2;grid-row:1}
+ .experiment{grid-column:1/-1;grid-row:2}
+ .source-bar{min-width:0}
+ .workspace-nav .mode-tabs{min-width:0}
+ .mode-tabs button{padding:4px 8px;font-size:9px;white-space:nowrap}
+ .workspace-nav{gap:5px}
+ .source-bar>section{min-width:0}
+ .source-bar .text-btn{max-width:40px;font-size:7px}
+ .source-badge{display:none}
+ .prediction-warning{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;margin:0;padding:0}
+ .chart-wrap{min-height:100px}
+ .selection-info{font-size:7px;min-height:9px;line-height:1.2}
+}
+</style></head><body><div class="app"><header class="brand-header">
+    <div class="brand-logo-wrap">
+      <!-- LOGO KIRI: pasang gambarmu di bahan/logo-identitas.png. Ubah src jika nama filenya berbeda. -->
+      <img class="brand-logo" src="bahan/logo-identitas.png" alt="Logo identitas" decoding="async">
+    </div>
+    <h1 class="brand-title">Simulasi Regresi</h1>
+    <div class="interactive-logo-wrap">
+      <!-- LOGO KANAN: pasang gambarmu di bahan/logo-interaktif.png. Ubah src jika nama filenya berbeda. -->
+      <img class="interactive-logo" src="bahan/logo-interaktif.png" alt="Logo interaktif" decoding="async">
+    </div>
+  </header><div class="workspace">
+ <nav class="workspace-nav" aria-label="Pilihan data"><div class="mode-tabs" role="tablist" aria-label="Sumber data"><button type="button" id="casesTab" role="tab" aria-controls="casesPanel" aria-selected="true">Contoh Kasus</button><button type="button" id="customTab" role="tab" aria-controls="customPanel" aria-selected="false" tabindex="-1">Analisis Data Baru</button></div><button class="text-btn" id="helpBtn" type="button">Cara eksplorasi <span aria-hidden="true">?</span></button></nav>
+ <div class="source-bar">
+  <section id="casesPanel" role="tabpanel" aria-labelledby="casesTab"><label class="sr-only" for="caseSelect">Pilih contoh kasus</label><select id="caseSelect"><option value="study">01 · Jam belajar & nilai matematika</option><option value="price">02 · Harga produk & jumlah pembeli</option><option value="weather">03 · Suhu udara & penjualan minuman</option><option value="fuel">04 · Jarak tempuh & bahan bakar</option><option value="laptop">05 · Lama pemakaian & harga laptop</option></select><button class="text-btn" id="contextBtn" type="button">Konteks kasus ↗</button></section>
+  <section id="customPanel" role="tabpanel" aria-labelledby="customTab" hidden><div class="variable-summary"><span><b>X</b> <span id="xSummary"></span></span><span><b>Y</b> <span id="ySummary"></span></span></div><button class="btn small" id="variablesBtn" type="button">Atur variabel</button></section>
+  <span class="source-badge" id="sourceBadge">DATA LATIHAN</span>
  </div>
-</div>
-
-<div class="bottom">
- <section class="card">
-  <h2>Tabel Data</h2>
-  <div class="ts"><table><thead><tr><th>No.</th><th>X – Nilai Matematika</th><th>Y – Nilai Fisika</th></tr></thead><tbody id="dt"></tbody></table></div>
- </section>
- <section class="card">
-  <h2>Tabel Perhitungan Kuadrat Terkecil</h2>
-  <div class="ts"><table><thead><tr><th>No.</th><th>x</th><th>y</th><th>x − x̄</th><th>y − ȳ</th><th>(x − x̄)(y − ȳ)</th><th>(x − x̄)²</th><th>ŷ</th><th>Residual</th></tr></thead><tbody id="ct"></tbody><tfoot id="cf"></tfoot></table></div>
-  <div class="sum" id="sum"></div>
+ <section class="experiment" aria-label="Ruang eksperimen regresi linear">
+  <div class="model-bar"><div class="equation-group"><span class="eyebrow">MODEL REGRESI LINEAR</span><output id="equation">ŷ = a + bx</output></div><div class="model-tools"><span class="model-count" id="validCount"></span><button class="btn small" id="calcBtn" type="button" aria-label="Buka perhitungan kuadrat terkecil"><span class="calc-label">Perhitungan ↗</span><span class="calc-symbol" aria-hidden="true">Σ</span></button></div></div>
+  <div class="lab-body">
+   <section class="data-pane" aria-label="Tabel data yang dapat diedit"><div class="pane-heading"><strong>Tabel data</strong><div class="data-actions"><button class="text-btn" id="resetBtn" type="button">Pulihkan</button><button class="icon-btn" id="undoBtn" aria-label="Batalkan perubahan terakhir" title="Batalkan perubahan terakhir" type="button" disabled>↶</button></div></div><p class="data-hint">Ubah angka, lalu amati perubahan garis. Desimal boleh memakai koma atau titik.</p><div class="entry-table" tabindex="0" role="region" aria-label="Tabel pasangan X dan Y, dapat digulir"><table class="data-table"><thead><tr><th>No.</th><th><b>X</b><span id="xColumnName"></span><small id="xColumnUnit"></small></th><th><b>Y</b><span id="yColumnName"></span><small id="yColumnUnit"></small></th><th><span class="sr-only">Hapus</span></th></tr></thead><tbody id="dataBody"></tbody></table></div><p id="entryFeedback" class="entry-feedback" aria-live="polite"></p><button class="btn primary add-row" id="addRowBtn" type="button">+ Tambah data</button><p class="sr-only" id="actionStatus" role="status" aria-live="polite"></p><p class="save-status" id="saveStatus"></p></section>
+   <section class="plot-pane" aria-label="Diagram pencar dan garis regresi"><div class="plot-heading"><span><i class="data-key"></i> Data <i class="line-key"></i> Garis regresi</span><span class="drag-hint">Geser titik untuk bereksperimen</span></div><div id="chartWrap" class="chart-wrap" role="group" aria-label="Diagram pencar interaktif" aria-describedby="chartHelp"><canvas id="chart" aria-hidden="true"></canvas><div id="emptyChart" class="empty-chart" hidden><strong>Mulai dari pasangan datamu.</strong><span>Isi X dan Y pada tabel. Satu baris lengkap menjadi satu titik.</span></div></div><p id="chartHelp" class="sr-only">Pilih titik menggunakan Tab, lalu gunakan tombol panah untuk mengubah nilainya. Titik juga dapat diseret dengan mouse atau sentuhan.</p><div class="graph-controls"><label><input id="showResiduals" type="checkbox" checked> Residual</label><label><input id="showPrediction" type="checkbox" checked> Penanda prediksi</label><label><input id="showLabels" type="checkbox"> Nomor titik</label></div><p id="selectionInfo" class="selection-info">Pilih titik untuk melihat nilai prediksi dan residualnya.</p></section>
+  </div>
+  <div class="prediction-bar"><label for="predictionX"><span class="eyebrow">COBA PREDIKSI</span><span id="predictionLabel">Nilai X</span></label><input id="predictionX" inputmode="decimal" autocomplete="off" maxlength="40" placeholder="Isi X" aria-label="Nilai X untuk prediksi"><span class="prediction-arrow" aria-hidden="true">→</span><output id="predictionY">ŷ = —</output><button id="predictionType" type="button" class="prediction-type" title="Baca arti prediksi">Belum tersedia</button><button class="text-btn" id="meanBtn" type="button" title="Gunakan rata-rata X sebagai nilai prediksi">Pakai x̄</button><p id="predictionWarning" class="prediction-warning" role="status" hidden></p></div>
+  <section class="interpretation" aria-label="Interpretasi regresi"><div class="interpretation-top"><div class="meaning-tabs" role="tablist" aria-label="Pilih interpretasi"><button type="button" role="tab" data-meaning="slope" aria-selected="true" aria-controls="interpretationText">Makna b</button><button type="button" role="tab" data-meaning="intercept" aria-selected="false" tabindex="-1" aria-controls="interpretationText">Makna a</button><button type="button" role="tab" data-meaning="prediction" aria-selected="false" tabindex="-1" aria-controls="interpretationText">Prediksi</button><button type="button" role="tab" data-meaning="residual" aria-selected="false" tabindex="-1" aria-controls="interpretationText">Residual</button></div><button class="text-btn" id="meaningBtn" type="button">Penjelasan lengkap ↗</button></div><p id="interpretationText" role="tabpanel"></p><p class="compact-meaning" id="compactMeaning"></p></section>
  </section>
 </div>
-</div>
-
-<script>
-const $=id=>document.getElementById(id);
-const INIT=[[60,80],[45,69],[50,71],[60,85],[50,80],[65,82],[60,89],[65,93],[50,76],[65,86],[45,71],[50,69]];
-let pts=INIT.map(([x,y])=>({x,y})),sel=-1,drag=-1,dom;
-const W=640,H=440,L=50,R=16,T=14,B=46,PW=W-L-R,PH=H-T-B;
-const svg=$('svg'),tt=$('tt'),gw=$('gw');
-
-function fmt(v,d=2,sign){if(Math.abs(v)<5*Math.pow(10,-(d+1)))v=0;let s=v.toFixed(d).replace('.',',').replace('-','−');if(sign&&v>=0)s='+'+s;return s}
-function computeDom(){
-  const xs=pts.map(p=>p.x),ys=pts.map(p=>p.y);
-  const mn=a=>a.length?Math.min(...a):1e9,mxf=a=>a.length?Math.max(...a):-1e9;
-  return{x0:Math.min(30,Math.floor((mn(xs)-5)/5)*5),x1:Math.max(80,Math.ceil((mxf(xs)+5)/5)*5),
-         y0:Math.min(50,Math.floor((mn(ys)-5)/5)*5),y1:Math.max(100,Math.ceil((mxf(ys)+5)/5)*5)};
+<dialog id="variablesDialog" aria-labelledby="variablesTitle"><div class="dialog-head"><h2 id="variablesTitle">Variabel pengamatanmu</h2><button class="text-btn" data-close="variablesDialog" type="button">Selesai ✓</button></div><p class="dialog-intro">Pasangkan dua variabel numerik dari pengamatan yang sama. Nama dan satuan akan digunakan pada grafik serta interpretasi.</p><div class="variable-fields"><div><label for="xName">Nama variabel X</label><div class="name-unit"><input id="xName" maxlength="60" placeholder="Mis. Jam belajar" autocomplete="off"><input id="xUnit" maxlength="24" placeholder="Satuan" aria-label="Satuan variabel X" autocomplete="off"></div></div><div><label for="yName">Nama variabel Y</label><div class="name-unit"><input id="yName" maxlength="60" placeholder="Mis. Nilai matematika" autocomplete="off"><input id="yUnit" maxlength="24" placeholder="Satuan" aria-label="Satuan variabel Y" autocomplete="off"></div></div></div></dialog>
+<dialog id="meaningDialog" class="meaning-dialog" aria-labelledby="meaningTitle"><div class="dialog-head"><h2 id="meaningTitle">Membaca hasil regresi</h2><button class="text-btn" data-close="meaningDialog" type="button">Tutup ×</button></div><span class="eyebrow" id="meaningKicker"></span><h3 id="meaningPageTitle"></h3><p id="meaningMain"></p><p id="meaningExtra" class="meaning-extra"></p><p class="causality-note">Data contoh dibuat untuk latihan. Hubungan dan prediksi dalam model tidak otomatis membuktikan sebab-akibat.</p><div class="dialog-pager"><button class="btn" id="meaningPrev" type="button">← Kembali</button><span id="meaningPageCount" aria-live="polite">1 / 4</span><button class="btn primary" id="meaningNext" type="button">Lanjut →</button></div></dialog>
+<dialog id="calcDialog" class="calc-dialog" aria-labelledby="calcTitle"><div class="dialog-head"><h2 id="calcTitle">Perhitungan kuadrat terkecil</h2><button class="text-btn" data-close="calcDialog" type="button">Tutup ×</button></div><div class="calc-tabs" role="group" aria-label="Rincian perhitungan"><button type="button" id="formulaTab" aria-pressed="true">Rumus & hasil</button><button type="button" id="tableTab" aria-pressed="false">Rincian per data</button></div><div id="formulaPanel"><p class="formula-expression">b = Σ[(x − x̄)(y − ȳ)] ÷ Σ(x − x̄)²<br>a = ȳ − b x̄ &nbsp; · &nbsp; ŷ = a + bx</p><div id="calculationValues" class="calculation-values"></div><p class="formula-note">SSE = Σ(y − ŷ)². Garis kuadrat terkecil meminimalkan SSE. Pembulatan hanya untuk tampilan; prediksi memakai nilai penuh.</p></div><div id="calcTablePanel" hidden><p class="formula-note">Hanya pasangan lengkap dan valid yang dihitung. Geser tabel untuk melihat semua kolom.</p><div class="calc-table-wrap" tabindex="0" role="region" aria-label="Rincian perhitungan dapat digulir"><table class="calc-table"><thead><tr><th>No.</th><th>x</th><th>y</th><th>x − x̄</th><th>y − ȳ</th><th>(x − x̄)(y − ȳ)</th><th>(x − x̄)²</th><th>ŷ</th><th>y − ŷ</th><th>(y − ŷ)²</th></tr></thead><tbody id="calcBody"></tbody></table></div></div></dialog>
+<dialog id="contextDialog" aria-labelledby="contextTitle"><div class="dialog-head"><h2 id="contextTitle">Konteks pengamatan</h2><button class="text-btn" data-close="contextDialog" type="button">Tutup ×</button></div><h3 id="caseQuestion"></h3><p id="caseContext"></p><p class="meaning-extra">Semua pasangan data contoh bersifat simulasi untuk latihan. Kamu boleh mengedit, menambah, dan menghapus barisnya.</p></dialog>
+<dialog id="helpDialog" aria-labelledby="helpTitle"><div class="dialog-head"><h2 id="helpTitle">Mulai bereksperimen</h2><button class="text-btn" data-close="helpDialog" type="button">Tutup ×</button></div><ol class="help-steps"><li><b>Pilih data.</b> Gunakan satu dari lima kasus atau tentukan variabelmu di Analisis Data Baru.</li><li><b>Ubah pengamatan.</b> Edit angka, tambah baris, atau seret titik. Garis dan interpretasi mengikuti data.</li><li><b>Coba prediksi.</b> Masukkan X, lalu baca ŷ dan periksa apakah termasuk interpolasi atau ekstrapolasi.</li><li><b>Selidiki residual.</b> Pilih titik untuk membandingkan Y aktual dengan prediksi. Tombol ↶ membatalkan perubahan.</li></ol><p class="meaning-extra">Huruf a menyatakan konstanta, b menyatakan kemiringan, dan ŷ dibaca “Y topi”: nilai Y yang diprediksi model.</p></dialog>
+<footer class="brand-footer"><span>© 2026</span></footer></div><script>(()=>{
+'use strict';
+const $=id=>document.getElementById(id),LIMIT=200,STORE='simulasi-regresi-kontekstual-v1';
+const templates=[
+ {id:'study',xName:'Jam belajar',xUnit:'jam/minggu',yName:'Nilai matematika',yUnit:'skor',question:'Bagaimana memperkirakan nilai dari waktu belajar?',context:'Amati waktu belajar per minggu dan nilai ujian matematika dari 12 peserta. Gunakan model untuk membaca kecenderungan dalam data latihan ini. Nilai juga dapat berkaitan dengan kesiapan, cara belajar, dan kondisi lain.',xStep:.1,yStep:1,yMin:0,yMax:100,predX:'6',x:[1,2,3,4,5,6,7,8,9,10,11,12],y:[48,57,54,65,62,73,69,78,75,86,82,91]},
+ {id:'price',xName:'Harga produk',xUnit:'ribu rupiah',yName:'Jumlah pembeli',yUnit:'orang/hari',question:'Bagaimana memperkirakan jumlah pembeli pada suatu harga?',context:'Pasangkan harga produk yang sama dengan jumlah pembeli harian pada 12 pengamatan. Model merangkum kecenderungan pada data latihan. Promosi, lokasi, dan kondisi pasar juga dapat berkaitan dengan pembelian.',xStep:1,yStep:1,yMin:0,predX:'21',x:[10,12,14,16,18,20,22,24,26,28,30,32],y:[98,92,96,84,89,78,81,75,72,68,64,65]},
+ {id:'weather',xName:'Suhu udara',xUnit:'°C',yName:'Penjualan minuman dingin',yUnit:'gelas/hari',question:'Berapa perkiraan penjualan minuman pada suhu tertentu?',context:'Amati suhu udara harian dan minuman dingin yang terjual pada 12 hari. Model digunakan untuk perkiraan dalam rentang pengamatan, bukan bukti bahwa suhu adalah satu-satunya penyebab perubahan penjualan.',xStep:.1,yStep:1,yMin:0,predX:'28',x:[22,23,24,25,26,27,28,29,30,31,32,33],y:[45,52,48,64,58,70,68,83,75,92,85,100]},
+ {id:'fuel',xName:'Jarak tempuh',xUnit:'km',yName:'Bahan bakar terpakai',yUnit:'liter',question:'Berapa bahan bakar yang diperkirakan untuk sebuah perjalanan?',context:'Data latihan berasal dari sepuluh perjalanan dengan kendaraan yang sama. Kecepatan, kondisi jalan, dan beban kendaraan dapat berbeda. Prediksi mengacu pada kecenderungan rata-rata dalam pengamatan.',xStep:1,yStep:.1,yMin:0,predX:'75',x:[10,20,30,40,50,60,70,80,90,100],y:[1.2,1.6,2.4,2.7,3.5,3.8,4.6,4.9,5.7,6.1]},
+ {id:'laptop',xName:'Lama pemakaian laptop',xUnit:'tahun',yName:'Harga jual laptop',yUnit:'juta rupiah',question:'Bagaimana memperkirakan harga jual dari lama pemakaian?',context:'Bandingkan lama pemakaian dan harga jual laptop sejenis dari sepuluh pengamatan simulasi. Kondisi fisik, spesifikasi, dan pasar juga dapat berkaitan dengan harga. Model linear hanya pendekatan dalam rentang data.',xStep:.1,yStep:.1,yMin:0,predX:'3',x:[.5,1,1.5,2,2.5,3,3.5,4,4.5,5],y:[10.8,10.1,9.9,8.9,8.6,7.8,7.6,6.8,6.5,5.9]}
+];
+const defs=new Map(templates.map(t=>[t.id,t])),initial=t=>({rows:t.x.map((x,i)=>({x:String(x),y:String(t.y[i])})),predX:t.predX});
+const blankRows=()=>Array.from({length:3},()=>({x:'',y:''})),datasets=new Map(templates.map(t=>[t.id,initial(t)]));
+datasets.set('custom',{xName:'',xUnit:'',yName:'',yUnit:'',predX:'',rows:blankRows()});
+const histories=new Map([...datasets.keys()].map(k=>[k,[]])),handles=new Map(),canvas=$('chart'),wrap=$('chartWrap');
+let mode='cases',caseId='study',selected=-1,pairs=[],issues={invalid:0,incomplete:0},stats=null,view={xmin:0,xmax:10,ymin:0,ymax:10},size={w:1,h:1},pad={l:55,r:18,t:25,b:46},drag=null,session=null,raf=0,saveTimer=0,meaning='slope',calcTab='formula',canStore=true;
+const key=()=>mode==='custom'?'custom':caseId,data=()=>datasets.get(key()),meta=()=>mode==='custom'?{xName:data().xName.trim()||'Variabel X',xUnit:data().xUnit.trim(),yName:data().yName.trim()||'Variabel Y',yUnit:data().yUnit.trim()}:defs.get(caseId);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),label=(n,u)=>u?`${n} (${u})`:n;
+function parse(s){const t=String(s).trim().replace(/−/g,'-').replace(',','.');if(!t)return {valid:false,empty:true};if(!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(t))return {valid:false,empty:false};const v=Number(t);return {value:v,valid:Number.isFinite(v)&&Math.abs(v)<=1e12,empty:false};}
+function fmt(v,d=3){if(!Number.isFinite(v))return '—';if(v!==0&&(Math.abs(v)<.0005||Math.abs(v)>=1e7))return v.toExponential(Math.min(d,4)).replace('.',',').replace('e-','e−');return Object.is(v,-0)?'0':v.toLocaleString('id-ID',{maximumFractionDigits:d});}
+const raw=v=>String(Number(v.toPrecision(12))),unitY=()=>meta().yUnit||'satuan Y',unitX=()=>meta().xUnit||'satuan X';
+function restore(){try{const s=JSON.parse(localStorage.getItem(STORE)||'null');if(!s||s.version!==1)return;const rows=a=>Array.isArray(a)?a.slice(0,LIMIT).map(r=>({x:String(r?.x??'').slice(0,40),y:String(r?.y??'').slice(0,40)})):null;templates.forEach(t=>{const r=rows(s.cases?.[t.id]?.rows);if(r)datasets.get(t.id).rows=r;if(typeof s.cases?.[t.id]?.predX==='string')datasets.get(t.id).predX=s.cases[t.id].predX.slice(0,40);});if(s.custom&&typeof s.custom==='object'){const c=datasets.get('custom'),r=rows(s.custom.rows);if(r)c.rows=r;for(const f of ['xName','yName','xUnit','yUnit','predX'])if(typeof s.custom[f]==='string')c[f]=s.custom[f].slice(0,f.endsWith('Name')?60:f==='predX'?40:24);}if(s.mode==='custom')mode='custom';if(defs.has(s.caseId))caseId=s.caseId;}catch{canStore=false;}}
+function saveNow(){clearTimeout(saveTimer);const payload={version:1,mode,caseId,cases:Object.fromEntries(templates.map(t=>[t.id,datasets.get(t.id)])),custom:datasets.get('custom')};try{localStorage.setItem(STORE,JSON.stringify(payload));canStore=true;}catch{canStore=false;}$('saveStatus').textContent=canStore?'Tersimpan otomatis di browser perangkat ini.':'Data tersimpan selama halaman tetap terbuka.';}
+function save(){clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,250);}
+function announce(s){$('actionStatus').textContent=s;}
+function recordUndo(){const h=histories.get(key());h.push({dataset:JSON.parse(JSON.stringify(data())),selected});if(h.length>40)h.shift();$('undoBtn').disabled=false;}
+function finishEdit(){session=null;}
+function recordEdit(input){if(!session||session.input!==input)session={input,recorded:false};if(!session.recorded){recordUndo();session.recorded=true;}}
+function collect(){const p=[];let invalid=0,incomplete=0;data().rows.forEach((r,index)=>{const x=parse(r.x),y=parse(r.y);if(x.valid&&y.valid)p.push({x:x.value,y:y.value,index});else if((!x.valid&&!x.empty)||(!y.valid&&!y.empty))invalid++;else incomplete++;});pairs=p;issues={invalid,incomplete};}
+function calculate(){
+ const n=pairs.length,mx=n?pairs[0].x+pairs.reduce((s,p)=>s+(p.x-pairs[0].x),0)/n:NaN,my=n?pairs[0].y+pairs.reduce((s,p)=>s+(p.y-pairs[0].y),0)/n:NaN,base={n,mx,my};
+ if(n<2)return {...base,valid:false,reason:'Lengkapi sedikitnya dua pasangan X dan Y yang valid untuk membentuk model.'};
+ const scaleX=Math.max(...pairs.map(p=>Math.abs(p.x-mx))),scaleY=Math.max(...pairs.map(p=>Math.abs(p.y-my)));
+ if(scaleX===0)return {...base,valid:false,reason:'Semua nilai X sama. Kemiringan dan konstanta regresi tidak dapat ditentukan secara unik; buat nilai X bervariasi.'};
+ let xx=0,xy=0,yy=0;for(const p of pairs){const dx=(p.x-mx)/scaleX,dy=scaleY?(p.y-my)/scaleY:0;xx+=dx*dx;xy+=dx*dy;yy+=dy*dy;}
+ const normalizedSlope=xy/xx,b=(scaleY/scaleX)*normalizedSlope,predict=x=>my+(scaleY?scaleY*normalizedSlope*((x-mx)/scaleX):0),a=my-b*mx,sxx=xx*scaleX*scaleX,sxy=xy*scaleX*scaleY;
+ const sse=pairs.reduce((s,p)=>s+(p.y-predict(p.x))**2,0),xmin=Math.min(...pairs.map(p=>p.x)),xmax=Math.max(...pairs.map(p=>p.x));
+ if(![a,b,sxx,sxy,sse].every(Number.isFinite)||sxx===0)return {...base,valid:false,reason:'Skala angka terlalu ekstrem untuk perhitungan ini. Gunakan satuan yang lebih sesuai.'};
+ return {...base,valid:true,a,b,sxx,sxy,sse,predict,xmin,xmax};
 }
-function calc(){
-  const n=pts.length;if(n<2)return{st:'few',n};
-  const mx=pts.reduce((s,p)=>s+p.x,0)/n,my=pts.reduce((s,p)=>s+p.y,0)/n;
-  let sxy=0,sxx=0;pts.forEach(p=>{sxy+=(p.x-mx)*(p.y-my);sxx+=(p.x-mx)**2});
-  if(sxx<1e-9)return{st:'flat',n,mx,my};
-  const b=sxy/sxx,a=my-b*mx;let sse=0;pts.forEach(p=>{sse+=(p.y-(a+b*p.x))**2});
-  return{st:'ok',n,mx,my,sxy,sxx,b,a,sse};
+function nice(v){if(!(v>0)||!Number.isFinite(v))return 1;const p=10**Math.floor(Math.log10(v));if(!p)return Number.MIN_VALUE;const f=v/p;return(f<=1?1:f<=2?2:f<=5?5:10)*p;}
+function setView(){function extent(v){if(!v.length)return[0,10];const lo=Math.min(...v),hi=Math.max(...v);let span=hi-lo;if(span===0)span=Math.max(1,Math.abs(lo)*.2);const step=nice(span/5),margin=span*.12;let a=Math.floor((lo-margin)/step)*step,b=Math.ceil((hi+margin)/step)*step;if(lo>=0)a=Math.max(0,a);if(!(b>a)){a=lo-span;b=hi+span;}return[a,b];}const[xmin,xmax]=extent(pairs.map(p=>p.x)),[ymin,ymax]=extent(pairs.map(p=>p.y));view={xmin,xmax,ymin,ymax};}
+function offset(lo,hi){const range=hi-lo,m=Math.max(Math.abs(lo),Math.abs(hi));return m>1e5&&range/m<.001?Math.floor(lo/(10**Math.floor(Math.log10(range))))*(10**Math.floor(Math.log10(range))):0;}
+const px=x=>pad.l+(x-view.xmin)/(view.xmax-view.xmin)*(size.w-pad.l-pad.r),py=y=>size.h-pad.b-(y-view.ymin)/(view.ymax-view.ymin)*(size.h-pad.t-pad.b);
+function prediction(){const x=parse(data().predX);if(!stats.valid||!x.valid)return {valid:false,input:x};const y=stats.predict(x.value);if(!Number.isFinite(y))return{valid:false,input:x};const inside=x.value>=stats.xmin&&x.value<=stats.xmax,m=meta(),physical=(Number.isFinite(m.yMin)&&y<m.yMin)||(Number.isFinite(m.yMax)&&y>m.yMax);return {valid:true,x:x.value,y,inside,physical,input:x};}
+function describe(){
+ const m=meta(),s=stats,p=prediction(),sample=s.n===2?' Baru dua pasangan: garis dapat melalui keduanya dengan SSE = 0, tetapi ini belum menjamin prediksi untuk pengamatan lain.':'';
+ if(!s.valid){return {slope:{title:'Model belum tersedia',main:s.reason,extra:'Isi pasangan numerik yang lengkap. Y boleh konstan; X harus memiliki variasi.'},intercept:{title:'Konstanta belum tersedia',main:s.reason,extra:'a adalah prediksi pada X = 0; nilainya baru tersedia ketika model dapat dihitung.'},prediction:{title:'Prediksi belum tersedia',main:s.reason,extra:'Setelah model terbentuk, isi X pada bagian Coba Prediksi.'},residual:{title:'Residual belum tersedia',main:s.reason,extra:'Residual dihitung sebagai Y aktual dikurangi ŷ dari model.'}};}
+ const slope=s.b===0?`Pada model ini, perubahan ${m.xName} tidak mengubah prediksi ${m.yName}. Garis regresinya mendatar.`:`Setiap tambahan 1 ${unitX()} pada ${m.xName}, model memperkirakan ${m.yName} ${s.b>0?'naik':'turun'} sebesar ${fmt(Math.abs(s.b))} ${unitY()}.`;
+ const zeroObserved=s.xmin<=0&&s.xmax>=0,intercept=`Saat ${m.xName} = 0 ${m.xUnit}, model memberikan prediksi ${m.yName} sebesar ${fmt(s.a)} ${unitY()}.`;
+ const interceptExtra=zeroObserved?'X = 0 berada di dalam rentang pengamatan. Konstanta adalah nilai pada garis model, bukan jaminan hasil individu.':`X = 0 berada di luar rentang data (${fmt(s.xmin)}–${fmt(s.xmax)} ${m.xUnit}). Jadi a adalah perpotongan garis matematis; belum tentu bermakna sebagai keadaan nyata.`;
+ const predMain=p.valid?`Jika ${m.xName} = ${fmt(p.x)} ${m.xUnit}, perkiraan ${m.yName} dari model adalah ${fmt(p.y)} ${unitY()}.`:'Masukkan nilai X berupa angka pada bagian Coba Prediksi untuk memperoleh ŷ.';
+ const predExtra=p.valid?(p.inside?'Interpolasi: X berada di dalam rentang pengamatan. Prediksi tetap merupakan perkiraan, bukan nilai yang pasti.':'Ekstrapolasi: X berada di luar rentang pengamatan. Pola linear dapat berubah di luar data, sehingga prediksi ini perlu lebih berhati-hati.')+(p.physical?' Hasil model berada di luar batas yang masuk akal pada kasus ini; jangan dianggap sebagai hasil nyata.':'')+sample:'Penanda warna jingga menunjukkan prediksi pada garis jika posisinya masih terlihat pada grafik.';
+ const selectedPair=pairs.find(q=>q.index===selected);let residualMain='Pilih sebuah titik atau nomor baris untuk membandingkan nilai aktual dengan prediksi model.';
+ if(selectedPair){const yh=s.predict(selectedPair.x),e=selectedPair.y-yh;residualMain=`Data ${selectedPair.index+1}: ${m.yName} aktual ${fmt(selectedPair.y)} ${unitY()}, sedangkan prediksi ${fmt(yh)} ${unitY()}. Residual = Y − ŷ = ${fmt(e)} ${unitY()}. Titik ${e===0?'berada tepat pada garis':e>0?'berada di atas garis; nilai aktual lebih tinggi':'berada di bawah garis; nilai aktual lebih rendah'}.`;}
+ return {slope:{title:`b = ${fmt(s.b)} · ${s.b>0?'kecenderungan naik':s.b<0?'kecenderungan turun':'garis mendatar'}`,main:slope,extra:'b menyatakan perubahan nilai prediksi Y per satu satuan X pada model ini. Hasil ini merangkum data yang digunakan.'+sample},intercept:{title:`a = ${fmt(s.a)} · prediksi saat X = 0`,main:intercept,extra:interceptExtra},prediction:{title:p.valid?`ŷ = ${fmt(p.y)} · ${p.inside?'interpolasi':'ekstrapolasi'}`:'Coba nilai X pilihanmu',main:predMain,extra:predExtra},residual:{title:`SSE = ${fmt(s.sse)} ${m.yUnit?'('+m.yUnit+')²':''}`,main:residualMain,extra:'SSE adalah jumlah kuadrat residual semua pasangan. Metode kuadrat terkecil memilih garis yang meminimalkan SSE. SSE bukan persentase akurasi dan tidak langsung sebanding antar data dengan skala atau jumlah berbeda.'+sample}};
 }
-const sx=x=>L+(x-dom.x0)/(dom.x1-dom.x0)*PW,sy=y=>T+PH-(y-dom.y0)/(dom.y1-dom.y0)*PH;
-
-function drawGraph(c){
-  let s='<defs><clipPath id="cp"><rect x="'+L+'" y="'+T+'" width="'+PW+'" height="'+PH+'"/></clipPath></defs>';
-  const spanX=dom.x1-dom.x0,spanY=dom.y1-dom.y0,mnr=Math.max(spanX,spanY)>100?5:2,mj=mnr*5;
-  const grid=(lo,hi,pos,vert)=>{for(let v=Math.ceil(lo/mnr)*mnr;v<=hi;v+=mnr){const maj=Math.abs(v%mj)<1e-9,p=pos(v);
-    s+=vert?`<line x1="${p}" y1="${T}" x2="${p}" y2="${T+PH}" stroke="${maj?'#b9c6d6':'#e6ecf3'}" stroke-width="${maj?1:.7}"/>`:
-            `<line x1="${L}" y1="${p}" x2="${L+PW}" y2="${p}" stroke="${maj?'#b9c6d6':'#e6ecf3'}" stroke-width="${maj?1:.7}"/>`;
-    if(maj)s+=vert?`<text x="${p}" y="${T+PH+16}" font-size="12" text-anchor="middle" fill="#334155">${v}</text>`:
-            `<text x="${L-7}" y="${p+4}" font-size="12" text-anchor="end" fill="#334155">${v}</text>`}};
-  grid(dom.x0,dom.x1,sx,true);grid(dom.y0,dom.y1,sy,false);
-  s+=`<rect x="${L}" y="${T}" width="${PW}" height="${PH}" fill="none" stroke="#475569" stroke-width="1.6"/>`;
-  s+=`<text x="${L+PW/2}" y="${H-8}" font-size="13" font-weight="bold" text-anchor="middle" fill="#1e3a8a">X = Nilai Matematika</text>`;
-  s+=`<text transform="translate(14 ${T+PH/2}) rotate(-90)" font-size="13" font-weight="bold" text-anchor="middle" fill="#1e3a8a">Y = Nilai Fisika</text>`;
-  s+='<g clip-path="url(#cp)">';
-  if(c.st==='ok'){
-    pts.forEach(p=>{s+=`<line x1="${sx(p.x)}" y1="${sy(p.y)}" x2="${sx(p.x)}" y2="${sy(c.a+c.b*p.x)}" stroke="${'#f0627a'}" stroke-width="1.6" opacity=".85"/>`});
-    s+=`<line x1="${sx(dom.x0)}" y1="${sy(c.a+c.b*dom.x0)}" x2="${sx(dom.x1)}" y2="${sy(c.a+c.b*dom.x1)}" stroke="#1d6fd8" stroke-width="2.6"/>`;
-  }
-  pts.forEach((p,i)=>{const on=i===sel;
-    s+=`<circle cx="${sx(p.x)}" cy="${sy(p.y)}" r="${on?8:6}" fill="${on?'#facc15':'#1e3a8a'}" stroke="${on?'#1e3a8a':'#fff'}" stroke-width="${on?2.2:1.5}"/>`});
-  s+='</g>';svg.innerHTML=s;
+function updateContext(){
+ const custom=mode==='custom',m=meta();for(const [id,on]of[['casesTab',!custom],['customTab',custom]]){$(id).setAttribute('aria-selected',String(on));$(id).tabIndex=on?0:-1;}$('casesPanel').hidden=custom;$('customPanel').hidden=!custom;$('caseSelect').value=caseId;
+ $('sourceBadge').textContent=custom?'DATA SENDIRI':'DATA LATIHAN';$('sourceBadge').classList.toggle('custom',custom);
+ for(const f of ['xName','xUnit','yName','yUnit'])if(document.activeElement!==$(f))$(f).value=datasets.get('custom')[f];
+ for(const axis of ['x','y']){const n=m[axis+'Name'],u=m[axis+'Unit'];$(axis+'Summary').textContent=label(n,u);$(axis+'Summary').title=label(n,u);$(axis+'ColumnName').textContent=n;$(axis+'ColumnName').title=label(n,u);$(axis+'ColumnUnit').textContent=u;}
+ $('predictionLabel').textContent=label(m.xName,m.xUnit);$('predictionLabel').title=label(m.xName,m.xUnit);$('predictionX').setAttribute('aria-label',`Nilai ${m.xName} untuk prediksi (${m.xUnit||'tanpa satuan'})`);if(document.activeElement!==$('predictionX'))$('predictionX').value=data().predX;
+ wrap.setAttribute('aria-label',`Diagram pencar ${label(m.xName,m.xUnit)} dan ${label(m.yName,m.yUnit)}. Titik dapat digeser.`);
+ $('resetBtn').textContent=custom?'Kosongkan':'Pulihkan';$('resetBtn').title=custom?'Kosongkan data; nama variabel tetap disimpan.':'Pulihkan pasangan data awal pada kasus ini.';$('undoBtn').disabled=histories.get(key()).length===0;$('addRowBtn').disabled=data().rows.length>=LIMIT;$('addRowBtn').title=data().rows.length>=LIMIT?'Batas 200 baris tercapai.':'Tambahkan pasangan kosong untuk diisi.';
+ const t=defs.get(caseId);$('caseQuestion').textContent=t.question;$('caseContext').textContent=t.context;
 }
-function showTT(i,c){
-  if(i<0||!pts[i]){tt.style.display='none';return}
-  const p=pts[i];let h=`<b>Data ${i+1}</b><br>X: ${fmt(p.x,2).replace(',00','')}<br>Y: ${fmt(p.y,2).replace(',00','')}`;
-  if(c.st==='ok'){const yh=c.a+c.b*p.x,r=p.y-yh;
-    h+=`<br>Prediksi ŷ: ${fmt(yh)}<br>Residual: ${fmt(r,2,true)}<br><span style="color:#64748b">${Math.abs(r)<.005?'titik tepat di garis':r>0?'titik di atas garis':'titik di bawah garis'}</span>`}
-  tt.innerHTML=h;tt.style.display='block';
-  const k=svg.getBoundingClientRect().width/W,px=sx(p.x)*k,py=sy(p.y)*k,gwW=gw.clientWidth;
-  let l=px+14;if(l+tt.offsetWidth>gwW-4)l=px-14-tt.offsetWidth;l=Math.max(4,l);
-  let t=py-tt.offsetHeight-12;if(t<4)t=py+14;
-  const mxT=gw.clientHeight-tt.offsetHeight-4;t=Math.min(Math.max(4,t),mxT);
-  tt.style.left=l+'px';tt.style.top=t+'px';
+function updateResults(){
+ $('equation').textContent=stats.valid?`ŷ = ${fmt(stats.a)} ${stats.b<0?'−':'+'} ${fmt(Math.abs(stats.b))}x`:'ŷ = —';$('equation').title=stats.valid?'ŷ = '+String(stats.a)+' + ('+String(stats.b)+')x':stats.reason;
+ $('validCount').textContent=`${stats.n} pasangan lengkap · ${data().rows.length} baris`;
+ const notes=[];if(issues.invalid)notes.push(`${issues.invalid} tidak valid`);if(issues.incomplete)notes.push(`${issues.incomplete} belum lengkap`);$('entryFeedback').textContent=notes.length?notes.join(' · ')+'. Belum dihitung.':`${stats.n} pasangan ikut dianalisis.`;if(data().rows.length>=LIMIT)$('entryFeedback').textContent+=' Maks. 200 baris.';$('entryFeedback').classList.toggle('has-errors',issues.invalid>0);
+ $('emptyChart').hidden=pairs.length>0;$('meanBtn').disabled=pairs.length===0;
+ const p=prediction();$('predictionX').setAttribute('aria-invalid',String(!p.input.valid&&!p.input.empty));$('predictionY').textContent=p.valid?'ŷ = '+fmt(p.y):'ŷ = —';$('predictionY').title=p.valid?`${meta().yName}: ${String(p.y)} ${meta().yUnit}`:'Prediksi belum tersedia';
+ $('predictionType').textContent=p.valid?(p.physical?'Di luar batas':p.inside?'Interpolasi':'Ekstrapolasi'):'Belum tersedia';$('predictionType').className='prediction-type'+(!p.valid?' unavailable':!p.inside||p.physical?' outside':'');$('predictionType').setAttribute('aria-label',(p.valid?(p.physical?'Prediksi di luar batas wajar. ':p.inside?'Interpolasi. ':'Ekstrapolasi. '):'Prediksi belum tersedia. ')+'Buka penjelasan prediksi.');
+ const warnings=[];if(stats.valid&&!p.input.valid&&!p.input.empty)warnings.push('Isi X dengan angka valid (maksimum nilai mutlak 10¹²).');if(p.valid&&!p.inside)warnings.push('X di luar rentang data. Prediksi ini merupakan ekstrapolasi.');if(p.valid&&p.physical)warnings.push('Hasil berada di luar batas wajar kasus ini; model tidak boleh dianggap sebagai hasil nyata.');$('predictionWarning').hidden=!warnings.length;$('predictionWarning').textContent=warnings.join(' ');
+ const d=describe();$('interpretationText').textContent=d[meaning].main;document.querySelectorAll('[data-meaning]').forEach(btn=>{const on=btn.dataset.meaning===meaning;btn.setAttribute('aria-selected',String(on));btn.tabIndex=on?0:-1;});
+ $('compactMeaning').textContent=stats.valid?`b ${stats.b>0?'positif: prediksi Y cenderung naik.':stats.b<0?'negatif: prediksi Y cenderung turun.':'= 0: prediksi Y mendatar.'}`:'Isi data untuk membaca arti model.';
+ updateSelection();renderMeaning();renderCalc();
 }
-function buildDT(){
-  $('dt').innerHTML=pts.map((p,i)=>`<tr data-i="${i}"><td>${i+1}</td><td><input type="number" step="any" data-i="${i}" data-f="x" value="${p.x}" aria-label="X data ${i+1}"></td><td><input type="number" step="any" data-i="${i}" data-f="y" value="${p.y}" aria-label="Y data ${i+1}"></td></tr>`).join('');
-  markRows();
+function buildTable(){const body=$('dataBody');body.replaceChildren();data().rows.forEach((r,i)=>{const tr=document.createElement('tr'),td=document.createElement('td'),b=document.createElement('button');b.type='button';b.className='row-number';b.dataset.select=String(i);b.textContent=String(i+1);b.setAttribute('aria-label',`Pilih data ${i+1}`);td.append(b);tr.append(td);for(const k of ['x','y']){const td=document.createElement('td'),input=document.createElement('input');input.inputMode='decimal';input.autocomplete='off';input.maxLength=40;input.dataset.i=String(i);input.dataset.k=k;input.value=r[k];td.append(input);tr.append(td);}const deltd=document.createElement('td'),del=document.createElement('button');del.type='button';del.className='row-delete';del.dataset.delete=String(i);del.textContent='×';del.setAttribute('aria-label',`Hapus baris ${i+1}`);deltd.append(del);tr.append(deltd);body.append(tr);});}
+function syncTable(){const m=meta();[...$('dataBody').children].forEach((tr,i)=>{tr.classList.toggle('selected',selected===i);for(const input of tr.querySelectorAll('input')){const k=input.dataset.k,s=data().rows[i][k],v=parse(s);if(document.activeElement!==input&&input.value!==s)input.value=s;input.setAttribute('aria-invalid',String(!v.valid&&!v.empty));input.setAttribute('aria-label',`${k.toUpperCase()} data ${i+1}: ${m[k+'Name']}`);}});}
+function updateSelection(){const p=pairs.find(q=>q.index===selected),compact=matchMedia('(max-height:460px),(max-width:760px) and (max-height:700px)').matches;if(p&&stats.valid){const yh=stats.predict(p.x),e=p.y-yh,full=`Data ${p.index+1} · Y = ${fmt(p.y)} · ŷ = ${fmt(yh)} · residual = ${fmt(e)} ${meta().yUnit}`;$('selectionInfo').textContent=compact?`Data ${p.index+1} · residual = ${fmt(e)}`:full;$('selectionInfo').title=full;}else $('selectionInfo').textContent=selected>=0?`Data ${selected+1} dipilih. Lengkapi X dan Y.`:'Pilih titik untuk membaca residualnya.';}
+function revealRow(i){const row=$('dataBody').children[i],table=document.querySelector('.entry-table');if(!row)return;const r=row.getBoundingClientRect(),box=table.getBoundingClientRect(),head=table.querySelector('thead').getBoundingClientRect().height;if(r.top<box.top+head)table.scrollTop-=box.top+head-r.top;else if(r.bottom>box.bottom)table.scrollTop+=r.bottom-box.bottom;}
+function selectRow(i,fromGraph=false){selected=i;syncTable();updateSelection();renderMeaning();draw();if(fromGraph)revealRow(i);}
+function clearHandles(){handles.forEach(b=>b.remove());handles.clear();}
+function syncHandles(){const ids=new Set(pairs.map(p=>p.index));for(const[i,b]of handles)if(!ids.has(i)){b.remove();handles.delete(i);}for(const p of pairs)if(!handles.has(p.index)){const i=p.index,b=document.createElement('button');b.type='button';b.className='point';b.dataset.index=String(i);b.addEventListener('focus',()=>selectRow(i,true));b.addEventListener('click',e=>{if(e.detail===0)selectRow(i,true);});b.addEventListener('pointerdown',e=>startDrag(e,i));b.addEventListener('pointermove',moveDrag);b.addEventListener('pointerup',endDrag);b.addEventListener('pointercancel',endDrag);b.addEventListener('lostpointercapture',endDrag);b.addEventListener('keydown',e=>{const k=e.key==='ArrowLeft'||e.key==='ArrowRight'?'x':e.key==='ArrowUp'||e.key==='ArrowDown'?'y':null;if(!k)return;e.preventDefault();const p=pairs.find(q=>q.index===i);if(!p)return;recordUndo();const t=mode==='cases'?defs.get(caseId):null,span=k==='x'?view.xmax-view.xmin:view.ymax-view.ymin,step=t?.[k+'Step']||nice(span/80),sign=e.key==='ArrowLeft'||e.key==='ArrowDown'?-1:1;data().rows[i][k]=raw(clamp(p[k]+sign*step,-1e12,1e12));selected=i;refresh(true);save();});wrap.append(b);handles.set(i,b);}}
+function lines(ctx,text,width,max=3){let current='',all=[];for(const c of text){if(current&&ctx.measureText(current+c).width>width){all.push(current.trim());current=c;}else current+=c;}if(current)all.push(current.trim());if(all.length>max){all.length=max;let last=all[max-1];while(last&&ctx.measureText(last+'…').width>width)last=last.slice(0,-1);all[max-1]=last+'…';}return all.length?all:[''];}
+function draw(){
+ const ctx=canvas.getContext('2d'),{w,h}=size;if(w<130||h<65||!stats)return;ctx.clearRect(0,0,w,h);const m=meta(),ox=offset(view.xmin,view.xmax),oy=offset(view.ymin,view.ymax),offsets=[['X',ox],['Y',oy]].filter(v=>v[1]);ctx.font='10px Arial';
+ const xl=lines(ctx,label(m.xName,m.xUnit),w-80),yl=lines(ctx,label(m.yName,m.yUnit),Math.max(45,h-67-(xl.length-1)*11));pad={l:49+(yl.length-1)*10,r:16,t:offsets.length?26:17,b:38+(xl.length-1)*11};
+ const pw=w-pad.l-pad.r,ph=h-pad.t-pad.b;if(pw<=15||ph<=8)return;
+ ctx.fillStyle='#fcfdff';ctx.fillRect(pad.l,pad.t,pw,ph);ctx.font='8px Arial';ctx.textBaseline='top';ctx.textAlign='left';ctx.fillStyle='#869caa';offsets.forEach(([axis,value],i)=>ctx.fillText(`Skala ${axis} + ${String(value)} = nilai ${axis}`,pad.l,2+i*10,pw));
+ function grid(lo,hi,map,vertical){const minor=nice((hi-lo)/32),major=minor*5,start=Math.ceil(lo/minor)*minor,off=vertical?ox:oy;for(let i=0;i<100;i++){const v=start+i*minor;if(v>hi+minor*1e-6)break;const p=map(v),big=Math.abs(v/major-Math.round(v/major))<1e-7;ctx.strokeStyle=big?'#cbdce9':'#e7eff5';ctx.lineWidth=1;ctx.beginPath();if(vertical){ctx.moveTo(p,pad.t);ctx.lineTo(p,h-pad.b);}else{ctx.moveTo(pad.l,p);ctx.lineTo(w-pad.r,p);}ctx.stroke();if(big){ctx.font='9px Arial';ctx.fillStyle='#8097a8';ctx.textAlign=vertical?'center':'right';ctx.textBaseline=vertical?'top':'middle';ctx.fillText(fmt(Math.abs(v-off)<minor*1e-7?0:v-off),vertical?p:pad.l-6,vertical?h-pad.b+6:p,vertical?Math.max(20,pw/5):37);}}}
+ grid(view.xmin,view.xmax,px,true);grid(view.ymin,view.ymax,py,false);ctx.strokeStyle='#a6bdce';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,h-pad.b);ctx.lineTo(w-pad.r,h-pad.b);ctx.stroke();
+ ctx.font='10px Arial';ctx.fillStyle='#63839b';ctx.textBaseline='middle';ctx.textAlign='center';xl.forEach((t,i)=>ctx.fillText(t,pad.l+pw/2,h-pad.b+27+i*11));ctx.save();ctx.translate(11,pad.t+ph/2);ctx.rotate(-Math.PI/2);yl.forEach((t,i)=>ctx.fillText(t,0,i*10));ctx.restore();
+ ctx.save();ctx.beginPath();ctx.rect(pad.l,pad.t,pw,ph);ctx.clip();
+ if(stats.valid){if($('showResiduals').checked)for(const p of pairs){ctx.strokeStyle=p.index===selected?'#b66d36':'#ca698388';ctx.lineWidth=p.index===selected?2:1.3;ctx.beginPath();ctx.moveTo(px(p.x),py(p.y));ctx.lineTo(px(p.x),py(stats.predict(p.x)));ctx.stroke();}const y1=stats.predict(view.xmin),y2=stats.predict(view.xmax);if(Number.isFinite(y1)&&Number.isFinite(y2)){ctx.strokeStyle='#3166c1';ctx.lineWidth=2.3;ctx.beginPath();ctx.moveTo(px(view.xmin),py(y1));ctx.lineTo(px(view.xmax),py(y2));ctx.stroke();}}
+ const pred=prediction();if($('showPrediction').checked&&pred.valid&&pred.x>=view.xmin&&pred.x<=view.xmax&&pred.y>=view.ymin&&pred.y<=view.ymax){const x=px(pred.x),y=py(pred.y);ctx.strokeStyle='#c48c4e';ctx.lineWidth=1;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(x,h-pad.b);ctx.lineTo(x,y);ctx.lineTo(pad.l,y);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#d58b35';ctx.beginPath();ctx.moveTo(x,y-6);ctx.lineTo(x+6,y);ctx.lineTo(x,y+6);ctx.lineTo(x-6,y);ctx.closePath();ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.3;ctx.stroke();}
+ ctx.restore();
+ for(const p of pairs){const b=handles.get(p.index);if(!b)continue;b.style.left=px(p.x)+'px';b.style.top=py(p.y)+'px';b.classList.toggle('selected',p.index===selected);b.setAttribute('aria-pressed',String(p.index===selected));b.setAttribute('aria-label',`Data ${p.index+1}: X ${fmt(p.x)}, Y ${fmt(p.y)}. Gunakan tombol panah untuk menggeser.`);if($('showLabels').checked||p.index===selected){const x=clamp(px(p.x),pad.l+11,w-pad.r-11),y=clamp(py(p.y)-19,pad.t+7,h-pad.b-7);ctx.fillStyle=p.index===selected?'#b66d36':'#5a7f9c';ctx.beginPath();ctx.roundRect(x-12,y-8,24,16,5);ctx.fill();ctx.font='bold 9px Arial';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(p.index+1),x,y);}}
 }
-function syncDT(skip){document.querySelectorAll('#dt input').forEach(el=>{if(el===skip)return;const v=pts[+el.dataset.i][el.dataset.f];if(parseFloat(el.value)!==v)el.value=v})}
-function markRows(){document.querySelectorAll('#dt tr').forEach((tr,i)=>tr.classList.toggle('sel',i===sel))}
-
-function render(skip){
-  const c=calc();
-  drawGraph(c);syncDT(skip);markRows();
-  $('vn').textContent=pts.length;$('del').disabled=sel<0;
-  const msg=$('msg');msg.style.display='none';
-  let tb='',tf='',sm='';
-  if(c.st==='ok'){
-    $('eq').textContent='ŷ = '+fmt(c.a,3)+(c.b<0?' − ':' + ')+fmt(Math.abs(c.b),3)+'x';
-    $('va').textContent=fmt(c.a,3);$('vb').textContent=fmt(c.b,3);$('vsse').textContent=fmt(c.sse,2);
-    $('bdir').textContent=c.b>0?'Karena b positif, garis naik dari kiri ke kanan.':c.b<0?'Karena b negatif, garis turun dari kiri ke kanan.':'Karena b = 0, garis mendatar.';
-    let sr=0;
-    pts.forEach((p,i)=>{const yh=c.a+c.b*p.x,r=p.y-yh;sr+=r;
-      tb+=`<tr class="${i===sel?'sel':''}"><td>${i+1}</td><td>${fmt(p.x)}</td><td>${fmt(p.y)}</td><td>${fmt(p.x-c.mx)}</td><td>${fmt(p.y-c.my)}</td><td>${fmt((p.x-c.mx)*(p.y-c.my))}</td><td>${fmt((p.x-c.mx)**2)}</td><td>${fmt(yh)}</td><td>${fmt(r,2,true)}</td></tr>`});
-    tf=`<tr><td colspan="3">Jumlah</td><td>${fmt(0)}</td><td>${fmt(0)}</td><td>${fmt(c.sxy,3)}</td><td>${fmt(c.sxx,3)}</td><td></td><td>${fmt(sr,2,true)}</td></tr>`;
-    sm=`<p>x̄ = ${fmt(c.mx,3)}</p><p>ȳ = ${fmt(c.my,3)}</p><p>Σ[(x − x̄)(y − ȳ)] = ${fmt(c.sxy,3)}</p><p>Σ[(x − x̄)²] = ${fmt(c.sxx,3)}</p><p>b = ${fmt(c.sxy,3)} / ${fmt(c.sxx,3)} = ${fmt(c.b,3)}</p><p>a = ${fmt(c.my,3)} − (${fmt(c.b,3)})(${fmt(c.mx,3)}) = ${fmt(c.a,3)}</p><p><b>ŷ = a + bx = ${fmt(c.a,3)}${c.b<0?' − ':' + '}${fmt(Math.abs(c.b),3)}x</b></p>`;
-  }else{
-    ['eq','va','vb','vsse'].forEach(k=>$(k).textContent='—');$('bdir').textContent='';
-    msg.style.display='block';
-    msg.textContent=c.st==='few'?'Tambahkan minimal dua pasangan data.':'Garis regresi tidak dapat dihitung karena nilai X tidak memiliki variasi.';
-    tb=pts.map((p,i)=>`<tr><td>${i+1}</td><td>${fmt(p.x)}</td><td>${fmt(p.y)}</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>`).join('');
-    if(c.st==='flat')sm=`<p>x̄ = ${fmt(c.mx,3)}</p><p>ȳ = ${fmt(c.my,3)}</p><p>Σ[(x − x̄)²] = 0</p><p>b dan a: —</p>`;
-  }
-  $('ct').innerHTML=tb;$('cf').innerHTML=tf;$('sum').innerHTML=sm;
-  predict(c);
-  showTT(sel>=0?sel:-1,c);
-}
-function predict(c){
-  const pv=$('pv'),pm=$('pmsg'),x=parseFloat($('px').value);
-  pm.style.display='none';pm.classList.remove('ok');
-  if(c.st!=='ok'){pv.textContent='Prediksi Y = —';return}
-  if(isNaN(x)){pv.textContent='Prediksi Y = —';return}
-  pv.textContent='Prediksi Y = '+fmt(c.a+c.b*x,2);
-  const xs=pts.map(p=>p.x),inside=x>=Math.min(...xs)&&x<=Math.max(...xs);
-  pm.style.display='block';
-  if(inside){pm.classList.add('ok');pm.innerHTML='<b>Interpolasi</b> — X berada di dalam rentang data.'}
-  else pm.innerHTML='<b>Ekstrapolasi</b> — Nilai X berada di luar rentang data yang diamati. Gunakan prediksi dengan lebih hati-hati.';
-}
-
-/* interaksi grafik */
-function toSvg(e){const r=svg.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
-function nearest(m){let bi=-1,bd=1e9;pts.forEach((p,i)=>{const d=Math.hypot(sx(p.x)-m.x,sy(p.y)-m.y);if(d<bd){bd=d;bi=i}});return bd<=18?bi:-1}
-svg.addEventListener('pointerdown',e=>{
-  const i=nearest(toSvg(e));
-  if(i>=0){drag=i;sel=i;svg.setPointerCapture(e.pointerId);e.preventDefault()}else sel=-1;
-  render();
-});
-svg.addEventListener('pointermove',e=>{
-  const m=toSvg(e);
-  if(drag>=0){
-    const p=pts[drag];
-    p.x=Math.round(Math.min(dom.x1,Math.max(dom.x0,dom.x0+(m.x-L)/PW*(dom.x1-dom.x0)))*10)/10;
-    p.y=Math.round(Math.min(dom.y1,Math.max(dom.y0,dom.y0+(T+PH-m.y)/PH*(dom.y1-dom.y0)))*10)/10;
-    render();
-  }else if(e.pointerType==='mouse'){
-    const i=nearest(m),c=calc();showTT(i>=0?i:sel,c);
-    svg.style.cursor=i>=0?'grab':'default';
-  }
-});
-const endDrag=()=>{if(drag>=0){drag=-1;dom=computeDom();render()}};
-svg.addEventListener('pointerup',endDrag);svg.addEventListener('pointercancel',endDrag);
-svg.addEventListener('pointerleave',e=>{if(drag<0)showTT(sel,calc())});
-
-/* tabel data */
-$('dt').addEventListener('input',e=>{
-  const el=e.target;if(el.tagName!=='INPUT')return;
-  const v=parseFloat(String(el.value).replace(',','.'));if(isNaN(v))return;
-  const i=+el.dataset.i;pts[i][el.dataset.f]=v;sel=i;dom=computeDom();render(el);
-});
-$('dt').addEventListener('click',e=>{const tr=e.target.closest('tr');if(!tr)return;sel=+tr.dataset.i;render()});
-
-/* tombol */
-$('add').onclick=()=>{
-  const c=calc();let x,y;
-  if(c.st==='ok'){x=Math.min(dom.x1,Math.round(c.mx)+5);y=Math.round(c.a+c.b*x)}
-  else if(pts.length){x=Math.min(dom.x1,Math.round(pts[0].x)+5);y=pts[0].y}
-  else{x=55;y=75}
-  pts.push({x,y});sel=pts.length-1;dom=computeDom();buildDT();render();
-};
-$('del').onclick=()=>{if(sel<0)return;pts.splice(sel,1);sel=-1;dom=computeDom();buildDT();render()};
-$('reset').onclick=()=>{pts=INIT.map(([x,y])=>({x,y}));sel=-1;dom=computeDom();buildDT();render()};
-$('px').addEventListener('input',()=>predict(calc()));
-window.addEventListener('resize',()=>showTT(sel,calc()));
-
-dom=computeDom();buildDT();render();
-</script>
-</body>
-</html>
+function resize(){const r=wrap.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);size={w:r.width,h:r.height};canvas.width=Math.max(1,Math.round(r.width*d));canvas.height=Math.max(1,Math.round(r.height*d));canvas.getContext('2d').setTransform(d,0,0,d,0,0);if(stats)updateSelection();draw();}
+function refresh(rescale=false){if(raf){cancelAnimationFrame(raf);raf=0;}collect();stats=calculate();if(rescale&&!drag)setView();updateContext();syncTable();syncHandles();updateResults();draw();}
+function queue(rescale=true){if(raf)cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{raf=0;refresh(rescale);});}
+function startDrag(e,i){if(!e.isPrimary||e.button!==0||drag)return;e.preventDefault();finishEdit();const box=wrap.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top;let nearest=null,dist=Infinity;for(const p of pairs){const d=Math.hypot(px(p.x)-x,py(p.y)-y);if(d<dist){dist=d;nearest=p;}}if(!nearest)return;selected=nearest.index;const b=handles.get(selected);b.focus({preventScroll:true});drag={index:selected,pointer:e.pointerId,b,x:e.clientX,y:e.clientY,dx:px(nearest.x)-x,dy:py(nearest.y)-y,moved:false};b.setPointerCapture(e.pointerId);b.classList.add('dragging');syncTable();updateSelection();draw();}
+function moveDrag(e){if(!drag||e.pointerId!==drag.pointer)return;if(!drag.moved&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<2)return;e.preventDefault();if(!drag.moved)recordUndo();drag.moved=true;const box=wrap.getBoundingClientRect(),x=e.clientX-box.left+drag.dx,y=e.clientY-box.top+drag.dy;const xv=view.xmin+(x-pad.l)/(size.w-pad.l-pad.r)*(view.xmax-view.xmin),yv=view.ymin+(size.h-pad.b-y)/(size.h-pad.t-pad.b)*(view.ymax-view.ymin);for(const[k,v]of[['x',xv],['y',yv]]){const t=mode==='cases'?defs.get(caseId):null,span=k==='x'?view.xmax-view.xmin:view.ymax-view.ymin,step=t?.[k+'Step']||10**(Math.floor(Math.log10(span))-3),rounded=step>0&&Number.isFinite(v/step)?Number((Math.round(v/step)*step).toPrecision(12)):v,lo=k==='x'?view.xmin:view.ymin,hi=k==='x'?view.xmax:view.ymax;data().rows[drag.index][k]=raw(clamp(rounded,Math.max(-1e12,lo),Math.min(1e12,hi)));}queue(false);save();}
+function endDrag(e){if(!drag||(e&&e.pointerId!==drag.pointer))return;const old=drag;drag=null;old.b.classList.remove('dragging');if(old.b.hasPointerCapture(old.pointer))old.b.releasePointerCapture(old.pointer);refresh(true);if(old.moved){save();announce(`Data ${old.index+1} diperbarui.`);}}
+function switchWorkspace(next,id=caseId){endDrag();finishEdit();mode=next;caseId=id;selected=-1;clearHandles();buildTable();refresh(true);save();announce(mode==='custom'?'Tentukan variabel dan lengkapi data pengamatanmu.':'Data latihan siap diubah dan ditambah.');}
+function renderMeaning(){if(!$('meaningDialog').open)return;const order=['slope','intercept','prediction','residual'],i=order.indexOf(meaning),d=describe()[meaning];$('meaningKicker').textContent=['01 · KEMIRINGAN','02 · KONSTANTA','03 · PREDIKSI','04 · RESIDUAL & SSE'][i];$('meaningPageTitle').textContent=d.title;$('meaningMain').textContent=d.main;$('meaningExtra').textContent=d.extra;$('meaningPageCount').textContent=`${i+1} / 4`;$('meaningPrev').disabled=i===0;$('meaningNext').disabled=i===3;}
+function renderCalc(){if(!$('calcDialog').open)return;const rows=stats.valid?[['Pasangan lengkap',stats.n],['Rata-rata X · x̄',stats.mx],['Rata-rata Y · ȳ',stats.my],['Σ(x − x̄)²',stats.sxx],['Σ[(x − x̄)(y − ȳ)]',stats.sxy],['Kemiringan · b',stats.b],['Konstanta · a',stats.a],['SSE',stats.sse]]:[['Pasangan lengkap',stats.n],['Rata-rata X · x̄',stats.mx],['Rata-rata Y · ȳ',stats.my]];$('calculationValues').replaceChildren();for(const[n,v]of rows){const div=document.createElement('div'),span=document.createElement('span'),b=document.createElement('b');span.textContent=n;b.textContent=fmt(v,6);div.append(span,b);$('calculationValues').append(div);}if(!stats.valid){const p=document.createElement('p');p.className='formula-note';p.textContent=stats.reason;$('calculationValues').append(p);}$('formulaPanel').hidden=calcTab!=='formula';$('calcTablePanel').hidden=calcTab!=='table';$('formulaTab').setAttribute('aria-pressed',String(calcTab==='formula'));$('tableTab').setAttribute('aria-pressed',String(calcTab==='table'));if(calcTab==='table')$('calcBody').innerHTML=pairs.map(p=>{const yh=stats.valid?stats.predict(p.x):NaN,e=p.y-yh,dx=p.x-stats.mx,dy=p.y-stats.my;return `<tr${p.index===selected?' class="selected"':''}><td>${p.index+1}</td><td>${fmt(p.x,6)}</td><td>${fmt(p.y,6)}</td><td>${fmt(dx,6)}</td><td>${fmt(dy,6)}</td><td>${fmt(dx*dy,6)}</td><td>${fmt(dx*dx,6)}</td><td>${fmt(yh,6)}</td><td>${fmt(e,6)}</td><td>${fmt(e*e,6)}</td></tr>`;}).join('');}
+function setMeaning(next){meaning=next;updateResults();}
+$('casesTab').addEventListener('click',()=>switchWorkspace('cases'));$('customTab').addEventListener('click',()=>switchWorkspace('custom'));
+for(const id of ['casesTab','customTab'])$(id).addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const next=e.key==='Home'?'cases':e.key==='End'?'custom':mode==='cases'?'custom':'cases';switchWorkspace(next);$(next==='cases'?'casesTab':'customTab').focus();});
+$('caseSelect').addEventListener('change',e=>{if(defs.has(e.target.value))switchWorkspace('cases',e.target.value);});
+$('dataBody').addEventListener('focusin',e=>{if(e.target.matches('input[data-i]')){session={input:e.target,recorded:false};selectRow(Number(e.target.dataset.i));}});
+$('dataBody').addEventListener('input',e=>{const input=e.target;if(!input.matches('input[data-i]'))return;const i=Number(input.dataset.i),k=input.dataset.k;if(data().rows[i][k]===input.value)return;recordEdit(input);data().rows[i][k]=input.value.slice(0,40);selected=i;queue(true);save();});
+$('dataBody').addEventListener('focusout',e=>{if(e.target.matches('input')){finishEdit();refresh(true);}});
+$('dataBody').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('input'))e.target.blur();});
+$('dataBody').addEventListener('click',e=>{const del=e.target.closest('[data-delete]'),sel=e.target.closest('[data-select]');if(del){endDrag();finishEdit();recordUndo();data().rows.splice(Number(del.dataset.delete),1);selected=-1;clearHandles();buildTable();refresh(true);save();announce('Baris dihapus. Tombol ↶ dapat membatalkannya.');}else if(sel)selectRow(Number(sel.dataset.select));});
+$('addRowBtn').addEventListener('click',()=>{if(data().rows.length>=LIMIT)return;endDrag();finishEdit();recordUndo();data().rows.push({x:'',y:''});selected=data().rows.length-1;buildTable();refresh(true);save();announce(`Baris ${selected+1} ditambahkan.`);$('dataBody').querySelector(`input[data-i="${selected}"][data-k="x"]`).focus();});
+$('undoBtn').addEventListener('click',()=>{endDrag();finishEdit();const old=histories.get(key()).pop();if(!old)return;datasets.set(key(),old.dataset);selected=old.selected;clearHandles();buildTable();refresh(true);save();announce('Perubahan terakhir dibatalkan.');});
+$('resetBtn').addEventListener('click',()=>{endDrag();finishEdit();recordUndo();if(mode==='cases')datasets.set(caseId,initial(defs.get(caseId)));else{data().rows=blankRows();data().predX='';}selected=-1;clearHandles();buildTable();refresh(true);save();announce(mode==='custom'?'Tabel dikosongkan; nama variabel tetap disimpan.':'Data latihan dipulihkan.');});
+for(const f of ['xName','xUnit','yName','yUnit']){$(f).addEventListener('focus',e=>session={input:e.target,recorded:false});$(f).addEventListener('input',e=>{if(mode!=='custom')return;recordEdit(e.target);data()[f]=e.target.value.slice(0,f.endsWith('Name')?60:24);queue(false);save();});$(f).addEventListener('blur',finishEdit);}
+$('predictionX').addEventListener('focus',e=>session={input:e.target,recorded:false});$('predictionX').addEventListener('input',e=>{recordEdit(e.target);data().predX=e.target.value.slice(0,40);updateResults();draw();save();});$('predictionX').addEventListener('blur',finishEdit);$('predictionX').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur();});
+$('meanBtn').addEventListener('click',()=>{if(!pairs.length)return;finishEdit();recordUndo();data().predX=String(stats.mx);updateContext();updateResults();draw();save();});
+for(const id of ['showResiduals','showPrediction','showLabels'])$(id).addEventListener('change',draw);
+document.querySelectorAll('[data-meaning]').forEach(btn=>{btn.addEventListener('click',()=>setMeaning(btn.dataset.meaning));btn.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const names=['slope','intercept','prediction','residual'],i=names.indexOf(meaning),next=e.key==='Home'?0:e.key==='End'?3:(i+(e.key==='ArrowRight'?1:3))%4;setMeaning(names[next]);document.querySelector(`[data-meaning="${names[next]}"]`).focus();});});
+$('meaningBtn').addEventListener('click',()=>{$('meaningDialog').showModal();renderMeaning();});
+$('predictionType').addEventListener('click',()=>{meaning='prediction';$('meaningDialog').showModal();updateResults();});
+for(const[id,delta]of[['meaningPrev',-1],['meaningNext',1]])$(id).addEventListener('click',()=>{const order=['slope','intercept','prediction','residual'];setMeaning(order[clamp(order.indexOf(meaning)+delta,0,3)]);});
+$('variablesBtn').addEventListener('click',()=>{$('variablesDialog').showModal();$('xName').focus();});$('calcBtn').addEventListener('click',()=>{$('calcDialog').showModal();renderCalc();});$('contextBtn').addEventListener('click',()=>$('contextDialog').showModal());$('helpBtn').addEventListener('click',()=>$('helpDialog').showModal());
+for(const[id,tab]of[['formulaTab','formula'],['tableTab','table']])$(id).addEventListener('click',()=>{calcTab=tab;renderCalc();});
+document.querySelectorAll('[data-close]').forEach(btn=>btn.addEventListener('click',()=>{$(btn.dataset.close).close();finishEdit();refresh(false);}));
+document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('click',e=>{if(e.target!==dialog)return;const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}));
+window.addEventListener('pagehide',saveNow);
+document.querySelectorAll('.brand-logo,.interactive-logo').forEach(img=>{const update=()=>{const missing=img.complete&&img.naturalWidth===0;img.hidden=missing;img.parentElement.classList.toggle('logo-empty',missing);};img.addEventListener('load',update);img.addEventListener('error',update);if(img.complete)update();});
+restore();buildTable();collect();stats=calculate();setView();refresh(false);resize();saveNow();if('ResizeObserver'in window)new ResizeObserver(resize).observe(wrap);else window.addEventListener('resize',resize);
+})();
+</script></body></html>
